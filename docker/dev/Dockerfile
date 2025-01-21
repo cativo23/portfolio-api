@@ -26,6 +26,10 @@ COPY --chown=node:node yarn.lock ./
 
 # Install dependencies
 RUN yarn install
+RUN yarn global add @nestjs/cli
+
+# Add yarn global bin to the PATH
+ENV PATH /home/node/.yarn/bin:$PATH
 
 # Copy the project files
 COPY --chown=node:node . .

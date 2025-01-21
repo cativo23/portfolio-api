@@ -12,3 +12,26 @@ services:
     environment:
       - NODE_ENV=development
     user: 'node'
+    networks:
+      - portfolio
+  
+  mysql:
+    image: mysql:8.0
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: portfolio
+      MYSQL_USER: cativo23
+      MYSQL_PASSWORD: password
+    volumes:
+      - 'mysql-data:/var/lib/mysql'
+    networks:
+      - portfolio
+
+networks:
+  portfolio:
+    driver: bridge
+volumes:
+  mysql-data:
+    driver: local
