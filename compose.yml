@@ -1,0 +1,14 @@
+
+services:
+  api:
+    image: portfolio-api:dev-latest
+    build:
+      context: .
+      dockerfile: docker/dev/Dockerfile
+    ports:
+      - '3001:3001'
+    volumes:
+      - .:/home/node/app 
+    environment:
+      - NODE_ENV=development
+    user: 'node'
