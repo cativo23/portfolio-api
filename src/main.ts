@@ -13,7 +13,7 @@ async function bootstrap() {
     .addTag('cats')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('doc', app, documentFactory);
+  SwaggerModule.setup('docs', app, documentFactory);
 
   // Set up port  
   const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
