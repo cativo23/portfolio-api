@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe, Query, InternalServerErrorException } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiQuery, ApiTags, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
@@ -44,8 +44,8 @@ export class ProjectsController {
   @ApiBody({ type: CreateProjectDto })
   @ApiResponse({ status: 201, description: 'The project has been successfully created.' })
   @ApiResponse({ status: 400, description: 'Invalid input' })
-  create(@Body() createProjectDto: CreateProjectDto) {
-    return this.projectsService.create(createProjectDto);
+  async create(@Body() createProjectDto: CreateProjectDto) {
+    return await this.projectsService.create(createProjectDto);
   }
 
   @Patch(':id')
@@ -66,6 +66,10 @@ export class ProjectsController {
   @ApiResponse({ status: 200, description: 'The project has been successfully deleted.' })
   @ApiResponse({ status: 404, description: 'Project not found' })
   async remove(@Param('id') id: string) {
-    return this.projectsService.remove(+id);
+    const project = await this.projectsService.remove(+id);
+    if (!project) {
+      throw new InternalServerErrorException('Project could not be deleted');
+    }
+    return { message: 'Project successfully deleted' };
   }
 }

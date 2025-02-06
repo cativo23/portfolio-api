@@ -99,7 +99,7 @@ describe('ProjectsService', () => {
     it('should remove a project', async () => {
       jest.spyOn(repository, 'delete').mockResolvedValue({ affected: 1 } as any);
 
-      await expect(service.remove(1)).resolves.toBeUndefined();
+      await expect(service.remove(1)).resolves.toBeTruthy();
     });
 
     it('should throw NotFoundException if project not found', async () => {
