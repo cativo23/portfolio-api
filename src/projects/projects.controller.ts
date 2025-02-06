@@ -1,24 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Logger } from '@nestjs/common';
-import { ProjectsService } from './projects.service';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UsePipes, ValidationPipe } from '@nestjs/common';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { ProjectsService } from './projects.service';
 
 @Controller('projects')
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
-  @Post()
-  create(@Body() createProjectDto: CreateProjectDto) {
-    return this.projectsService.create(createProjectDto);
-  }
-
   @Get()
-  findAll(
-    @Query('page') page: string,
-    @Query('per_page') per_page: string,
-    @Query('search') search?: string,
-    @Query('isFeatured') isFeatured?: string,
-  ) {
+  findAll(@Query('page') page: string, @Query('per_page') per_page: string, @Query('search') search: string, @Query('isFeatured') isFeatured: string) {
     const pageNumber = parseInt(page, 10) || 1;
     const perPage = parseInt(per_page, 10) || 10;
 
@@ -35,7 +25,14 @@ export class ProjectsController {
     return this.projectsService.findOne(+id);
   }
 
+  @Post()
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  create(@Body() createProjectDto: CreateProjectDto) {
+    return this.projectsService.create(createProjectDto);
+  }
+
   @Patch(':id')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
   update(@Param('id') id: string, @Body() updateProjectDto: UpdateProjectDto) {
     return this.projectsService.update(+id, updateProjectDto);
   }
