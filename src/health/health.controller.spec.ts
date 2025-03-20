@@ -1,5 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { HealthCheckService, HttpHealthIndicator, DiskHealthIndicator, HealthCheckResult, HealthIndicatorResult } from '@nestjs/terminus';
+import {
+  HealthCheckService,
+  HttpHealthIndicator,
+  DiskHealthIndicator,
+  HealthCheckResult,
+  HealthIndicatorResult,
+} from '@nestjs/terminus';
 import { HealthController } from './health.controller';
 
 describe('HealthController', () => {
@@ -57,9 +63,21 @@ describe('HealthController', () => {
       },
     };
 
-    jest.spyOn(httpHealthIndicator, 'pingCheck').mockReturnValue(Promise.resolve({ 'nestjs-docs': { status: 'up' } } as HealthIndicatorResult));
-    jest.spyOn(diskHealthIndicator, 'checkStorage').mockReturnValue(Promise.resolve({ storage: { status: 'up' } } as HealthIndicatorResult));
-    jest.spyOn(healthCheckService, 'check').mockReturnValue(Promise.resolve(healthCheckResult));
+    jest
+      .spyOn(httpHealthIndicator, 'pingCheck')
+      .mockReturnValue(
+        Promise.resolve({
+          'nestjs-docs': { status: 'up' },
+        } as HealthIndicatorResult),
+      );
+    jest
+      .spyOn(diskHealthIndicator, 'checkStorage')
+      .mockReturnValue(
+        Promise.resolve({ storage: { status: 'up' } } as HealthIndicatorResult),
+      );
+    jest
+      .spyOn(healthCheckService, 'check')
+      .mockReturnValue(Promise.resolve(healthCheckResult));
 
     const result = await controller.check();
     expect(result).toEqual(healthCheckResult);

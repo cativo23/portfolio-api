@@ -34,8 +34,21 @@ describe('ProjectsController', () => {
 
   describe('create', () => {
     it('should create a new project', async () => {
-      const createProjectDto: CreateProjectDto = { title: 'Test Project', description: 'Test Description', shortDescription: 'Short Description', repoUrl: 'url' };
-      const result: Project = { id: 1, ...createProjectDto, liveUrl: null, isFeatured: false, createdAt: new Date(), updatedAt: new Date(), deletedAt: null };
+      const createProjectDto: CreateProjectDto = {
+        title: 'Test Project',
+        description: 'Test Description',
+        shortDescription: 'Short Description',
+        repoUrl: 'url',
+      };
+      const result: Project = {
+        id: 1,
+        ...createProjectDto,
+        liveUrl: null,
+        isFeatured: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        deletedAt: null,
+      };
 
       jest.spyOn(service, 'create').mockImplementation(async () => result);
 
@@ -47,7 +60,18 @@ describe('ProjectsController', () => {
     it('should return an array of projects', async () => {
       const result = {
         data: [
-          { id: 1, title: 'Test Project', description: 'Test Description', shortDescription: 'Short Description', repoUrl: 'url', liveUrl: null, isFeatured: false, createdAt: new Date(), updatedAt: new Date(), deletedAt: null },
+          {
+            id: 1,
+            title: 'Test Project',
+            description: 'Test Description',
+            shortDescription: 'Short Description',
+            repoUrl: 'url',
+            liveUrl: null,
+            isFeatured: false,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            deletedAt: null,
+          },
         ],
         total: 1,
       };
@@ -60,7 +84,18 @@ describe('ProjectsController', () => {
 
   describe('findOne', () => {
     it('should return a single project', async () => {
-      const result: Project = { id: 1, title: 'Test Project', description: 'Test Description', shortDescription: 'Short Description', repoUrl: 'url', liveUrl: null, isFeatured: false, createdAt: new Date(), updatedAt: new Date(), deletedAt: null };
+      const result: Project = {
+        id: 1,
+        title: 'Test Project',
+        description: 'Test Description',
+        shortDescription: 'Short Description',
+        repoUrl: 'url',
+        liveUrl: null,
+        isFeatured: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        deletedAt: null,
+      };
 
       jest.spyOn(service, 'findOne').mockImplementation(async () => result);
 
@@ -70,8 +105,23 @@ describe('ProjectsController', () => {
 
   describe('update', () => {
     it('should update a project', async () => {
-      const updateProjectDto: UpdateProjectDto = { title: 'Updated Title', description: 'Updated Description' };
-      const result: Project = { id: 1, title: 'New Title', description: 'New Description',  ...updateProjectDto, shortDescription: 'Short Description', repoUrl: 'url', liveUrl: null, isFeatured: false, createdAt: new Date(), updatedAt: new Date(), deletedAt: null };
+      const updateProjectDto: UpdateProjectDto = {
+        title: 'Updated Title',
+        description: 'Updated Description',
+      };
+      const result: Project = {
+        id: 1,
+        title: 'New Title',
+        description: 'New Description',
+        ...updateProjectDto,
+        shortDescription: 'Short Description',
+        repoUrl: 'url',
+        liveUrl: null,
+        isFeatured: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        deletedAt: null,
+      };
 
       jest.spyOn(service, 'update').mockImplementation(async () => result);
 

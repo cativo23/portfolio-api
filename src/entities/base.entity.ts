@@ -1,20 +1,20 @@
 import {
-    CreateDateColumn,
-    DeleteDateColumn,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
+  CreateDateColumn,
+  DeleteDateColumn,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 export class BaseEntity {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @CreateDateColumn({ type: 'timestamp' })
-    readonly createdAt!: Date;
+  @CreateDateColumn({ type: 'timestamp' })
+  readonly createdAt!: Date;
 
-    @UpdateDateColumn({ type: 'timestamp' })
-    readonly updatedAt!: Date;
+  @UpdateDateColumn({ type: 'timestamp' })
+  readonly updatedAt!: Date;
 
-    @DeleteDateColumn({ type: 'timestamp' })
-    deletedAt!: Date;
+  @DeleteDateColumn({ type: 'timestamp' })
+  deletedAt!: Date;
 }

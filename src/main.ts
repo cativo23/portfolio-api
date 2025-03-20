@@ -8,15 +8,14 @@ async function bootstrap() {
 
   // Set up Swagger
   const config = new DocumentBuilder()
-    .setTitle('Cats example')
-    .setDescription('The cats API description')
+    .setTitle('Portfolio API')
+    .setDescription('API for my personal portfolio')
     .setVersion('1.0')
-    .addTag('cats')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, documentFactory);
 
-  // Set up port  
+  // Set up port
   const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
   Logger.log(`Starting server on port ${port}`, 'Bootstrap');
   await app.listen(port);
