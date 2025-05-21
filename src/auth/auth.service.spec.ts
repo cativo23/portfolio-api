@@ -17,8 +17,11 @@ describe('AuthService', () => {
   const password = '123456';
   let hashedPassword: string;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     hashedPassword = await bcryptjs.hash(password, 10);
+  });
+
+  beforeEach(async () => {
 
     const mockUsersService: Partial<jest.Mocked<UsersService>> = {
       findOneByEmail: jest.fn(),
