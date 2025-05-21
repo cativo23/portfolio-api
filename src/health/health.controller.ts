@@ -1,6 +1,10 @@
-
 import { Controller, Get } from '@nestjs/common';
-import { HealthCheckService, HttpHealthIndicator, HealthCheck, DiskHealthIndicator } from '@nestjs/terminus';
+import {
+  HealthCheckService,
+  HttpHealthIndicator,
+  HealthCheck,
+  DiskHealthIndicator,
+} from '@nestjs/terminus';
 
 @Controller('health')
 export class HealthController {
@@ -15,7 +19,8 @@ export class HealthController {
   check() {
     return this.health.check([
       () => this.http.pingCheck('nestjs-docs', 'https://docs.nestjs.com'),
-      () => this.disk.checkStorage('storage', { path: '/', thresholdPercent: 0.5 }),
+      () =>
+        this.disk.checkStorage('storage', { path: '/', thresholdPercent: 0.5 }),
     ]);
   }
 }

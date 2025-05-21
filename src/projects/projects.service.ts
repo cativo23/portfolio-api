@@ -1,5 +1,10 @@
-import { Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
-import { DeleteDateColumn, Repository } from 'typeorm';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
+import { Repository } from 'typeorm';
 import { Project } from './entities/project.entity';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
@@ -9,18 +14,17 @@ interface FindAllOptions {
   page: number;
   per_page: number;
   search?: string;
-  isFeatured?: boolean|undefined;
+  isFeatured?: boolean | undefined;
 }
 
 @Injectable()
 export class ProjectsService {
-
   private readonly logger = new Logger(ProjectsService.name);
 
   constructor(
     @InjectRepository(Project)
     private projectsRepository: Repository<Project>,
-  ) { }
+  ) {}
 
   async create(createProjectDto: CreateProjectDto): Promise<Project> {
     try {
@@ -34,14 +38,19 @@ export class ProjectsService {
     }
   }
 
-  async findAll(options: FindAllOptions): Promise<{ data: Project[]; total: number }> {
+  async findAll(
+    options: FindAllOptions,
+  ): Promise<{ data: Project[]; total: number }> {
     const { page, per_page, search, isFeatured } = options;
     const query = this.projectsRepository.createQueryBuilder('projects');
     // Filtering by search
     if (search) {
-      query.andWhere('projects.title LIKE :search OR projects.description LIKE :search', {
-        search: `%${search}%`,
-      });
+      query.andWhere(
+        'projects.title LIKE :search OR projects.description LIKE :search',
+        {
+          search: `%${search}%`,
+        },
+      );
     }
 
     // Filtering by isFeatured
@@ -75,7 +84,10 @@ export class ProjectsService {
     return project;
   }
 
-  async update(id: number, updateProjectDto: UpdateProjectDto): Promise<Project> {
+  async update(
+    id: number,
+    updateProjectDto: UpdateProjectDto,
+  ): Promise<Project> {
     await this.projectsRepository.update(id, updateProjectDto);
     this.logger.log(`Updated project with ID ${id}`);
     return this.findOne(id);

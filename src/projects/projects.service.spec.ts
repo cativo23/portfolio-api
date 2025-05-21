@@ -32,7 +32,12 @@ describe('ProjectsService', () => {
 
   describe('create', () => {
     it('should create a new project', async () => {
-      const createProjectDto: CreateProjectDto = { title: 'Test Project', description: 'Test Description', shortDescription: 'Short Description',  repoUrl: 'url'};
+      const createProjectDto: CreateProjectDto = {
+        title: 'Test Project',
+        description: 'Test Description',
+        shortDescription: 'Short Description',
+        repoUrl: 'url',
+      };
       const project = { id: 1, ...createProjectDto };
 
       jest.spyOn(repository, 'create').mockReturnValue(project as any);
@@ -44,16 +49,26 @@ describe('ProjectsService', () => {
 
   describe('findAll', () => {
     it('should return an array of projects and total count', async () => {
-      const options = { page: 1, per_page: 10, search: '', isFeatured: undefined };
-      const projects = [{ id: 1, title: 'Test Project', description: 'Test Description' }];
+      const options = {
+        page: 1,
+        per_page: 10,
+        search: '',
+        isFeatured: undefined,
+      };
+      const projects = [
+        { id: 1, title: 'Test Project', description: 'Test Description' },
+      ];
       const total = 1;
 
-      jest.spyOn(repository, 'createQueryBuilder').mockImplementation(() => ({
-        andWhere: jest.fn().mockReturnThis(),
-        skip: jest.fn().mockReturnThis(),
-        take: jest.fn().mockReturnThis(),
-        getManyAndCount: jest.fn().mockResolvedValue([projects, total]),
-      }) as any);
+      jest.spyOn(repository, 'createQueryBuilder').mockImplementation(
+        () =>
+          ({
+            andWhere: jest.fn().mockReturnThis(),
+            skip: jest.fn().mockReturnThis(),
+            take: jest.fn().mockReturnThis(),
+            getManyAndCount: jest.fn().mockResolvedValue([projects, total]),
+          }) as any,
+      );
 
       expect(await service.findAll(options)).toEqual({ data: projects, total });
     });
@@ -61,7 +76,11 @@ describe('ProjectsService', () => {
 
   describe('findOne', () => {
     it('should return a project', async () => {
-      const project = { id: 1, title: 'Test Project', description: 'Test Description' };
+      const project = {
+        id: 1,
+        title: 'Test Project',
+        description: 'Test Description',
+      };
 
       jest.spyOn(repository, 'findOne').mockResolvedValue(project as any);
 
@@ -77,33 +96,49 @@ describe('ProjectsService', () => {
 
   describe('update', () => {
     it('should update a project', async () => {
-      const updateProjectDto: UpdateProjectDto = { title: 'Updated Project', description: 'Updated Description' };
+      const updateProjectDto: UpdateProjectDto = {
+        title: 'Updated Project',
+        description: 'Updated Description',
+      };
       const project = { id: 1, ...updateProjectDto };
 
-      jest.spyOn(repository, 'update').mockResolvedValue({ affected: 1 } as any);
+      jest
+        .spyOn(repository, 'update')
+        .mockResolvedValue({ affected: 1 } as any);
       jest.spyOn(service, 'findOne').mockResolvedValue(project as any);
 
       expect(await service.update(1, updateProjectDto)).toEqual(project);
     });
 
     it('should throw NotFoundException if project not found', async () => {
-      const updateProjectDto: UpdateProjectDto = { title: 'Updated Title', description: 'Updated Description' };
+      const updateProjectDto: UpdateProjectDto = {
+        title: 'Updated Title',
+        description: 'Updated Description',
+      };
       jest.spyOn(repository, 'findOne').mockResolvedValue(undefined);
-      jest.spyOn(repository, 'update').mockResolvedValue({ affected: 0 } as any);
+      jest
+        .spyOn(repository, 'update')
+        .mockResolvedValue({ affected: 0 } as any);
 
-      await expect(service.update(1, updateProjectDto)).rejects.toThrow(NotFoundException);
+      await expect(service.update(1, updateProjectDto)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
   describe('remove', () => {
     it('should remove a project', async () => {
-      jest.spyOn(repository, 'delete').mockResolvedValue({ affected: 1 } as any);
+      jest
+        .spyOn(repository, 'delete')
+        .mockResolvedValue({ affected: 1 } as any);
 
       await expect(service.remove(1)).resolves.toBeTruthy();
     });
 
     it('should throw NotFoundException if project not found', async () => {
-      jest.spyOn(repository, 'delete').mockResolvedValue({ affected: 0 } as any);
+      jest
+        .spyOn(repository, 'delete')
+        .mockResolvedValue({ affected: 0 } as any);
 
       await expect(service.remove(1)).rejects.toThrow(NotFoundException);
     });
