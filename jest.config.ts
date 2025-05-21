@@ -20,7 +20,10 @@ const config: Config = {
     coveragePathIgnorePatterns: [
         "/node_modules/",
         "dist/",
-        'test/'
+        'test/',
+        '.module.ts$',
+        '.eslintrc.js',
+        'jest.config.ts',
     ],
     testEnvironment: 'node',
     moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' }),
