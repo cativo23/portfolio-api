@@ -18,7 +18,7 @@ export class AuthService {
     private configService: ConfigService,
   ) { }
 
-  async register(payload: RegisterDto) {
+  async register(payload: RegisterDto): Promise<User> {
     const existingUser = await this.usersService.findOneByEmail(payload.email);
 
     if (existingUser) {
@@ -33,7 +33,7 @@ export class AuthService {
     });
   }
 
-  async login(email, password) {
+  async login(email, password): Promise<{ access_token: string, expires_at: Date, user: { id: number, username: string, email: string } }> {
     const user = await this.validateUser(email, password);
 
     const payload = { sub: user.id, email: user.email };
