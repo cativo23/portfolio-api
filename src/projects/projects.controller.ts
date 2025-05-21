@@ -58,7 +58,6 @@ export class ProjectsController {
     const perPage = parseInt(per_page, 10) || 10;
     const isFeatured =
       is_featured === undefined ? undefined : is_featured === 'true';
-
     return this.projectsService.findAll({
       page: pageNumber,
       per_page: perPage,
