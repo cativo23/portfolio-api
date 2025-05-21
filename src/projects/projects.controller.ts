@@ -19,13 +19,17 @@ import {
   ApiTags,
   ApiResponse,
   ApiBody,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { ProjectsService } from './projects.service';
+import { AuthGuard } from '@app/auth/auth.guard';
 
 @ApiTags('Projects')
 @Controller('projects')
+@UseGuards(AuthGuard)
+@ApiBearerAuth()
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
