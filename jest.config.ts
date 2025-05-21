@@ -17,6 +17,11 @@ const config: Config = {
         '**/*.(t|j)s'
     ],
     coverageDirectory: '../coverage',
+    coveragePathIgnorePatterns: [
+        "/node_modules/",
+        "dist/",
+        'test/'
+    ],
     testEnvironment: 'node',
     moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' }),
 };
