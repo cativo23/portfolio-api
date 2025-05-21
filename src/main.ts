@@ -11,7 +11,9 @@ async function bootstrap() {
     .setTitle('Portfolio API')
     .setDescription('API for my personal portfolio')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
+
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, documentFactory);
 
