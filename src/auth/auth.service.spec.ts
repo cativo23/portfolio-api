@@ -29,16 +29,21 @@ describe('AuthService', () => {
       signAsync: jest.fn(),
     };
 
-    const mockConfigService: Partial<jest.Mocked<ConfigService>> = {
-      get: jest.fn(),
-    };
-
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
         { provide: UsersService, useValue: mockUsersService },
         { provide: JwtService, useValue: mockJwtService },
-        { provide: ConfigService, useValue: mockConfigService },
+        {
+          provide: ConfigService, useValue: {
+            get: jest.fn().mockImplementation((key: string) => {
+              const config = {
+                JWT_SECRET: 'test-secret',
+              };
+              return config[key];
+            }),
+          }
+        },
       ],
     }).compile();
 
