@@ -15,10 +15,10 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { CreateUserDto } from '@app/users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from './auth.guard';
-import { User } from 'src/users/entities/user.entity';
+import { User } from '@app/users/entities/user.entity';
 
 @Controller('auth')
 @ApiTags('auth')
