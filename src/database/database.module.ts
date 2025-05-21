@@ -8,7 +8,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     ConfigModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService): Promise<TypeOrmModuleOptions> => {
+      useFactory: async (
+        configService: ConfigService,
+      ): Promise<TypeOrmModuleOptions> => {
         const config: TypeOrmModuleOptions = {
           type: 'mysql',
           host: configService.get<string>('DB_HOST'),
