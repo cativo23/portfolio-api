@@ -236,7 +236,7 @@ Configuration:
 
 ### API Documentation
 
-The project uses Swagger for API documentation, accessible at `/api` when the application is running.
+The project uses Swagger for API documentation, accessible at `/docs` when the application is running.
 
 ### Authentication
 
