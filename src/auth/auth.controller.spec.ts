@@ -66,7 +66,10 @@ describe('AuthController', () => {
 
   describe('login', () => {
     it('should return user data on successful login', async () => {
-      const dto: LoginDto = { email: 'john@example.com', password: 'secure123' };
+      const dto: LoginDto = {
+        email: 'john@example.com',
+        password: 'secure123',
+      };
       mockAuthService.login.mockResolvedValue(mockUser);
 
       const result = await controller.login(dto);
@@ -77,7 +80,9 @@ describe('AuthController', () => {
 
     it('should throw if AuthService throws', async () => {
       const dto: LoginDto = { email: 'wrong@example.com', password: 'badpass' };
-      mockAuthService.login.mockRejectedValue(new BadRequestException('Invalid credentials'));
+      mockAuthService.login.mockRejectedValue(
+        new BadRequestException('Invalid credentials'),
+      );
 
       await expect(controller.login(dto)).rejects.toThrow(BadRequestException);
       expect(authService.login).toHaveBeenCalledWith(dto.email, dto.password);
@@ -109,9 +114,13 @@ describe('AuthController', () => {
         email: 'taken@example.com',
         password: 'password123',
       };
-      mockAuthService.register.mockRejectedValue(new BadRequestException('Email already exists'));
+      mockAuthService.register.mockRejectedValue(
+        new BadRequestException('Email already exists'),
+      );
 
-      await expect(controller.register(dto)).rejects.toThrow(BadRequestException);
+      await expect(controller.register(dto)).rejects.toThrow(
+        BadRequestException,
+      );
       expect(authService.register).toHaveBeenCalled();
     });
   });

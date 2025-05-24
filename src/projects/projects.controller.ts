@@ -31,7 +31,7 @@ import { AuthGuard } from '@app/auth/auth.guard';
 @UseGuards(AuthGuard)
 @ApiBearerAuth()
 export class ProjectsController {
-  constructor(private readonly projectsService: ProjectsService) { }
+  constructor(private readonly projectsService: ProjectsService) {}
 
   @Get()
   @ApiOperation({ summary: 'Get all projects' })

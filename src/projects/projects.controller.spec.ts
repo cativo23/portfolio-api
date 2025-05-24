@@ -6,7 +6,10 @@ import { Project } from './entities/project.entity';
 import { Repository } from 'typeorm';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
-import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 
@@ -51,7 +54,7 @@ describe('ProjectsController', () => {
         {
           provide: ConfigService,
           useValue: {
-            get: jest.fn((key: string) => ({ JWT_SECRET: 'test-secret' }[key])),
+            get: jest.fn((key: string) => ({ JWT_SECRET: 'test-secret' })[key]),
           },
         },
       ],
@@ -107,7 +110,12 @@ describe('ProjectsController', () => {
 
       const response = await controller.findAll('1', '10');
       expect(response).toBe(result);
-      expect(service.findAll).toHaveBeenCalledWith({ page: 1, per_page: 10, search: undefined, isFeatured: undefined });
+      expect(service.findAll).toHaveBeenCalledWith({
+        page: 1,
+        per_page: 10,
+        search: undefined,
+        isFeatured: undefined,
+      });
     });
 
     it('should throw if service fails', async () => {
@@ -151,7 +159,9 @@ describe('ProjectsController', () => {
     it('should throw if update fails', async () => {
       mockService.update.mockRejectedValue(new Error('Update failed'));
 
-      await expect(controller.update('1', { title: 'fail' })).rejects.toThrow('Update failed');
+      await expect(controller.update('1', { title: 'fail' })).rejects.toThrow(
+        'Update failed',
+      );
     });
   });
 
@@ -166,7 +176,9 @@ describe('ProjectsController', () => {
     });
 
     it('should throw if deletion fails', async () => {
-      mockService.remove.mockRejectedValue(new InternalServerErrorException('Cannot delete'));
+      mockService.remove.mockRejectedValue(
+        new InternalServerErrorException('Cannot delete'),
+      );
 
       await expect(controller.remove('99')).rejects.toThrow('Cannot delete');
     });
