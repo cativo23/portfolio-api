@@ -22,6 +22,7 @@ import { CreateUserDto } from '@app/users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from './auth.guard';
 import { User } from '@app/users/entities/user.entity';
+import { User as UserDecorator } from './decorators/user.decorator';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -75,7 +76,10 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get User Profile' })
-  profile(@Request() req) {
-    return req.user;
+  profile(@Request() req: any, @UserDecorator() user: any) {
+    return {
+      user: user,
+      req_user: req.user,
+    };
   }
 }
