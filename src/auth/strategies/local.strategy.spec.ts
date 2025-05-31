@@ -38,12 +38,15 @@ describe('LocalStrategy', () => {
       authService.validateUser.mockResolvedValue(null);
 
       // Call the validate method and expect it to throw
-      await expect(strategy.validate('test@example.com', 'password')).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(
+        strategy.validate('test@example.com', 'password'),
+      ).rejects.toThrow(UnauthorizedException);
 
       // Verify that AuthService.validateUser was called with the correct parameters
-      expect(authService.validateUser).toHaveBeenCalledWith('test@example.com', 'password');
+      expect(authService.validateUser).toHaveBeenCalledWith(
+        'test@example.com',
+        'password',
+      );
     });
 
     it('should return the user when validation succeeds', async () => {
@@ -60,7 +63,10 @@ describe('LocalStrategy', () => {
       expect(result).toEqual(mockUser);
 
       // Verify that AuthService.validateUser was called with the correct parameters
-      expect(authService.validateUser).toHaveBeenCalledWith('test@example.com', 'password');
+      expect(authService.validateUser).toHaveBeenCalledWith(
+        'test@example.com',
+        'password',
+      );
     });
 
     it('should handle empty credentials', async () => {

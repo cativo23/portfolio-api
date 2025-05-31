@@ -127,7 +127,11 @@ describe('AuthController', () => {
   describe('profile', () => {
     it('should return both user from decorator and req.user', () => {
       const mockRequest = { user: mockUser };
-      const mockUserDecorator = { id: 2, username: 'decorator', email: 'decorator@example.com' };
+      const mockUserDecorator = {
+        id: 2,
+        username: 'decorator',
+        email: 'decorator@example.com',
+      };
 
       const result = controller.profile(mockRequest as any, mockUserDecorator);
 
@@ -151,7 +155,11 @@ describe('AuthController', () => {
     it('should handle missing req.user gracefully', () => {
       const mockRequest = {};
 
-      const mockUserDecorator = { id: 3, username: 'decorator2', email: 'decorator2@example.com' };
+      const mockUserDecorator = {
+        id: 3,
+        username: 'decorator2',
+        email: 'decorator2@example.com',
+      };
 
       const result = controller.profile(mockRequest as any, mockUserDecorator);
 
