@@ -16,9 +16,9 @@ describe('User Decorator Factory', () => {
     const mockExecutionContext: ExecutionContext = {
       switchToHttp: jest.fn().mockReturnValue({
         getRequest: jest.fn().mockReturnValue({
-          user: mockUser
-        })
-      })
+          user: mockUser,
+        }),
+      }),
     } as unknown as ExecutionContext;
 
     // Call the factory function with our mock context
