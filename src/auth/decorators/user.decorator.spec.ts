@@ -2,35 +2,36 @@ import { ExecutionContext } from '@nestjs/common';
 import { extractUser, User } from './user.decorator';
 
 describe('User Decorator', () => {
+  let mockExecutionContext: ExecutionContext;
+  let getRequestMock: jest.Mock;
+
+  beforeEach(() => {
+    getRequestMock = jest.fn();
+    mockExecutionContext = {
+      switchToHttp: jest.fn().mockReturnValue({
+        getRequest: getRequestMock,
+      }),
+    } as unknown as ExecutionContext;
+  });
+
   describe('extractUser', () => {
     it('should extract the entire user object when no property is specified', () => {
-      // Mock data
       const mockUser = {
         id: 1,
         username: 'testuser',
         email: 'test@example.com',
       };
 
-      // Mock execution context
-      const mockExecutionContext: ExecutionContext = {
-        switchToHttp: jest.fn().mockReturnValue({
-          getRequest: jest.fn().mockReturnValue({
-            user: mockUser,
-          }),
-        }),
-      } as unknown as ExecutionContext;
+      getRequestMock.mockReturnValue({ user: mockUser });
 
-      // Call the extractUser function with our mock context
       const result = extractUser(undefined, mockExecutionContext);
 
-      // Verify the result
       expect(result).toEqual(mockUser);
       expect(mockExecutionContext.switchToHttp).toHaveBeenCalled();
-      expect(mockExecutionContext.switchToHttp().getRequest).toHaveBeenCalled();
+      expect(getRequestMock).toHaveBeenCalled();
     });
 
-    it('should extract a specific property from the user object when property is specified', () => {
-      // Mock data
+    it('should extract a specific property from the user object', () => {
       const mockUser = {
         id: 1,
         username: 'testuser',
@@ -38,46 +39,42 @@ describe('User Decorator', () => {
       };
       const propertyToExtract = 'username';
 
-      // Mock execution context
-      const mockExecutionContext: ExecutionContext = {
-        switchToHttp: jest.fn().mockReturnValue({
-          getRequest: jest.fn().mockReturnValue({
-            user: mockUser,
-          }),
-        }),
-      } as unknown as ExecutionContext;
+      getRequestMock.mockReturnValue({ user: mockUser });
 
-      // Call the extractUser function with our mock context and property
       const result = extractUser(propertyToExtract, mockExecutionContext);
 
-      // Verify the result
       expect(result).toEqual(mockUser[propertyToExtract]);
       expect(mockExecutionContext.switchToHttp).toHaveBeenCalled();
-      expect(mockExecutionContext.switchToHttp().getRequest).toHaveBeenCalled();
+      expect(getRequestMock).toHaveBeenCalled();
     });
 
-    it('should return undefined when user is not present in the request', () => {
-      // Mock execution context with no user
-      const mockExecutionContext: ExecutionContext = {
-        switchToHttp: jest.fn().mockReturnValue({
-          getRequest: jest.fn().mockReturnValue({
-            user: undefined,
-          }),
-        }),
-      } as unknown as ExecutionContext;
+    it('should return undefined when user is not present', () => {
+      getRequestMock.mockReturnValue({ user: undefined });
 
-      // Call the extractUser function with our mock context
       const result = extractUser(undefined, mockExecutionContext);
 
-      // Verify the result
       expect(result).toBeUndefined();
       expect(mockExecutionContext.switchToHttp).toHaveBeenCalled();
-      expect(mockExecutionContext.switchToHttp().getRequest).toHaveBeenCalled();
+      expect(getRequestMock).toHaveBeenCalled();
+    });
+
+    it('should return undefined when requested property is not present', () => {
+      const mockUser = {
+        id: 1,
+        username: 'testuser',
+      };
+
+      getRequestMock.mockReturnValue({ user: mockUser });
+
+      const result = extractUser('nonExistentProp', mockExecutionContext);
+
+      expect(result).toBeUndefined();
+      expect(mockExecutionContext.switchToHttp).toHaveBeenCalled();
+      expect(getRequestMock).toHaveBeenCalled();
     });
   });
 
-  // Test the decorator itself
-  describe('User Decorator', () => {
+  describe('User Decorator Factory', () => {
     it('should be defined', () => {
       expect(User).toBeDefined();
     });
