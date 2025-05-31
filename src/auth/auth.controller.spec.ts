@@ -124,16 +124,41 @@ describe('AuthController', () => {
       expect(authService.register).toHaveBeenCalled();
     });
   });
-
   describe('profile', () => {
-    it('should return the user from request object', () => {
-      const mockRequest = {
-        user: mockUser,
-      };
+    it('should return both user from decorator and req.user', () => {
+      const mockRequest = { user: mockUser };
+      const mockUserDecorator = { id: 2, username: 'decorator', email: 'decorator@example.com' };
 
-      const result = controller.profile(mockRequest as any);
+      const result = controller.profile(mockRequest as any, mockUserDecorator);
 
-      expect(result).toEqual(mockUser);
+      expect(result).toEqual({
+        user: mockUserDecorator,
+        req_user: mockUser,
+      });
+    });
+
+    it('should handle missing user decorator gracefully', () => {
+      const mockRequest = { user: mockUser };
+
+      const result = controller.profile(mockRequest as any, undefined);
+
+      expect(result).toEqual({
+        user: undefined,
+        req_user: mockUser,
+      });
+    });
+
+    it('should handle missing req.user gracefully', () => {
+      const mockRequest = {};
+
+      const mockUserDecorator = { id: 3, username: 'decorator2', email: 'decorator2@example.com' };
+
+      const result = controller.profile(mockRequest as any, mockUserDecorator);
+
+      expect(result).toEqual({
+        user: mockUserDecorator,
+        req_user: undefined,
+      });
     });
   });
 });
