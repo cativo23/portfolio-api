@@ -3,11 +3,11 @@ import { ProjectsService } from './projects.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Project } from './entities/project.entity';
-import { CreateProjectDto } from './dto/create-project.dto';
-import { UpdateProjectDto } from './dto/update-project.dto';
+import { CreateProjectDto } from '@projects/dto';
+import { UpdateProjectDto } from '@projects/dto';
 import { NotFoundException, Logger } from '@nestjs/common';
-import { InternalServerException } from '../core/exceptions';
-import { SuccessResponseDto } from '../core/dto';
+import { InternalServerException } from '@core/exceptions/internal-server.exception';
+import { SuccessResponseDto } from '@core/dto';
 
 describe('ProjectsService', () => {
   let service: ProjectsService;

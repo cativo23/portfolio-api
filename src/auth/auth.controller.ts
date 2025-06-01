@@ -10,8 +10,8 @@ import {
   Get,
   BadRequestException,
 } from '@nestjs/common';
-import { ValidationPipe } from '../core/pipes';
-import { ErrorResponseDto } from '../core/dto';
+import { ValidationPipe } from '@core/pipes';
+import { ErrorResponseDto } from '@core/dto';
 import { AuthService } from './auth.service';
 import {
   ApiBearerAuth,
@@ -19,10 +19,10 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { CreateUserDto } from '@app/users/dto/create-user.dto';
+import { CreateUserDto } from '@users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from './auth.guard';
-import { User } from '@app/users/entities/user.entity';
+import { User } from '@users/entities/user.entity';
 import { User as UserDecorator } from './decorators/user.decorator';
 
 @Controller('auth')

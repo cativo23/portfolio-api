@@ -10,7 +10,8 @@ import {
   DeleteResponseDto,
 } from './dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { InternalServerException, NotFoundException } from '../core/exceptions';
+import { InternalServerException } from '@core/exceptions/internal-server.exception';
+import { NotFoundException } from '@core/exceptions/not-found.exception';
 
 interface FindAllOptions {
   page: number;

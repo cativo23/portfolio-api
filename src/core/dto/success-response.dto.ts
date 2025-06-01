@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { BaseResponseDto } from './base-response.dto';
+import { BaseResponseDto } from '@core/dto/base-response.dto';
 
 /**
  * DTO for pagination metadata

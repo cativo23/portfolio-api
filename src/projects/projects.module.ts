@@ -3,7 +3,7 @@ import { ProjectsController } from './projects.controller';
 import { ProjectsService } from './projects.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Project } from './entities/project.entity';
-import { AuthModule } from '@app/auth/auth.module';
+import { AuthModule } from '@auth/auth.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Project]), AuthModule],

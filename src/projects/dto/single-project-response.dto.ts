@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ProjectResponseDto } from './project-response.dto';
-import { SuccessResponseDto } from '../../core/dto';
+import { SuccessResponseDto } from '@core/dto';
 import { Project } from '../entities/project.entity';
 
 /**
