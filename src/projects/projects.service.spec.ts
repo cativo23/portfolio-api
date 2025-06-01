@@ -307,8 +307,8 @@ describe('ProjectsService', () => {
 
       jest
         .spyOn(repository, 'findOne')
-        .mockResolvedValueOnce(existingProject as any) // First call for checking if project exists
-        .mockResolvedValueOnce(updatedProject as any); // Second call for getting updated project
+        .mockResolvedValueOnce(existingProject as any)
+        .mockResolvedValueOnce(updatedProject as any);
       jest
         .spyOn(repository, 'update')
         .mockResolvedValue({ affected: 1 } as any);

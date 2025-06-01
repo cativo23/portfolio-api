@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { ErrorResponseDto, ErrorCode } from '../dto';
-import { BaseException } from './base.exception';
+import { BaseException } from '@core/exceptions';
 
 /**
  * Global exception filter that transforms all exceptions into standardized error responses

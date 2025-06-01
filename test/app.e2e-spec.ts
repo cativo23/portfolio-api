@@ -16,7 +16,7 @@ describe('AppController (e2e)', () => {
   });
 
   afterAll(async () => {
-    await app.close(); // 👈 Esto es crucial
+    await app.close();
   });
 
   it('/ (GET)', () => {

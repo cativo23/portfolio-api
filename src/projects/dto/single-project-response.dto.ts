@@ -4,7 +4,7 @@ import { SuccessResponseDto } from '@core/dto';
 import { Project } from '../entities/project.entity';
 
 /**
- * DTO for single project response
+ * DTO for a single project response
  */
 export class SingleProjectResponseDto extends SuccessResponseDto<ProjectResponseDto> {
   @ApiProperty({
