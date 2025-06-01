@@ -7,10 +7,11 @@ import {
   HttpCode,
   HttpStatus,
   UsePipes,
-  ValidationPipe,
   Get,
   BadRequestException,
 } from '@nestjs/common';
+import { ValidationPipe } from '../core/pipes';
+import { ErrorResponseDto } from '../core/dto';
 import { AuthService } from './auth.service';
 import {
   ApiBearerAuth,
@@ -37,12 +38,17 @@ export class AuthController {
    */
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  @UsePipes(new ValidationPipe({ whitelist: true }))
+  @UsePipes(new ValidationPipe())
   @ApiOperation({ summary: 'User Login' })
   @ApiResponse({
-    status: 200,
+    status: HttpStatus.OK,
     description: 'The record found',
     type: CreateUserDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNPROCESSABLE_ENTITY,
+    description: 'Validation failed',
+    type: ErrorResponseDto,
   })
   async login(@Body() loginDto: LoginDto): Promise<any> {
     return this.authService.login(loginDto.email, loginDto.password);
@@ -50,17 +56,17 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('register')
-  @UsePipes(new ValidationPipe({ whitelist: true }))
+  @UsePipes(new ValidationPipe())
   @ApiOperation({ summary: 'User Registration' })
   @ApiResponse({
-    status: 200,
+    status: HttpStatus.OK,
     description: 'The record found',
     type: CreateUserDto,
   })
   @ApiResponse({
-    status: 400,
-    description: 'Bad Request',
-    type: BadRequestException,
+    status: HttpStatus.UNPROCESSABLE_ENTITY,
+    description: 'Validation failed',
+    type: ErrorResponseDto,
   })
   register(
     @Body() signUpDto: CreateUserDto,

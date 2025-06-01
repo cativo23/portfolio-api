@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { ErrorCode } from '@core/dto';
+import { ErrorCode } from '../dto';
 
 /**
  * Base exception class that all custom exceptions should extend

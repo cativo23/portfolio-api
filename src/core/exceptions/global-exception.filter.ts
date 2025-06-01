@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { ErrorResponseDto, ErrorCode } from '../dto';
-import { BaseException } from '@app/core';
+import { BaseException } from './base.exception';
 
 /**
  * Global exception filter that transforms all exceptions into standardized error responses
@@ -58,6 +58,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       let code: ErrorCode;
       switch (status) {
         case HttpStatus.BAD_REQUEST:
+        case HttpStatus.UNPROCESSABLE_ENTITY:
           code = ErrorCode.VALIDATION_ERROR;
           break;
         case HttpStatus.UNAUTHORIZED:
