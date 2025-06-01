@@ -1,10 +1,22 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { Logger } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
+import { ResponseTransformInterceptor, GlobalExceptionFilter } from './core';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Set up global pipes, interceptors, and filters
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
+  app.useGlobalInterceptors(new ResponseTransformInterceptor());
+  app.useGlobalFilters(new GlobalExceptionFilter());
 
   // Set up Swagger
   const config = new DocumentBuilder()
