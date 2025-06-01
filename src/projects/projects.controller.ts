@@ -28,9 +28,9 @@ import {
   DeleteResponseDto,
 } from './dto';
 import { ProjectsService } from './projects.service';
-import { AuthGuard } from '../auth/auth.guard';
-import { ErrorResponseDto } from '../core/dto';
-import { ValidationPipe } from '../core/pipes';
+import { AuthGuard } from '@auth/auth.guard';
+import { ErrorResponseDto } from '@core/dto';
+import { ValidationPipe } from '@core/pipes';
 
 @ApiTags('Projects')
 @Controller('projects')

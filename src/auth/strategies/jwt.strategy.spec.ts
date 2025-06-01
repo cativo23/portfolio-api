@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './jwt.strategy';
-import { ExtractJwt } from 'passport-jwt';
 import { AccessTokenPayload } from '../types/AccessTokenPayload';
 
 describe('JwtStrategy', () => {

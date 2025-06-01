@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { SuccessResponseDto } from '../../core/dto';
+import { SuccessResponseDto } from '@core/dto';
 
 /**
  * DTO for delete operation response

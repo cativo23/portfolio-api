@@ -12,7 +12,8 @@ import {
   SingleProjectResponseDto,
   DeleteResponseDto,
 } from './dto';
-import { InternalServerException, NotFoundException } from '../core/exceptions';
+import { InternalServerException } from '@core/exceptions/internal-server.exception';
+import { NotFoundException } from '@core/exceptions/not-found.exception';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 

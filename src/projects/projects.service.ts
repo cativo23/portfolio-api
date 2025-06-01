@@ -10,7 +10,8 @@ import {
   DeleteResponseDto,
 } from './dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { InternalServerException, NotFoundException } from '../core/exceptions';
+import { InternalServerException } from '@core/exceptions/internal-server.exception';
+import { NotFoundException } from '@core/exceptions/not-found.exception';
 
 interface FindAllOptions {
   page: number;
@@ -118,7 +119,7 @@ export class ProjectsService {
     updateProjectDto: UpdateProjectDto,
   ): Promise<SingleProjectResponseDto> {
     try {
-      // Check if project exists
+      // Check if the project exists
       const existingProject = await this.projectsRepository.findOne({
         where: { id },
       });
@@ -132,7 +133,7 @@ export class ProjectsService {
       await this.projectsRepository.update(id, updateProjectDto);
       this.logger.log(`Updated project with ID ${id}`);
 
-      // Get updated project
+      // Get the updated project
       const updatedProject = await this.projectsRepository.findOne({
         where: { id },
       });

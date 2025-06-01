@@ -2,7 +2,7 @@ import {
   ValidationPipe as NestValidationPipe,
   ValidationError,
 } from '@nestjs/common';
-import { ValidationException } from '../exceptions';
+import { ValidationException } from '@core/exceptions/validation.exception';
 
 /**
  * Custom validation pipe that throws ValidationException instead of BadRequestException

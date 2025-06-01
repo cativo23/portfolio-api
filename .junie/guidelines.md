@@ -281,6 +281,35 @@ Configuration:
   - `database/`: Database-related code and migrations
   - `core/`: Core functionality and shared code
 
+### Path Aliases
+
+The project uses TypeScript path aliases to make imports more readable and maintainable. The following aliases are available:
+
+- `@core/*`: Core functionality and shared code (`src/core/*`)
+- `@auth/*`: Authentication module (`src/auth/*`)
+- `@users/*`: Users module (`src/users/*`)
+- `@projects/*`: Projects module (`src/projects/*`)
+- `@config/*`: Configuration files (`src/config/*`)
+- `@database/*`: Database-related code (`src/database/*`)
+- `@health/*`: Health check module (`src/health/*`)
+- `@src/*`: Root source directory (`src/*`)
+
+Guidelines for using path aliases:
+- Use path aliases instead of relative imports when importing from different modules
+- Use relative imports when importing from the same module
+- Prefer specific module aliases (e.g., `@users/*`) over the general `@src/*` alias when possible
+- Use `@core/*` for importing core functionality (pipes, DTOs, entities, etc.)
+- Use `@src/*` only when you need to import from the root source directory
+
+Example usage:
+```typescript
+// Instead of relative imports like:
+import { SomeService } from '../../users/some.service';
+
+// Use path aliases:
+import { SomeService } from '@users/some.service';
+```
+
 ### API Documentation
 
 The project uses Swagger for API documentation, accessible at `/docs` when the application is running.

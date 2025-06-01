@@ -32,6 +32,28 @@
 $ yarn install
 ```
 
+## Path Aliases
+
+This project uses TypeScript path aliases to make imports more readable and maintainable. The following aliases are available:
+
+- `@core/*`: Core functionality and shared code (`src/core/*`)
+- `@auth/*`: Authentication module (`src/auth/*`)
+- `@users/*`: Users module (`src/users/*`)
+- `@projects/*`: Projects module (`src/projects/*`)
+- `@config/*`: Configuration files (`src/config/*`)
+- `@database/*`: Database-related code (`src/database/*`)
+- `@health/*`: Health check module (`src/health/*`)
+- `@src/*`: Root source directory (`src/*`)
+
+Example usage:
+```typescript
+// Instead of relative imports like:
+import { SomeService } from '../../users/some.service';
+
+// Use path aliases:
+import { SomeService } from '@users/some.service';
+```
+
 ## Compile and run the project
 
 ```bash
