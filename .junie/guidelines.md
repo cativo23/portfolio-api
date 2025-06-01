@@ -285,6 +285,72 @@ Configuration:
 
 The project uses Swagger for API documentation, accessible at `/docs` when the application is running.
 
+### API Response Standards
+
+All API responses should follow these standardized formats:
+
+#### Success Responses
+
+Success responses should use the following structure:
+```json5
+{
+  "status": "success",
+  "data": {
+    // Response data goes here
+  },
+  "meta": {
+    // Metadata such as pagination info goes here (if applicable)
+  }
+}
+```
+
+For paginated responses, include pagination metadata:
+```json5
+{
+  "status": "success",
+  "data": [
+    // Array of items
+  ],
+  "meta": {
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "totalItems": 100,
+      "totalPages": 10
+    }
+  }
+}
+```
+
+#### Error Responses
+
+Error responses should use the following structure:
+```json5
+{
+  "status": "error",
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Human-readable error message",
+    "details": {
+      // Additional error details (if applicable)
+    }
+  }
+}
+```
+
+Common error codes:
+- `VALIDATION_ERROR`: Input validation failed
+- `AUTHENTICATION_ERROR`: Authentication failed
+- `AUTHORIZATION_ERROR`: User is not authorized to perform action
+- `RESOURCE_NOT_FOUND`: Requested resource not found
+- `INTERNAL_SERVER_ERROR`: Unexpected server error
+
+#### Implementation
+
+- Use the response transformation interceptor to transform all responses
+- Use custom exception filters to handle errors
+- Use response DTOs to define response structures
+
 ### Authentication
 
 The project uses JWT for authentication:

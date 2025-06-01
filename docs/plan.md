@@ -22,6 +22,15 @@ This document outlines a comprehensive improvement plan for the Portfolio API pr
 
 ## Architecture Improvements
 
+### API Response Standardization
+**Rationale**: Consistent API responses improve the developer experience, make the API more predictable, and simplify client-side integration.
+
+**Proposed Changes**:
+- Create response DTOs for standardizing success and error responses
+- Implement a response transformation interceptor to ensure all responses follow the standard format
+- Define a standard metadata structure for pagination and other response metadata
+- Document the response format standards in the API documentation
+
 ### Error Handling Enhancement
 **Rationale**: Consistent error handling improves debugging and provides better feedback to API consumers.
 
@@ -30,6 +39,7 @@ This document outlines a comprehensive improvement plan for the Portfolio API pr
 - Create custom exception classes for different error types
 - Add proper logging for all errors with appropriate severity levels
 - Implement structured error responses with error codes and messages
+- Create a centralized error code registry to ensure consistency
 
 ### Security Enhancements
 **Rationale**: Security is critical for any API, especially one that manages user data and authentication.
