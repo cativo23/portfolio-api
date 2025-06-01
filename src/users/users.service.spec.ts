@@ -9,7 +9,9 @@ import { NotFoundException, Logger } from '@nestjs/common';
 describe('UsersService', () => {
   let service: UsersService;
   let repository: Repository<User>;
-  const loggerSpy = jest.spyOn(Logger.prototype, 'log').mockImplementation(jest.fn());
+  const loggerSpy = jest
+    .spyOn(Logger.prototype, 'log')
+    .mockImplementation(jest.fn());
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -85,9 +87,13 @@ describe('UsersService', () => {
       const email = 'notfound@email.com';
       jest.spyOn(repository, 'findOneBy').mockResolvedValue(undefined);
 
-      await expect(service.findOneByEmail(email)).rejects.toThrow(NotFoundException);
+      await expect(service.findOneByEmail(email)).rejects.toThrow(
+        NotFoundException,
+      );
       expect(repository.findOneBy).toHaveBeenCalledWith({ email });
-      expect(loggerSpy).toHaveBeenCalledWith(`User with email ${email} not found.`);
+      expect(loggerSpy).toHaveBeenCalledWith(
+        `User with email ${email} not found.`,
+      );
     });
   });
 });

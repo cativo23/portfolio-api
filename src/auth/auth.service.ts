@@ -3,12 +3,12 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import * as bcryptjs from "bcryptjs";
+import * as bcryptjs from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
-import { UsersService } from '@app/users/users.service';
+import { UsersService } from '@users/users.service';
 import { RegisterDto } from './dto/register.dto';
 import { ConfigService } from '@nestjs/config';
-import { User } from '@app/users/entities/user.entity';
+import { User } from '@users/entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -16,7 +16,7 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private configService: ConfigService,
-  ) { }
+  ) {}
 
   async register(payload: RegisterDto): Promise<User> {
     const existingUser = await this.usersService.findOneByEmail(payload.email);
@@ -33,7 +33,14 @@ export class AuthService {
     });
   }
 
-  async login(email, password): Promise<{ access_token: string, expires_at: Date, user: { id: number, username: string, email: string } }> {
+  async login(
+    email,
+    password,
+  ): Promise<{
+    access_token: string;
+    expires_at: Date;
+    user: { id: number; username: string; email: string };
+  }> {
     const user = await this.validateUser(email, password);
 
     const payload = { sub: user.id, email: user.email };
@@ -43,15 +50,16 @@ export class AuthService {
     // Return token, until when its valid the toke and user info
     return {
       access_token: access_token,
-      expires_at: new Date(Date.now() + (this.configService.get<number>('JWT_EXPIRES_IN') * 1000)),
+      expires_at: new Date(
+        Date.now() + this.configService.get<number>('JWT_EXPIRES_IN') * 1000,
+      ),
       user: {
         id: user.id,
         username: user.username,
         email: user.email,
-      }
-    }
+      },
+    };
   }
-
 
   async validateUser(email: string, password: string): Promise<User> {
     const user: User = await this.usersService.findOneByEmail(email);

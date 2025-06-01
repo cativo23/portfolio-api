@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { CreateUserDto } from '@app/users/dto/create-user.dto';
+import { CreateUserDto } from '@users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
-import { User } from '@app/users/entities/user.entity';
+import { User } from '@users/entities/user.entity';
 import { BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -66,7 +66,10 @@ describe('AuthController', () => {
 
   describe('login', () => {
     it('should return user data on successful login', async () => {
-      const dto: LoginDto = { email: 'john@example.com', password: 'secure123' };
+      const dto: LoginDto = {
+        email: 'john@example.com',
+        password: 'secure123',
+      };
       mockAuthService.login.mockResolvedValue(mockUser);
 
       const result = await controller.login(dto);
@@ -77,7 +80,9 @@ describe('AuthController', () => {
 
     it('should throw if AuthService throws', async () => {
       const dto: LoginDto = { email: 'wrong@example.com', password: 'badpass' };
-      mockAuthService.login.mockRejectedValue(new BadRequestException('Invalid credentials'));
+      mockAuthService.login.mockRejectedValue(
+        new BadRequestException('Invalid credentials'),
+      );
 
       await expect(controller.login(dto)).rejects.toThrow(BadRequestException);
       expect(authService.login).toHaveBeenCalledWith(dto.email, dto.password);
@@ -109,22 +114,60 @@ describe('AuthController', () => {
         email: 'taken@example.com',
         password: 'password123',
       };
-      mockAuthService.register.mockRejectedValue(new BadRequestException('Email already exists'));
+      mockAuthService.register.mockRejectedValue(
+        new BadRequestException('Email already exists'),
+      );
 
-      await expect(controller.register(dto)).rejects.toThrow(BadRequestException);
+      await expect(controller.register(dto)).rejects.toThrow(
+        BadRequestException,
+      );
       expect(authService.register).toHaveBeenCalled();
     });
   });
 
   describe('profile', () => {
-    it('should return the user from request object', () => {
-      const mockRequest = {
-        user: mockUser,
+    it('should return both user from decorator and req.user', () => {
+      const mockRequest = { user: mockUser };
+      const mockUserDecorator = {
+        id: 2,
+        username: 'decorator',
+        email: 'decorator@example.com',
       };
 
-      const result = controller.profile(mockRequest as any);
+      const result = controller.profile(mockRequest as any, mockUserDecorator);
 
-      expect(result).toEqual(mockUser);
+      expect(result).toEqual({
+        user: mockUserDecorator,
+        req_user: mockUser,
+      });
+    });
+
+    it('should handle missing user decorator gracefully', () => {
+      const mockRequest = { user: mockUser };
+
+      const result = controller.profile(mockRequest as any, undefined);
+
+      expect(result).toEqual({
+        user: undefined,
+        req_user: mockUser,
+      });
+    });
+
+    it('should handle missing req.user gracefully', () => {
+      const mockRequest = {};
+
+      const mockUserDecorator = {
+        id: 3,
+        username: 'decorator2',
+        email: 'decorator2@example.com',
+      };
+
+      const result = controller.profile(mockRequest as any, mockUserDecorator);
+
+      expect(result).toEqual({
+        user: mockUserDecorator,
+        req_user: undefined,
+      });
     });
   });
 });
