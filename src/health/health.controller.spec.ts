@@ -63,13 +63,11 @@ describe('HealthController', () => {
       },
     };
 
-    jest
-      .spyOn(httpHealthIndicator, 'pingCheck')
-      .mockReturnValue(
-        Promise.resolve({
-          'nestjs-docs': { status: 'up' },
-        } as HealthIndicatorResult),
-      );
+    jest.spyOn(httpHealthIndicator, 'pingCheck').mockReturnValue(
+      Promise.resolve({
+        'nestjs-docs': { status: 'up' },
+      } as HealthIndicatorResult),
+    );
     jest
       .spyOn(diskHealthIndicator, 'checkStorage')
       .mockReturnValue(

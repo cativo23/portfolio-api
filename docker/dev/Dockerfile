@@ -1,5 +1,5 @@
 # Use the official Node.js image as a base image
-FROM node:23-bullseye
+FROM node:23-bookworm
 
 LABEL org.opencontainers.image.authors="cativo23.kt@gmail.com"
 

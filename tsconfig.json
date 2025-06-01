@@ -19,7 +19,13 @@
     "noFallthroughCasesInSwitch": false,
     "paths": {
       "@core/*": ["src/core/*"],
-      "@app/*": ["src/*"]
+      "@auth/*": ["src/auth/*"],
+      "@users/*": ["src/users/*"],
+      "@projects/*": ["src/projects/*"],
+      "@config/*": ["src/config/*"],
+      "@database/*": ["src/database/*"],
+      "@health/*": ["src/health/*"],
+      "@src/*": ["src/*"]
     },
     "resolveJsonModule": true
   }
