@@ -23,10 +23,17 @@ This document contains a comprehensive checklist of improvement tasks for the Po
 
 ## Architecture Improvements
 
+- [ ] Standardize API responses:
+  - [ ] Create response DTOs for success and error responses
+  - [ ] Implement a response transformation interceptor
+  - [ ] Define standard response metadata structure
+  - [ ] Document response format standards
+
 - [ ] Implement proper error handling:
   - [ ] Create a global exception filter
-  - [ ] Standardize error responses
+  - [ ] Standardize error responses with error codes
   - [ ] Add proper logging for errors
+  - [ ] Create custom exception classes for different error types
 
 - [ ] Enhance security:
   - [ ] Implement rate limiting
