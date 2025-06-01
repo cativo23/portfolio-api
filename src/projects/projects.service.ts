@@ -13,13 +13,25 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { InternalServerException } from '@core/exceptions/internal-server.exception';
 import { NotFoundException } from '@core/exceptions/not-found.exception';
 
+/**
+ * Interface defining options for finding projects with pagination, search, and filtering
+ */
 interface FindAllOptions {
+  /** Page number for pagination */
   page: number;
+  /** Number of items per page */
   per_page: number;
+  /** Optional search term to filter projects by title or description */
   search?: string;
+  /** Optional flag to filter projects by featured status */
   isFeatured?: boolean | undefined;
 }
 
+/**
+ * Service responsible for managing portfolio projects
+ *
+ * Provides methods for creating, retrieving, updating, and deleting projects
+ */
 @Injectable()
 export class ProjectsService {
   private readonly logger = new Logger(ProjectsService.name);
@@ -29,6 +41,13 @@ export class ProjectsService {
     private projectsRepository: Repository<Project>,
   ) {}
 
+  /**
+   * Creates a new project
+   *
+   * @param createProjectDto - Data transfer object containing project details
+   * @returns Promise resolving to the created project wrapped in a standardized response
+   * @throws InternalServerException if there's an error during creation
+   */
   async create(
     createProjectDto: CreateProjectDto,
   ): Promise<SingleProjectResponseDto> {
@@ -43,6 +62,13 @@ export class ProjectsService {
     }
   }
 
+  /**
+   * Retrieves a paginated list of projects with optional filtering
+   *
+   * @param options - Object containing pagination, search, and filtering options
+   * @returns Promise resolving to a list of projects with pagination metadata
+   * @throws InternalServerException if there's an error during retrieval
+   */
   async findAll(options: FindAllOptions): Promise<ProjectsListResponseDto> {
     try {
       const { page, per_page, search, isFeatured } = options;
@@ -92,6 +118,14 @@ export class ProjectsService {
     }
   }
 
+  /**
+   * Retrieves a single project by its ID
+   *
+   * @param id - The ID of the project to retrieve
+   * @returns Promise resolving to the project wrapped in a standardized response
+   * @throws NotFoundException if the project doesn't exist
+   * @throws InternalServerException if there's an error during retrieval
+   */
   async findOne(id: number): Promise<SingleProjectResponseDto> {
     try {
       const project = await this.projectsRepository.findOne({
@@ -114,6 +148,15 @@ export class ProjectsService {
     }
   }
 
+  /**
+   * Updates an existing project by its ID
+   *
+   * @param id - The ID of the project to update
+   * @param updateProjectDto - Data transfer object containing the fields to update
+   * @returns Promise resolving to the updated project wrapped in a standardized response
+   * @throws NotFoundException if the project doesn't exist
+   * @throws InternalServerException if there's an error during update
+   */
   async update(
     id: number,
     updateProjectDto: UpdateProjectDto,
@@ -148,6 +191,14 @@ export class ProjectsService {
     }
   }
 
+  /**
+   * Deletes a project by its ID
+   *
+   * @param id - The ID of the project to delete
+   * @returns Promise resolving to a standardized response with a success message
+   * @throws NotFoundException if the project doesn't exist
+   * @throws InternalServerException if there's an error during deletion
+   */
   async remove(id: number): Promise<DeleteResponseDto> {
     try {
       // Check if a project exists
