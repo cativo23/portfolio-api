@@ -1,5 +1,10 @@
 # Portfolio API
 
+[![Coverage Status](https://coveralls.io/repos/github/cativo23/portfolio-api/badge.svg?branch=main)](https://coveralls.io/github/cativo23/portfolio-api?branch=main)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Node Version](https://img.shields.io/badge/node-%3E%3D23.0.0-brightgreen.svg)](https://nodejs.org/)
+[![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](https://hub.docker.com/)
+
 ## Description
 
 Portfolio API is a RESTful API built with NestJS for managing portfolio projects. It provides endpoints for authentication, user management, and project management. The API is designed to be used as a backend for a portfolio website or application.
