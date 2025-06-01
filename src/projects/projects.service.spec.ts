@@ -7,9 +7,6 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { NotFoundException, Logger } from '@nestjs/common';
 import { InternalServerException } from '../core/exceptions';
-import {
-  SingleProjectResponseDto,
-} from './dto';
 import { SuccessResponseDto } from '../core/dto';
 
 describe('ProjectsService', () => {
