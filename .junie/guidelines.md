@@ -292,7 +292,7 @@ All API responses should follow these standardized formats:
 #### Success Responses
 
 Success responses should use the following structure:
-```json
+```json5
 {
   "status": "success",
   "data": {
@@ -305,7 +305,7 @@ Success responses should use the following structure:
 ```
 
 For paginated responses, include pagination metadata:
-```json
+```json5
 {
   "status": "success",
   "data": [
@@ -325,7 +325,7 @@ For paginated responses, include pagination metadata:
 #### Error Responses
 
 Error responses should use the following structure:
-```json
+```json5
 {
   "status": "error",
   "error": {
@@ -341,7 +341,7 @@ Error responses should use the following structure:
 Common error codes:
 - `VALIDATION_ERROR`: Input validation failed
 - `AUTHENTICATION_ERROR`: Authentication failed
-- `AUTHORIZATION_ERROR`: User not authorized to perform action
+- `AUTHORIZATION_ERROR`: User is not authorized to perform action
 - `RESOURCE_NOT_FOUND`: Requested resource not found
 - `INTERNAL_SERVER_ERROR`: Unexpected server error
 
