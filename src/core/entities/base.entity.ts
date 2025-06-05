@@ -8,7 +8,7 @@ import {
 /**
  * Base entity class that provides common fields for all entities
  *
- * This abstract class is extended by all entity classes in the application
+ * All entity classes extend this abstract class in the application
  * to provide common functionality and fields
  */
 export class BaseEntity {
@@ -19,14 +19,14 @@ export class BaseEntity {
   id: number;
 
   /**
-   * Timestamp when the entity was created
+   * Timestamp when the entity was created.
    * This field is automatically set when the entity is first saved
    */
   @CreateDateColumn({ type: 'timestamp' })
   readonly createdAt!: Date;
 
   /**
-   * Timestamp when the entity was last updated
+   * Timestamp when the entity was last updated.
    * This field is automatically updated whenever the entity is saved
    */
   @UpdateDateColumn({ type: 'timestamp' })

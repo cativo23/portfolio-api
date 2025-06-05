@@ -84,7 +84,7 @@ OR
 
 ### Register
 
-Registers a new user.
+Register a new user.
 
 **URL**: `/auth/register`
 
@@ -282,7 +282,7 @@ Returns a specific project by ID.
 
 ### Create Project
 
-Creates a new project.
+Create a new project.
 
 **URL**: `/projects`
 
@@ -385,7 +385,7 @@ Updates an existing project.
 
 ### Delete Project
 
-Deletes a project.
+Delete a project.
 
 **URL**: `/projects/:id`
 

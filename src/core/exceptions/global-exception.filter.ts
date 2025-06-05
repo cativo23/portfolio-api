@@ -20,7 +20,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
   /**
    * Catch method that handles exceptions
    * @param exception The exception that was thrown
-   * @param host The arguments host
+   * @param host The argument host
    */
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
@@ -30,7 +30,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     // Log the exception
     this.logger.error(
       `Exception occurred: ${exception instanceof Error ? exception.message : 'Unknown error'} | ` +
-      `Request: ${request.method} ${request.url} | IP: ${request.ip}`,
+        `Request: ${request.method} ${request.url} | IP: ${request.ip}`,
       exception instanceof Error ? exception.stack : undefined,
     );
 

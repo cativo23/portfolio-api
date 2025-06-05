@@ -152,7 +152,7 @@ export class ProjectsService {
    * Updates an existing project by its ID
    *
    * @param id - The ID of the project to update
-   * @param updateProjectDto - Data transfer object containing the fields to update
+   * @param updateProjectDto - DTO containing the fields to update
    * @returns Promise resolving to the updated project wrapped in a standardized response
    * @throws NotFoundException if the project doesn't exist
    * @throws InternalServerException if there's an error during update
