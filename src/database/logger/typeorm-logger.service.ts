@@ -6,7 +6,7 @@ import { ConfigService } from '@nestjs/config';
  * Custom TypeORM logger that integrates with NestJS logger
  * Provides detailed logging for database operations
  */
-@Injectable() 
+@Injectable()
 export class TypeOrmLoggerService implements TypeOrmLogger {
   private readonly logger = new Logger('TypeORM');
   private readonly logLevels: string[];

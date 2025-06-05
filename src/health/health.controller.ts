@@ -5,6 +5,7 @@ import {
   HealthCheck,
   DiskHealthIndicator,
   TypeOrmHealthIndicator,
+  HealthCheckResult,
 } from '@nestjs/terminus';
 
 /**
@@ -32,12 +33,27 @@ export class HealthController {
    */
   @Get()
   @HealthCheck()
-  check() {
-    return this.health.check([
+  async check(): Promise<{
+    summary: string;
+    checks: Record<string, any>;
+    checkedAt: string;
+  }> {
+    const result: HealthCheckResult = await this.health.check([
       () => this.http.pingCheck('nestjs-docs', 'https://docs.nestjs.com'),
       () =>
-        this.disk.checkStorage('storage', { path: '/', thresholdPercent: 0.5 }),
+        this.disk.checkStorage('storage', {
+          path: '/',
+          thresholdPercent: 0.05,
+        }),
       () => this.db.pingCheck('database'),
     ]);
+
+    return {
+      summary: Object.entries(result.info)
+        .map(([key, val]) => `${key}: ${val.status}`)
+        .join(', '),
+      checks: result.info,
+      checkedAt: new Date().toISOString(),
+    };
   }
 }

@@ -51,7 +51,9 @@ describe('HealthController', () => {
     healthCheckService = module.get<HealthCheckService>(HealthCheckService);
     httpHealthIndicator = module.get<HttpHealthIndicator>(HttpHealthIndicator);
     diskHealthIndicator = module.get<DiskHealthIndicator>(DiskHealthIndicator);
-    typeOrmHealthIndicator = module.get<TypeOrmHealthIndicator>(TypeOrmHealthIndicator);
+    typeOrmHealthIndicator = module.get<TypeOrmHealthIndicator>(
+      TypeOrmHealthIndicator,
+    );
   });
 
   it('should be defined', () => {
@@ -86,9 +88,13 @@ describe('HealthController', () => {
       .spyOn(healthCheckService, 'check')
       .mockReturnValue(Promise.resolve(healthCheckResult));
 
-    jest.spyOn(typeOrmHealthIndicator, 'pingCheck').mockReturnValue(
-      Promise.resolve({ database: { status: 'up' } } as HealthIndicatorResult),
-    );
+    jest
+      .spyOn(typeOrmHealthIndicator, 'pingCheck')
+      .mockReturnValue(
+        Promise.resolve({
+          database: { status: 'up' },
+        } as HealthIndicatorResult),
+      );
 
     const result = await controller.check();
     expect(result).toEqual(healthCheckResult);

@@ -34,6 +34,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       exception instanceof Error ? exception.stack : undefined,
     );
 
+    // Special handling for health check endpoint
+    const isHealthCheck = request.url.startsWith('/health');
+
     if (exception instanceof BaseException) {
       const errorResponse = new ErrorResponseDto({
         code: exception.code,
@@ -70,15 +73,20 @@ export class GlobalExceptionFilter implements ExceptionFilter {
           code = ErrorCode.INTERNAL_SERVER_ERROR;
       }
 
+      console.log('Exception response:', exceptionResponse);
+
       const errorResponse = new ErrorResponseDto({
         code,
         message,
         details:
+          isHealthCheck &&
           typeof exceptionResponse === 'object' &&
           'message' in exceptionResponse &&
           Array.isArray(exceptionResponse.message)
             ? { errors: exceptionResponse.message }
-            : undefined,
+            : isHealthCheck
+              ? { errors: exceptionResponse }
+              : undefined,
       });
 
       response.status(status).json(errorResponse);
