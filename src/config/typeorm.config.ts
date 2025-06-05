@@ -1,22 +1,18 @@
-import { DataSource } from 'typeorm';
+import { DataSource, DataSourceOptions } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
+import { createTypeOrmOptions } from './typeorm-common.config';
 import { config } from 'dotenv';
+
+// Load environment variables from .env file
 config();
 
 const configService = new ConfigService();
 
+// Use common TypeORM configuration with migration-specific options
 const AppDataSource = new DataSource({
-  type: 'mysql',
-  host: configService.get<string>('DB_HOST'),
-  port: configService.get<number>('DB_PORT'),
-  username: configService.get<string>('DB_USERNAME'),
-  password: configService.get<string>('DB_PASSWORD'),
-  database: configService.get<string>('DB_NAME'),
-  entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-  synchronize: false,
+  ...(createTypeOrmOptions(configService) as DataSourceOptions),
   migrations: ['src/database/migrations/*-migration.ts'],
   migrationsRun: false,
-  logging: true,
 });
 
 export default AppDataSource;

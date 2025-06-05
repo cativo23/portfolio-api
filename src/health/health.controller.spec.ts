@@ -5,6 +5,7 @@ import {
   DiskHealthIndicator,
   HealthCheckResult,
   HealthIndicatorResult,
+  TypeOrmHealthIndicator,
 } from '@nestjs/terminus';
 import { HealthController } from './health.controller';
 
@@ -13,6 +14,7 @@ describe('HealthController', () => {
   let healthCheckService: HealthCheckService;
   let httpHealthIndicator: HttpHealthIndicator;
   let diskHealthIndicator: DiskHealthIndicator;
+  let typeOrmHealthIndicator: TypeOrmHealthIndicator;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -36,6 +38,12 @@ describe('HealthController', () => {
             checkStorage: jest.fn(),
           },
         },
+        {
+          provide: TypeOrmHealthIndicator,
+          useValue: {
+            pingCheck: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
@@ -43,6 +51,7 @@ describe('HealthController', () => {
     healthCheckService = module.get<HealthCheckService>(HealthCheckService);
     httpHealthIndicator = module.get<HttpHealthIndicator>(HttpHealthIndicator);
     diskHealthIndicator = module.get<DiskHealthIndicator>(DiskHealthIndicator);
+    typeOrmHealthIndicator = module.get<TypeOrmHealthIndicator>(TypeOrmHealthIndicator);
   });
 
   it('should be defined', () => {
@@ -76,6 +85,10 @@ describe('HealthController', () => {
     jest
       .spyOn(healthCheckService, 'check')
       .mockReturnValue(Promise.resolve(healthCheckResult));
+
+    jest.spyOn(typeOrmHealthIndicator, 'pingCheck').mockReturnValue(
+      Promise.resolve({ database: { status: 'up' } } as HealthIndicatorResult),
+    );
 
     const result = await controller.check();
     expect(result).toEqual(healthCheckResult);

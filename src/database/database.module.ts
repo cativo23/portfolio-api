@@ -1,33 +1,57 @@
-import { Global, Module, Logger } from '@nestjs/common';
+import { Global, Module, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
+import { TransactionService } from './transaction/transaction.service';
+import { ConnectionRetryService } from './connection/connection-retry.service';
+import { TypeOrmLoggerService } from './logger/typeorm-logger.service';
+import { createTypeOrmOptions } from '@config/typeorm-common.config';
 
 @Global()
 @Module({
   imports: [
     ConfigModule,
+    ScheduleModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (
         configService: ConfigService,
+        loggerService: TypeOrmLoggerService,
       ): Promise<TypeOrmModuleOptions> => {
+        // Use common TypeORM configuration
         const config: TypeOrmModuleOptions = {
-          type: 'mysql',
-          host: configService.get<string>('DB_HOST'),
-          port: configService.get<number>('DB_PORT'),
-          username: configService.get<string>('DB_USERNAME'),
-          password: configService.get<string>('DB_PASSWORD'),
-          database: configService.get<string>('DB_NAME'),
-          entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-          synchronize: false,
+          ...createTypeOrmOptions(configService, loggerService),
+          // Add application-specific options
           autoLoadEntities: true,
         };
 
-        Logger.log('Database configuration loaded', 'DatabaseModule');
+        Logger.log('Database configuration loadd', 'DatabaseModule');
         return config;
       },
-      inject: [ConfigService],
+      inject: [ConfigService, TypeOrmLoggerService],
     }),
   ],
+  providers: [TransactionService, ConnectionRetryService, TypeOrmLoggerService],
+  exports: [TransactionService, ConnectionRetryService, TypeOrmLoggerService],
 })
-export class DatabaseModule {}
+export class DatabaseModule implements OnApplicationBootstrap {
+  private readonly logger = new Logger(DatabaseModule.name);
+
+  constructor(
+    private readonly connectionRetryService: ConnectionRetryService,
+  ) {}
+
+  /**
+   * Verify database connection on application startup
+   */
+  async onApplicationBootstrap() {
+    try {
+      await this.connectionRetryService.connect();
+      this.logger.log('Database connection verified on application startup');
+    } catch (error) {
+      this.logger.error(
+        `Failed to verify database connection: ${error.message}`,
+      );
+    }
+  }
+}

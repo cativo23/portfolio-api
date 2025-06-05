@@ -4,6 +4,7 @@ import {
   HttpHealthIndicator,
   HealthCheck,
   DiskHealthIndicator,
+  TypeOrmHealthIndicator,
 } from '@nestjs/terminus';
 
 /**
@@ -18,12 +19,14 @@ export class HealthController {
     private health: HealthCheckService,
     private http: HttpHealthIndicator,
     private readonly disk: DiskHealthIndicator,
+    private readonly db: TypeOrmHealthIndicator,
   ) {}
 
   /**
    * Performs health checks on various components of the application
    *
-   * Checks the connectivity to NestJS documentation site and disk storage availability
+   * Checks the connectivity to NestJS documentation site, disk storage availability,
+   * and database connection health
    *
    * @returns Health check results for each component
    */
@@ -34,6 +37,7 @@ export class HealthController {
       () => this.http.pingCheck('nestjs-docs', 'https://docs.nestjs.com'),
       () =>
         this.disk.checkStorage('storage', { path: '/', thresholdPercent: 0.5 }),
+      () => this.db.pingCheck('database'),
     ]);
   }
 }
