@@ -43,7 +43,7 @@ export class HealthController {
       () =>
         this.disk.checkStorage('storage', {
           path: '/',
-          thresholdPercent: 0.05,
+          thresholdPercent: 0.80,
         }),
       () => this.db.pingCheck('database'),
     ]);
