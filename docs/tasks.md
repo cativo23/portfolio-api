@@ -71,7 +71,8 @@ This document contains a comprehensive checklist of improvement tasks for the Po
   - [ ] Increase unit test coverage
   - [ ] Add integration tests
   - [ ] Implement E2E tests for critical flows
-  - [ ] Set up CI/CD pipeline
+  - [x] Set up CI/CD pipeline
+  - [ ] Upgrade testing framework to the latest version
 
 ## Code-Level Improvements
 
