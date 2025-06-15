@@ -20,7 +20,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
   /**
    * Catch method that handles exceptions
    * @param exception The exception that was thrown
-   * @param host The arguments host
+   * @param host The argument host
    */
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
@@ -29,22 +29,19 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     // Log the exception
     this.logger.error(
-      `Exception occurred: ${exception instanceof Error ? exception.message : 'Unknown error'}`,
+      `Exception occurred: ${exception instanceof Error ? exception.message : 'Unknown error'} | ` +
+        `Request: ${request.method} ${request.url} | IP: ${request.ip}`,
       exception instanceof Error ? exception.stack : undefined,
     );
 
-    // Handle different types of exceptions
     if (exception instanceof BaseException) {
-      // Handle custom exceptions
       const errorResponse = new ErrorResponseDto({
         code: exception.code,
         message: exception.message,
         details: exception.details,
       });
-
       response.status(exception.getStatus()).json(errorResponse);
     } else if (exception instanceof HttpException) {
-      // Handle NestJS HTTP exceptions
       const status = exception.getStatus();
       const exceptionResponse = exception.getResponse();
       const message =
@@ -54,7 +51,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
           ? exceptionResponse.message
           : exception.message;
 
-      // Map HTTP status codes to error codes
       let code: ErrorCode;
       switch (status) {
         case HttpStatus.BAD_REQUEST:
@@ -74,7 +70,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
           code = ErrorCode.INTERNAL_SERVER_ERROR;
       }
 
-      // Create error response
       const errorResponse = new ErrorResponseDto({
         code,
         message,
@@ -88,7 +83,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
       response.status(status).json(errorResponse);
     } else {
-      // Handle unknown exceptions
+      // Log the full error for internal monitoring but do not expose details to the client
+      this.logger.error('Unhandled exception', exception as any);
+
       const errorResponse = new ErrorResponseDto({
         code: ErrorCode.INTERNAL_SERVER_ERROR,
         message: 'Internal server error',

@@ -10,6 +10,11 @@ import { RegisterDto } from './dto/register.dto';
 import { ConfigService } from '@nestjs/config';
 import { User } from '@users/entities/user.entity';
 
+/**
+ * Service responsible for authentication-related operations
+ *
+ * Provides methods for user registration, login, and credential validation
+ */
 @Injectable()
 export class AuthService {
   constructor(
@@ -18,6 +23,13 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
 
+  /**
+   * Registers a new user in the system
+   *
+   * @param payload - Data transfer object containing user registration details
+   * @returns Promise resolving to the created user entity
+   * @throws BadRequestException if the email already exists
+   */
   async register(payload: RegisterDto): Promise<User> {
     const existingUser = await this.usersService.findOneByEmail(payload.email);
 
@@ -33,6 +45,15 @@ export class AuthService {
     });
   }
 
+  /**
+   * Authenticates a user and generates a JWT token
+   *
+   * @param email - User's email address
+   * @param password - User's password
+   * @returns Promise resolving to an object containing the access token, expiration time, and user information
+   * @throws BadRequestException if the user is not found
+   * @throws UnauthorizedException if the password is incorrect
+   */
   async login(
     email,
     password,
@@ -61,6 +82,15 @@ export class AuthService {
     };
   }
 
+  /**
+   * Validates user credentials
+   *
+   * @param email - User's email address
+   * @param password - User's password
+   * @returns Promise resolving to the user entity if validation is successful
+   * @throws BadRequestException if the user is not found
+   * @throws UnauthorizedException if the password is incorrect
+   */
   async validateUser(email: string, password: string): Promise<User> {
     const user: User = await this.usersService.findOneByEmail(email);
     if (!user) {
