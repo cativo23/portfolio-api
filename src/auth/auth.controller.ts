@@ -11,7 +11,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { ValidationPipe } from '@core/pipes';
-import { ErrorResponseDto } from '@core/dto';
+import { ErrorCode, ErrorResponseDto, SuccessResponseDto } from '@core/dto';
 import { AuthService } from './auth.service';
 import {
   ApiBearerAuth,
@@ -28,7 +28,7 @@ import { User as UserDecorator } from './decorators/user.decorator';
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
   /**
    * Handles user login by validating credentials and returning an authentication token.
@@ -43,12 +43,24 @@ export class AuthController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'The record found',
-    type: CreateUserDto,
+    type: SuccessResponseDto,
   })
   @ApiResponse({
     status: HttpStatus.UNPROCESSABLE_ENTITY,
     description: 'Validation failed',
     type: ErrorResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Invalid credentials',
+    type: ErrorResponseDto,
+    example: {
+      status: "error",
+      error: {
+        "code": ErrorCode.AUTHENTICATION_ERROR,
+        "message": "Password does not match"
+      }
+    },
   })
   async login(@Body() loginDto: LoginDto): Promise<any> {
     return this.authService.login(loginDto.email, loginDto.password);
