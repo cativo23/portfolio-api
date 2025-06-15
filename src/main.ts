@@ -32,4 +32,8 @@ async function bootstrap() {
   Logger.log(`Starting server on port ${port}`, 'Bootstrap');
   await app.listen(port);
 }
-bootstrap();
+
+bootstrap().catch((err) => {
+  Logger.error('Bootstrap failed', err);
+  process.exit(1);
+});

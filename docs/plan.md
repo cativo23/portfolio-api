@@ -68,14 +68,14 @@ This document outlines a comprehensive improvement plan for the Portfolio API pr
 **Proposed Changes**:
 - Add database indexes for frequently queried fields
 - Implement database transactions for critical operations
-- Create database seeding mechanism for development and testing
+- Create a database seeding mechanism for development and testing
 - Improve migration scripts with better documentation and rollback capabilities
 
 ### Data Access Patterns
 **Rationale**: Consistent data access patterns make the codebase more maintainable and easier to understand.
 
 **Proposed Changes**:
-- Implement repository pattern consistently across all entities
+- Implement the repository pattern consistently across all entities
 - Create data transfer objects (DTOs) for all API operations
 - Implement proper pagination for all list endpoints
 - Add sorting and filtering capabilities to list endpoints
@@ -180,19 +180,19 @@ This document outlines a comprehensive improvement plan for the Portfolio API pr
 
 ## Timeline and Prioritization
 
-### Phase 1: Foundation (1-2 months)
+### Phase 1: Foundation (1–2 months)
 - Implement error handling enhancements
 - Add security improvements
 - Improve configuration management
 - Enhance database performance
 
-### Phase 2: Feature Enhancement (2-3 months)
-- Improve authentication system
+### Phase 2: Feature Enhancement (2–3 months)
+- Improve the authentication system
 - Enhance project management features
 - Upgrade user management capabilities
 - Increase test coverage
 
-### Phase 3: DevOps and Documentation (1-2 months)
+### Phase 3: DevOps and Documentation (1–2 months)
 - Implement containerization improvements
 - Set up monitoring and logging
 - Automate deployment

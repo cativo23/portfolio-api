@@ -3,7 +3,7 @@ import { BaseException } from '@core/exceptions';
 import { ErrorCode } from '../dto';
 
 /**
- * Exception for resource not found errors
+ * Exception for "resource not found" errors
  */
 export class NotFoundException extends BaseException {
   /**
