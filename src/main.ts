@@ -17,11 +17,25 @@ async function bootstrap() {
   app.useGlobalFilters(new GlobalExceptionFilter());
 
   // Set up Swagger
+
   const config = new DocumentBuilder()
     .setTitle('Portfolio API')
     .setDescription('API for my personal portfolio')
     .setVersion('1.0')
-    .addBearerAuth()
+    .addBearerAuth({
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+      name: 'Authorization',
+      description: 'Enter JWT token',
+      in: 'header',
+    })
+    .addApiKey({
+      type: 'apiKey',
+      name: 'x-api-key',
+      in: 'header',
+      description: 'Paste your API key here',
+    }, 'x-api-key')
     .build();
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);

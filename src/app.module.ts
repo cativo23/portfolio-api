@@ -7,6 +7,7 @@ import { DatabaseModule } from '@database/database.module';
 import { ProjectsModule } from '@projects/projects.module';
 import { AuthModule } from '@auth/auth.module';
 import { UsersModule } from '@users/users.module';
+import { ApiKeyModule } from '@core/api-key.module';
 
 @Module({
   imports: [
@@ -16,8 +17,9 @@ import { UsersModule } from '@users/users.module';
     ProjectsModule,
     AuthModule,
     UsersModule,
+    ApiKeyModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

@@ -2,3 +2,8 @@ export * from './dto';
 export * from './exceptions';
 export * from './interceptors';
 export * from './pipes';
+export * from './entities/api-key.entity';
+export * from './api-key.service';
+export * from './api-key.guard';
+export * from './jwt-or-api-key.guard';
+export * from './api-key.module';
