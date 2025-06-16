@@ -1,3 +1,7 @@
+
+permissions:
+  contents: write
+
 name: CI
 
 on:
@@ -37,6 +41,10 @@ jobs:
 
       - name: Run code formatter
         run: yarn format
+
+      - name: Set up git for pushing
+        run: |
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
 
       - name: Commit formatted code if needed
         run: |
