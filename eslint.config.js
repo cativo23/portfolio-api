@@ -46,4 +46,4 @@ module.exports = defineConfig([{
         "@typescript-eslint/explicit-module-boundary-types": "off",
         "@typescript-eslint/no-explicit-any": "off",
     },
-}, globalIgnores(["**/.eslintrc.js"])]);
+}, globalIgnores(["**/eslintrc.config.js"])]);
