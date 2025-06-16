@@ -9,14 +9,12 @@ import {
   UsePipes,
   Param,
   Delete,
-  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
   ApiBearerAuth,
   ApiOperation,
   ApiResponse,
-  ApiQuery,
 } from '@nestjs/swagger';
 import { ValidationPipe } from '@core/pipes';
 import { AuthGuard } from '@auth/auth.guard';
@@ -56,16 +54,17 @@ export class ApiKeyController {
     description: 'Unauthorized',
     type: ErrorResponseDto,
   })
-  async create(@Body('description') description?: string) {
+  async create(
+    @Body('description') description?: string,
+  ): Promise<
+    SuccessResponseDto<{ id: number; key: string; description?: string }>
+  > {
     const apiKey = await this.apiKeyService.create(description);
-    return {
-      status: 'success',
-      data: {
-        id: apiKey.id,
-        key: apiKey.key, // Only return key at creation
-        description: apiKey.description,
-      },
-    };
+    return new SuccessResponseDto({
+      id: apiKey.id,
+      key: apiKey.key, // Only return key at creation
+      description: apiKey.description,
+    });
   }
 
   /**
@@ -93,9 +92,9 @@ export class ApiKeyController {
       },
     },
   })
-  async findAll() {
+  async findAll(): Promise<SuccessResponseDto<any[]>> {
     const keys = await this.apiKeyService.findAll();
-    return { status: 'success', data: keys };
+    return new SuccessResponseDto(keys);
   }
 
   /**
@@ -120,8 +119,10 @@ export class ApiKeyController {
     description: 'API key not found',
     type: ErrorResponseDto,
   })
-  async revoke(@Param('id') id: string) {
+  async revoke(
+    @Param('id') id: string,
+  ): Promise<SuccessResponseDto<{ id: number }>> {
     await this.apiKeyService.revokeById(Number(id));
-    return { status: 'success', data: { id: Number(id) } };
+    return new SuccessResponseDto({ id: Number(id) });
   }
 }
