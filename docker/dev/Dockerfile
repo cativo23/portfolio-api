@@ -14,6 +14,9 @@ RUN apt-get update && apt-get install -y \
 # Ensure that the user exists and matches the host's UID and GID
 RUN echo "node ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
+# Use yarn berry
+RUN corepack enable && corepack prepare yarn@stable --activate
+
 # Set user to avoid permission issues
 USER node
 
@@ -25,8 +28,8 @@ COPY --chown=node:node package.json ./
 COPY --chown=node:node yarn.lock ./
 
 # Install dependencies
-RUN yarn install
-RUN yarn global add @nestjs/cli
+RUN yarn install --immutable
+RUN yarn dlx @nestjs/cli
 
 # Add yarn global bin to the PATH
 ENV PATH /home/node/.yarn/bin:$PATH
