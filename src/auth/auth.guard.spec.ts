@@ -16,7 +16,7 @@ describe('AuthGuard', () => {
         {
           provide: JwtService,
           useValue: {
-                  verifyAsync: jest.fn(),
+            verifyAsync: jest.fn(),
           },
         },
         {
