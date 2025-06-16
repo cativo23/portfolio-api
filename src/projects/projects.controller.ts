@@ -118,6 +118,8 @@ export class ProjectsController {
   }
 
   @Post()
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new project' })
   @UsePipes(new ValidationPipe())
   @ApiBody({ type: CreateProjectDto })
@@ -143,6 +145,8 @@ export class ProjectsController {
   }
 
   @Patch(':id')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a project by ID' })
   @UsePipes(new ValidationPipe())
   @ApiParam({ name: 'id', type: String, description: 'Project ID' })
@@ -175,6 +179,8 @@ export class ProjectsController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a project by ID' })
   @ApiParam({ name: 'id', type: String, description: 'Project ID' })
   @ApiResponse({
