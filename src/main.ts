@@ -30,12 +30,15 @@ async function bootstrap() {
       description: 'Enter JWT token',
       in: 'header',
     })
-    .addApiKey({
-      type: 'apiKey',
-      name: 'x-api-key',
-      in: 'header',
-      description: 'Paste your API key here',
-    }, 'x-api-key')
+    .addApiKey(
+      {
+        type: 'apiKey',
+        name: 'x-api-key',
+        in: 'header',
+        description: 'Paste your API key here',
+      },
+      'x-api-key',
+    )
     .build();
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);

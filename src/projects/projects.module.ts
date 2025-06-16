@@ -14,4 +14,4 @@ import { JwtOrApiKeyGuard } from '@core/jwt-or-api-key.guard';
   providers: [ProjectsService, ApiKeyGuard, JwtOrApiKeyGuard],
   exports: [ApiKeyGuard, JwtOrApiKeyGuard],
 })
-export class ProjectsModule { }
+export class ProjectsModule {}

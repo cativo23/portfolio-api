@@ -15,7 +15,11 @@ describe('ApiKeyController (unit)', () => {
   });
 
   it('should create an API key', async () => {
-    (service.create as jest.Mock).mockResolvedValue({ id: 1, key: 'abc', description: 'desc' });
+    (service.create as jest.Mock).mockResolvedValue({
+      id: 1,
+      key: 'abc',
+      description: 'desc',
+    });
     const result = await controller.create('desc');
     expect(result.status).toBe('success');
     expect(result.data.key).toBe('abc');
@@ -23,7 +27,9 @@ describe('ApiKeyController (unit)', () => {
   });
 
   it('should list API keys', async () => {
-    (service.findAll as jest.Mock).mockResolvedValue([{ id: 1, description: 'desc' }]);
+    (service.findAll as jest.Mock).mockResolvedValue([
+      { id: 1, description: 'desc' },
+    ]);
     const result = await controller.findAll();
     expect(result.status).toBe('success');
     expect(Array.isArray(result.data)).toBe(true);

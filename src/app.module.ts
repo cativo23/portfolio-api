@@ -22,4 +22,4 @@ import { ApiKeyModule } from '@core/api-key.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

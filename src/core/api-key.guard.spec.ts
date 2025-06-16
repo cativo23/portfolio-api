@@ -22,7 +22,9 @@ describe('ApiKeyGuard', () => {
   it('should throw if key is invalid', async () => {
     (apiKeyService.validate as jest.Mock).mockResolvedValue(false);
     const context: any = {
-      switchToHttp: () => ({ getRequest: () => ({ headers: { 'x-api-key': 'bad' } }) }),
+      switchToHttp: () => ({
+        getRequest: () => ({ headers: { 'x-api-key': 'bad' } }),
+      }),
     };
     await expect(guard.canActivate(context)).rejects.toThrow();
   });
@@ -30,7 +32,9 @@ describe('ApiKeyGuard', () => {
   it('should return true if key is valid', async () => {
     (apiKeyService.validate as jest.Mock).mockResolvedValue(true);
     const context: any = {
-      switchToHttp: () => ({ getRequest: () => ({ headers: { 'x-api-key': 'good' } }) }),
+      switchToHttp: () => ({
+        getRequest: () => ({ headers: { 'x-api-key': 'good' } }),
+      }),
     };
     await expect(guard.canActivate(context)).resolves.toBe(true);
   });

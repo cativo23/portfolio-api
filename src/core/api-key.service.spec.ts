@@ -28,15 +28,21 @@ describe('ApiKeyService', () => {
   });
 
   it('should create an API key', async () => {
-    jest.spyOn(repo, 'create').mockReturnValue({ key: 'abc', isActive: true } as any);
-    jest.spyOn(repo, 'save').mockResolvedValue({ id: 1, key: 'abc', isActive: true } as any);
+    jest
+      .spyOn(repo, 'create')
+      .mockReturnValue({ key: 'abc', isActive: true } as any);
+    jest
+      .spyOn(repo, 'save')
+      .mockResolvedValue({ id: 1, key: 'abc', isActive: true } as any);
     const result = await service.create('desc');
     expect(result.key).toBe('abc');
     expect(result.isActive).toBe(true);
   });
 
   it('should validate a valid API key', async () => {
-    jest.spyOn(repo, 'findOne').mockResolvedValue({ key: 'abc', isActive: true } as any);
+    jest
+      .spyOn(repo, 'findOne')
+      .mockResolvedValue({ key: 'abc', isActive: true } as any);
     const valid = await service.validate('abc');
     expect(valid).toBe(true);
   });

@@ -37,7 +37,7 @@ import { ValidationPipe } from '@core/pipes';
 @ApiTags('Projects')
 @Controller('projects')
 export class ProjectsController {
-  constructor(private readonly projectsService: ProjectsService) { }
+  constructor(private readonly projectsService: ProjectsService) {}
 
   @Get()
   @UseGuards(JwtOrApiKeyGuard)

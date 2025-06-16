@@ -7,9 +7,9 @@ import { ApiKeyService } from './api-key.service';
 import { AuthModule } from '@auth/auth.module';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([ApiKey]), AuthModule],
-    controllers: [ApiKeyController],
-    providers: [ApiKeyService],
-    exports: [ApiKeyService],
+  imports: [TypeOrmModule.forFeature([ApiKey]), AuthModule],
+  controllers: [ApiKeyController],
+  providers: [ApiKeyService],
+  exports: [ApiKeyService],
 })
-export class ApiKeyModule { }
+export class ApiKeyModule {}
