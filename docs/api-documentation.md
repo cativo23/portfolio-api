@@ -14,6 +14,12 @@ This document provides detailed information about the Portfolio API endpoints, i
   - [Create Project](#create-project)
   - [Update Project](#update-project)
   - [Delete Project](#delete-project)
+- [Contacts](#contacts)
+  - [Submit Contact Form](#submit-contact-form)
+  - [Get All Contacts](#get-all-contacts)
+  - [Get Contact by ID](#get-contact-by-id)
+  - [Mark Contact as Read](#mark-contact-as-read)
+  - [Delete Contact](#delete-contact)
 - [Health Check](#health-check)
   - [Get Health Status](#get-health-status)
 
@@ -417,6 +423,319 @@ Delete a project.
   "error": {
     "code": "RESOURCE_NOT_FOUND",
     "message": "Project not found"
+  }
+}
+```
+
+## Contacts
+
+The Contacts API allows users to submit contact forms and administrators to manage contact submissions.
+
+### Submit Contact Form
+
+Submit a new contact form. This endpoint is public and does not require authentication.
+
+**URL**: `/contacts`
+
+**Method**: `POST`
+
+**Authentication**: None (Public endpoint)
+
+**Request Body**:
+```json
+{
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "message": "Hello, I would like to get in touch regarding a potential collaboration opportunity.",
+  "subject": "Project Inquiry"
+}
+```
+
+**Field Validation**:
+- `name`: Required, string, 2-100 characters
+- `email`: Required, valid email address
+- `message`: Required, string, 10-1000 characters
+- `subject`: Optional, string, max 200 characters
+
+**Success Response**:
+- **Code**: 201 Created
+- **Content**:
+```json
+{
+  "status": "success",
+  "data": {
+    "id": 1,
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "message": "Hello, I would like to get in touch regarding a potential collaboration opportunity.",
+    "subject": "Project Inquiry",
+    "isRead": false,
+    "readAt": null,
+    "createdAt": "2024-01-15T10:30:00.000Z",
+    "updatedAt": "2024-01-15T10:30:00.000Z"
+  },
+  "meta": {}
+}
+```
+
+**Error Response**:
+- **Code**: 422 Unprocessable Entity
+- **Content**:
+```json
+{
+  "status": "error",
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Validation failed",
+    "details": {
+      "email": ["email must be an email"],
+      "message": ["message must be longer than or equal to 10 characters"]
+    }
+  }
+}
+```
+
+### Get All Contacts
+
+Returns a paginated list of all contact submissions. This endpoint requires authentication and is intended for administrators.
+
+**URL**: `/contacts`
+
+**Method**: `GET`
+
+**Authentication**: Required (Bearer Token)
+
+**Query Parameters**:
+- `page` (optional): Page number (default: 1)
+- `per_page` (optional): Items per page (default: 10)
+- `search` (optional): Search term (searches in name, email, and message)
+- `is_read` (optional): Filter by read status (true/false)
+
+**Success Response**:
+- **Code**: 200 OK
+- **Content**:
+```json
+{
+  "status": "success",
+  "data": [
+    {
+      "id": 1,
+      "name": "John Doe",
+      "email": "john.doe@example.com",
+      "message": "Hello, I would like to get in touch...",
+      "subject": "Project Inquiry",
+      "isRead": false,
+      "readAt": null,
+      "createdAt": "2024-01-15T10:30:00.000Z",
+      "updatedAt": "2024-01-15T10:30:00.000Z"
+    },
+    {
+      "id": 2,
+      "name": "Jane Smith",
+      "email": "jane.smith@example.com",
+      "message": "Interested in your services...",
+      "subject": null,
+      "isRead": true,
+      "readAt": "2024-01-15T11:00:00.000Z",
+      "createdAt": "2024-01-15T09:00:00.000Z",
+      "updatedAt": "2024-01-15T11:00:00.000Z"
+    }
+  ],
+  "meta": {
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "totalItems": 2,
+      "totalPages": 1
+    }
+  }
+}
+```
+
+**Error Response**:
+- **Code**: 401 Unauthorized
+- **Content**:
+```json
+{
+  "status": "error",
+  "error": {
+    "code": "AUTHENTICATION_ERROR",
+    "message": "Unauthorized"
+  }
+}
+```
+
+### Get Contact by ID
+
+Returns a specific contact submission by ID. This endpoint requires authentication and is intended for administrators.
+
+**URL**: `/contacts/:id`
+
+**Method**: `GET`
+
+**Authentication**: Required (Bearer Token)
+
+**URL Parameters**:
+- `id`: Contact ID (integer)
+
+**Success Response**:
+- **Code**: 200 OK
+- **Content**:
+```json
+{
+  "status": "success",
+  "data": {
+    "id": 1,
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "message": "Hello, I would like to get in touch regarding a potential collaboration opportunity.",
+    "subject": "Project Inquiry",
+    "isRead": false,
+    "readAt": null,
+    "createdAt": "2024-01-15T10:30:00.000Z",
+    "updatedAt": "2024-01-15T10:30:00.000Z"
+  },
+  "meta": {}
+}
+```
+
+**Error Response**:
+- **Code**: 404 Not Found
+- **Content**:
+```json
+{
+  "status": "error",
+  "error": {
+    "code": "RESOURCE_NOT_FOUND",
+    "message": "Contact with ID 1 not found"
+  }
+}
+```
+
+OR
+
+- **Code**: 401 Unauthorized
+- **Content**:
+```json
+{
+  "status": "error",
+  "error": {
+    "code": "AUTHENTICATION_ERROR",
+    "message": "Unauthorized"
+  }
+}
+```
+
+### Mark Contact as Read
+
+Marks a contact submission as read. This endpoint requires authentication and is intended for administrators.
+
+**URL**: `/contacts/:id/read`
+
+**Method**: `PATCH`
+
+**Authentication**: Required (Bearer Token)
+
+**URL Parameters**:
+- `id`: Contact ID (integer)
+
+**Success Response**:
+- **Code**: 200 OK
+- **Content**:
+```json
+{
+  "status": "success",
+  "data": {
+    "id": 1,
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "message": "Hello, I would like to get in touch...",
+    "subject": "Project Inquiry",
+    "isRead": true,
+    "readAt": "2024-01-15T12:00:00.000Z",
+    "createdAt": "2024-01-15T10:30:00.000Z",
+    "updatedAt": "2024-01-15T12:00:00.000Z"
+  },
+  "meta": {}
+}
+```
+
+**Error Response**:
+- **Code**: 404 Not Found
+- **Content**:
+```json
+{
+  "status": "error",
+  "error": {
+    "code": "RESOURCE_NOT_FOUND",
+    "message": "Contact with ID 1 not found"
+  }
+}
+```
+
+OR
+
+- **Code**: 401 Unauthorized
+- **Content**:
+```json
+{
+  "status": "error",
+  "error": {
+    "code": "AUTHENTICATION_ERROR",
+    "message": "Unauthorized"
+  }
+}
+```
+
+### Delete Contact
+
+Deletes a contact submission. This endpoint requires authentication and is intended for administrators.
+
+**URL**: `/contacts/:id`
+
+**Method**: `DELETE`
+
+**Authentication**: Required (Bearer Token)
+
+**URL Parameters**:
+- `id`: Contact ID (integer)
+
+**Success Response**:
+- **Code**: 200 OK
+- **Content**:
+```json
+{
+  "status": "success",
+  "data": {
+    "message": "Contact successfully deleted"
+  },
+  "meta": {}
+}
+```
+
+**Error Response**:
+- **Code**: 404 Not Found
+- **Content**:
+```json
+{
+  "status": "error",
+  "error": {
+    "code": "RESOURCE_NOT_FOUND",
+    "message": "Contact with ID 1 not found"
+  }
+}
+```
+
+OR
+
+- **Code**: 401 Unauthorized
+- **Content**:
+```json
+{
+  "status": "error",
+  "error": {
+    "code": "AUTHENTICATION_ERROR",
+    "message": "Unauthorized"
   }
 }
 ```

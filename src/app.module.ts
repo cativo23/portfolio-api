@@ -8,6 +8,7 @@ import { ProjectsModule } from '@projects/projects.module';
 import { AuthModule } from '@auth/auth.module';
 import { UsersModule } from '@users/users.module';
 import { ApiKeyModule } from '@core/api-key.module';
+import { ContactsModule } from '@contacts/contacts.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ApiKeyModule } from '@core/api-key.module';
     AuthModule,
     UsersModule,
     ApiKeyModule,
+    ContactsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
