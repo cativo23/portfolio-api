@@ -1,6 +1,9 @@
 # Multi-stage build for production
 FROM node:24-bookworm AS builder
 
+# Set environment
+ENV NODE_ENV=production
+
 RUN npm install -g corepack
 RUN corepack enable && corepack prepare yarn@stable --activate
 
@@ -10,7 +13,7 @@ WORKDIR /app
 COPY package.json yarn.lock ./
 
 # Install all dependencies (including dev dependencies for build)
-RUN yarn install --immutable
+RUN yarn workspaces focus --all --production && rm -rf "$(yarn cache clean)"
 
 # Copy source code
 COPY . .
@@ -32,7 +35,7 @@ WORKDIR /app
 COPY package.json yarn.lock ./
 
 # Install production dependencies only
-RUN yarn install --immutable
+RUN yarn workspaces focus --all --production && rm -rf "$(yarn cache clean)"
 
 # Copy built application from builder
 COPY --from=builder /app/dist ./dist
