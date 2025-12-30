@@ -66,6 +66,9 @@ jobs:
             export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             export DB_NAME=${{ secrets.DB_NAME }}
             export MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
+            export JWT_SECRET=${{ secrets.JWT_SECRET }}
+            export JWT_EXPIRES_IN=${{ secrets.JWT_EXPIRES_IN }}
+            export CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
             
             cd /tmp/portfolio-api-deploy/
             
