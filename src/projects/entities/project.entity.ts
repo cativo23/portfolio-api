@@ -20,4 +20,7 @@ export class Project extends BaseEntity {
 
   @Column({ default: false })
   isFeatured: boolean;
+
+  @Column({ type: 'simple-json', nullable: true })
+  techStack: string[];
 }

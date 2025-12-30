@@ -20,4 +20,7 @@ export class UpdateProjectDto extends PartialType(CreateProjectDto) {
 
   @ApiPropertyOptional({ description: 'Is the project featured?' })
   isFeatured?: boolean;
+
+  @ApiPropertyOptional({ description: 'Tech stack', type: [String] })
+  techStack?: string[];
 }

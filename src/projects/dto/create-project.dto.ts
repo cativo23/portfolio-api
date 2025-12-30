@@ -4,6 +4,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsArray,
   IsUrl,
   IsBoolean,
 } from 'class-validator';
@@ -38,4 +39,10 @@ export class CreateProjectDto {
   @IsBoolean()
   @ApiPropertyOptional({ description: 'Is the project featured?' })
   isFeatured?: boolean;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @ApiPropertyOptional({ description: 'Tech stack', type: [String] })
+  techStack?: string[];
 }

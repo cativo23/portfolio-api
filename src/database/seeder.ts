@@ -37,19 +37,82 @@ async function seed() {
     const projects = [
       projectRepo.create({
         title: 'Portfolio Website',
-        description: 'Full stack portfolio website built with NestJS and React',
+        description: 'Portfolio website built with Nuxt.js and Tailwind CSS',
         shortDescription: 'Personal portfolio site',
-        liveUrl: 'https://example.com',
-        repoUrl: 'https://github.com/example/portfolio',
+        liveUrl: 'https://cativo.dev',
+        repoUrl: 'https://github.com/cativo23/portfolio',
         isFeatured: true,
+        techStack: ['Nuxt.js', 'Tailwind CSS', 'Vue.js', 'TypeScript'],
       }),
       projectRepo.create({
-        title: 'API Service',
-        description: 'REST API for managing projects and contacts',
+        title: 'Portfolio API',
+        description: 'Portfolio API built with NestJS and TypeORM',
         shortDescription: 'Backend API',
-        liveUrl: null,
-        repoUrl: 'https://github.com/example/api',
+        liveUrl: 'https://api.cativo.dev',
+        repoUrl: 'https://github.com/cativo23/portfolio-api',
+        isFeatured: true,
+        techStack: [
+          'NestJS',
+          'TypeORM',
+          'MySQL',
+          'TypeScript',
+          'Docker',
+          'JWT',
+        ],
+      }),
+      projectRepo.create({
+        title: 'Blog Platform',
+        description:
+          'A blogging platform with rich text editing and user management',
+        shortDescription: 'Blogging platform',
+        liveUrl: 'https://blog.example.com',
+        repoUrl: 'https://github.com/cativo23/blog-platform',
         isFeatured: false,
+        techStack: ['Next.js', 'Tailwind CSS', 'TypeScript'],
+      }),
+
+      projectRepo.create({
+        title: 'Blog Platform',
+        description:
+          'A blogging platform with rich text editing and user management',
+        shortDescription: 'Blogging platform',
+        liveUrl: 'https://blog.example.com',
+        repoUrl: 'https://github.com/cativo23/blog-platform',
+        isFeatured: false,
+        techStack: ['Next.js', 'Tailwind CSS', 'TypeScript'],
+      }),
+
+      projectRepo.create({
+        title: 'E-commerce Store',
+        description:
+          'An e-commerce store with shopping cart and payment integration',
+        shortDescription: 'E-commerce application',
+        liveUrl: 'https://store.example.com',
+        repoUrl: 'https://github.com/cativo23/ecommerce-store',
+        isFeatured: false,
+        techStack: ['React', 'Node.js', 'Express', 'MongoDB', 'TypeScript'],
+      }),
+
+      projectRepo.create({
+        title: 'Task Manager',
+        description:
+          'A task management app with user authentication and real-time updates',
+        shortDescription: 'Task management application',
+        liveUrl: 'https://tasks.example.com',
+        repoUrl: 'https://github.com/cativo23/task-manager',
+        isFeatured: false,
+        techStack: ['Angular', 'Firebase', 'TypeScript'],
+      }),
+
+      projectRepo.create({
+        title: 'Social Media App',
+        description:
+          'A social media application with user profiles and messaging features',
+        shortDescription: 'Social media platform',
+        liveUrl: 'https://social.example.com',
+        repoUrl: 'https://github.com/cativo23/social-media-app',
+        isFeatured: false,
+        techStack: ['React', 'Node.js', 'Express', 'MongoDB', 'TypeScript'],
       }),
     ];
     await projectRepo.save(projects);
