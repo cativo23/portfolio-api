@@ -124,6 +124,7 @@ describe('AuthController', () => {
       expect(authService.register).toHaveBeenCalled();
     });
   });
+
   describe('profile', () => {
     it('should return both user from decorator and req.user', () => {
       const mockRequest = { user: mockUser };
