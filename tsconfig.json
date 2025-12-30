@@ -22,6 +22,7 @@
       "@auth/*": ["src/auth/*"],
       "@users/*": ["src/users/*"],
       "@projects/*": ["src/projects/*"],
+      "@contacts/*": ["src/contacts/*"],
       "@config/*": ["src/config/*"],
       "@database/*": ["src/database/*"],
       "@health/*": ["src/health/*"],

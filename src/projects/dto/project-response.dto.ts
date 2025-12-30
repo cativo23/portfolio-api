@@ -26,6 +26,9 @@ export class ProjectResponseDto {
   @ApiProperty({ description: 'Is the project featured?' })
   isFeatured: boolean;
 
+  @ApiProperty({ description: 'Tech stack', type: [String], required: false })
+  techStack?: string[];
+
   @ApiProperty({ description: 'Creation date' })
   createdAt: Date;
 
@@ -46,6 +49,7 @@ export class ProjectResponseDto {
     dto.liveUrl = project.liveUrl;
     dto.repoUrl = project.repoUrl;
     dto.isFeatured = project.isFeatured;
+    dto.techStack = project.techStack || [];
     dto.createdAt = project.createdAt;
     dto.updatedAt = project.updatedAt;
     return dto;

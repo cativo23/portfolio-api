@@ -19,6 +19,7 @@ import {
   ApiResponse,
   ApiBody,
   ApiBearerAuth,
+  ApiSecurity,
 } from '@nestjs/swagger';
 import {
   CreateProjectDto,
@@ -29,17 +30,19 @@ import {
 } from './dto';
 import { ProjectsService } from './projects.service';
 import { AuthGuard } from '@auth/auth.guard';
+import { JwtOrApiKeyGuard } from '@core/jwt-or-api-key.guard';
 import { ErrorResponseDto } from '@core/dto';
 import { ValidationPipe } from '@core/pipes';
 
 @ApiTags('Projects')
 @Controller('projects')
-@UseGuards(AuthGuard)
-@ApiBearerAuth()
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
   @Get()
+  @UseGuards(JwtOrApiKeyGuard)
+  @ApiBearerAuth()
+  @ApiSecurity('x-api-key')
   @ApiOperation({ summary: 'Get all projects' })
   @ApiQuery({
     name: 'page',
@@ -90,6 +93,9 @@ export class ProjectsController {
   }
 
   @Get(':id')
+  @UseGuards(JwtOrApiKeyGuard)
+  @ApiBearerAuth()
+  @ApiSecurity('x-api-key')
   @ApiOperation({ summary: 'Get a project by ID' })
   @ApiParam({ name: 'id', type: String, description: 'Project ID' })
   @ApiResponse({
@@ -112,6 +118,8 @@ export class ProjectsController {
   }
 
   @Post()
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new project' })
   @UsePipes(new ValidationPipe())
   @ApiBody({ type: CreateProjectDto })
@@ -137,6 +145,8 @@ export class ProjectsController {
   }
 
   @Patch(':id')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a project by ID' })
   @UsePipes(new ValidationPipe())
   @ApiParam({ name: 'id', type: String, description: 'Project ID' })
@@ -169,6 +179,8 @@ export class ProjectsController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a project by ID' })
   @ApiParam({ name: 'id', type: String, description: 'Project ID' })
   @ApiResponse({

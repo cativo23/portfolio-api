@@ -11,17 +11,66 @@ import {
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Set up CORS
+  const allowedOrigins = process.env.CORS_ORIGINS
+    ? process.env.CORS_ORIGINS.split(',')
+    : [
+        'http://localhost:3000',
+        'http://localhost:5173',
+        'http://localhost:5174',
+      ];
+
+  app.enableCors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, Postman, curl)
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      // Check if origin is in allowed list
+      if (
+        allowedOrigins.includes(origin) ||
+        process.env.NODE_ENV === 'development'
+      ) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
+    exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  });
+
   // Set up global pipes, interceptors, and filters
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new ResponseTransformInterceptor());
   app.useGlobalFilters(new GlobalExceptionFilter());
 
   // Set up Swagger
+
   const config = new DocumentBuilder()
     .setTitle('Portfolio API')
     .setDescription('API for my personal portfolio')
     .setVersion('1.0')
-    .addBearerAuth()
+    .addBearerAuth({
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+      name: 'Authorization',
+      description: 'Enter JWT token',
+      in: 'header',
+    })
+    .addApiKey(
+      {
+        type: 'apiKey',
+        name: 'x-api-key',
+        in: 'header',
+        description: 'Paste your API key here',
+      },
+      'x-api-key',
+    )
     .build();
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);

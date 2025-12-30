@@ -1,3 +1,6 @@
+permissions:
+  contents: write
+
 name: CI
 
 on:
@@ -30,13 +33,27 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
 
       - name: Run tests
         run: yarn test
 
       - name: Run code formatter
         run: yarn format
+
+      - name: Set up git for pushing
+        run: |
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+
+      - name: Commit formatted code if needed
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          if [[ -n $(git status --porcelain) ]]; then
+            git add .
+            git commit -m "chore: apply code formatting [ci skip]"
+            git push
+          fi
 
       - name: Run linter
         run: yarn lint
