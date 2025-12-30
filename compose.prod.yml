@@ -1,0 +1,56 @@
+services:
+  api:
+    image: ${DOCKER_USERNAME:-yourusername}/portfolio-api:latest
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portfolio-api.rule=Host(`api.cativo.dev`)"
+      - "traefik.http.routers.portfolio-api.entrypoints=websecure"
+      - "traefik.http.routers.portfolio-api.tls.certresolver=letsencryptresolver"
+      - "traefik.http.services.portfolio-api.loadbalancer.server.port=3000"
+    networks:
+      - space-server_web
+      - portfolio-internal
+
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - portfolio-internal
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    # Don't expose MySQL port publicly in production
+    # ports:
+    #   - '3306:3306'
+
+networks:
+  space-server_web:
+    external: true
+  portfolio-internal:
+    driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local

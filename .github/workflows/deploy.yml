@@ -1,0 +1,95 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKER_USERNAME }}/portfolio-api
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/prod/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/portfolio-api:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/portfolio-api:buildcache,mode=max
+
+      - name: Copy compose file to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: 186.32.90.71
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          source: "compose.prod.yml"
+          target: "/tmp/portfolio-api-deploy/"
+
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 186.32.90.71
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          envs: DOCKER_USERNAME,DB_USERNAME,DB_PASSWORD,DB_NAME,MYSQL_ROOT_PASSWORD
+          script: |
+            export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
+            export DB_USERNAME=${{ secrets.DB_USERNAME }}
+            export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            export DB_NAME=${{ secrets.DB_NAME }}
+            export MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
+            
+            cd /tmp/portfolio-api-deploy/
+            
+            # Login to Docker Hub on server
+            echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+            
+            # Pull latest image
+            docker compose -f compose.prod.yml pull
+            
+            # Stop and remove old containers (but keep volumes)
+            docker compose -f compose.prod.yml down || true
+            
+            # Start new containers
+            docker compose -f compose.prod.yml up -d
+            
+            # Wait for services to be healthy
+            sleep 10
+            
+            # Run database migrations (if needed)
+            # docker compose -f compose.prod.yml exec -T api yarn migration:run || true
+            
+            # Clean up old images
+            docker image prune -f
+            
+            # Show logs
+            echo "=== Deployment Logs ==="
+            docker compose -f compose.prod.yml logs --tail=50
