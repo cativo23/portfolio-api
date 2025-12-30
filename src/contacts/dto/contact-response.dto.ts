@@ -23,7 +23,10 @@ export class ContactResponseDto {
   @ApiProperty({ description: 'Whether the contact has been read' })
   isRead: boolean;
 
-  @ApiProperty({ description: 'Date when the contact was read', required: false })
+  @ApiProperty({
+    description: 'Date when the contact was read',
+    required: false,
+  })
   readAt?: Date;
 
   @ApiProperty({ description: 'Creation date' })

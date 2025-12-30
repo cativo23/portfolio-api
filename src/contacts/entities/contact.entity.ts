@@ -6,21 +6,21 @@ import { Entity, Column } from 'typeorm';
  */
 @Entity('contacts')
 export class Contact extends BaseEntity {
-    @Column()
-    name: string;
+  @Column()
+  name: string;
 
-    @Column()
-    email: string;
+  @Column()
+  email: string;
 
-    @Column({ type: 'text' })
-    message: string;
+  @Column({ type: 'text' })
+  message: string;
 
-    @Column({ nullable: true })
-    subject?: string;
+  @Column({ nullable: true })
+  subject?: string;
 
-    @Column({ default: false })
-    isRead: boolean;
+  @Column({ default: false })
+  isRead: boolean;
 
-    @Column({ nullable: true, type: 'timestamp' })
-    readAt?: Date;
+  @Column({ nullable: true, type: 'timestamp' })
+  readAt?: Date;
 }
