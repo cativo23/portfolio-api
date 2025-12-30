@@ -57,10 +57,6 @@ COPY --from=builder /app/dist ./dist
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Create non-root user
-RUN useradd -m -u 1000 node && chown -R node:node /app
-USER node
-
 # Expose port
 EXPOSE 3000
 
