@@ -1,19 +1,25 @@
 # Multi-stage build for production
 FROM node:24-bookworm AS builder
 
-# Set environment
-ENV NODE_ENV=production
-
 RUN npm install -g corepack
 RUN corepack enable && corepack prepare yarn@stable --activate
 
+LABEL org.opencontainers.image.authors="cativo23.kt@gmail.com"
+
 WORKDIR /app
+
+# Copy yarn configuration and release (required for Yarn 4)
+COPY .yarnrc.yml ./
+COPY .yarn ./.yarn
 
 # Copy package files
 COPY package.json yarn.lock ./
 
-# Install all dependencies (including dev dependencies for build)
-RUN yarn workspaces focus --all --production && rm -rf "$(yarn cache clean)"
+# Install to initialize workspace state
+RUN yarn install --immutable
+
+# Focus on all workspaces (including dev dependencies for build)
+RUN yarn workspaces focus --all
 
 # Copy source code
 COPY . .
@@ -31,11 +37,18 @@ LABEL org.opencontainers.image.authors="cativo23.kt@gmail.com"
 
 WORKDIR /app
 
+# Copy yarn configuration and release (required for Yarn 4)
+COPY .yarnrc.yml ./
+COPY .yarn ./.yarn
+
 # Copy package files
 COPY package.json yarn.lock ./
 
-# Install production dependencies only
-RUN yarn workspaces focus --all --production && rm -rf "$(yarn cache clean)"
+# Install to initialize workspace state
+RUN yarn install --immutable
+
+# Focus on production dependencies only (replaces yarn install --production)
+RUN yarn workspaces focus --all --production
 
 # Copy built application from builder
 COPY --from=builder /app/dist ./dist
