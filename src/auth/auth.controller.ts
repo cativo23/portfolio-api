@@ -28,7 +28,7 @@ import { User as UserDecorator } from './decorators/user.decorator';
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService) {}
 
   /**
    * Handles user login by validating credentials and returning an authentication token.
