@@ -17,5 +17,6 @@ jobs:
         username: ${{ secrets.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          touch /home/cativo23/deploy/portfolio-api-deploy/test.txt
-          echo "ok" > /home/cativo23/deploy/portfolio-api-deploy/test.txt
+          whoami
+          pwd
+          ls -la /home/cativo23
