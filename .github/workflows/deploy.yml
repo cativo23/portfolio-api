@@ -56,7 +56,8 @@ jobs:
           source: "./compose.prod.yml"
           target: "/tmp/portfolio-api-deploy/"
           debug: true
-          timeout: 100
+          timeout: 120s
+          command_timeout: 5m
 
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
