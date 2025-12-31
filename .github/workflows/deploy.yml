@@ -51,7 +51,7 @@ jobs:
         with:
           host: 186.32.90.71
           username: ${{ secrets.SSH_USERNAME }}
-          password: ${{ secrets.SSH_PASSWORD }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           source: "compose.prod.yml"
           target: "/tmp/portfolio-api-deploy/"
