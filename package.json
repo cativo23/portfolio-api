@@ -22,6 +22,8 @@
     "migration:create": "npx ts-node -P ./tsconfig.json -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:create -d ./src/config/typeorm.config.ts ./src/database/migrations/migration",
     "migration:run": "npx ts-node -P ./tsconfig.json -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d ./src/config/typeorm.config.ts",
     "migration:revert": "npx ts-node -P ./tsconfig.json -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:revert -d ./src/config/typeorm.config.ts",
+    "migration:run:prod": "node ./node_modules/typeorm/cli.js migration:run -d ./dist/src/config/typeorm.config.prod.js",
+    "migration:revert:prod": "node ./node_modules/typeorm/cli.js migration:revert -d ./dist/src/config/typeorm.config.prod.js",
     "seed:test": "npx ts-node -r tsconfig-paths/register src/database/seeder.ts"
   },
   "dependencies": {
