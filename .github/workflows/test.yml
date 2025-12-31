@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: prod
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Copy compose file to server
         uses: appleboy/scp-action@v1
         with:
