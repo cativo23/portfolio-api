@@ -1,0 +1,9 @@
+- name: Test write permission
+  uses: appleboy/ssh-action@v1.0.3
+  with:
+    host: 186.32.90.71
+    username: ${{ secrets.SSH_USERNAME }}
+    key: ${{ secrets.SSH_PRIVATE_KEY }}
+    script: |
+      touch /tmp/portfolio-api-deploy/test.txt
+      echo "ok" > /tmp/portfolio-api-deploy/test.txt
