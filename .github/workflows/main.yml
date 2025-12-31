@@ -1,9 +1,21 @@
-- name: Test write permission
-  uses: appleboy/ssh-action@v1.0.3
-  with:
-    host: 186.32.90.71
-    username: ${{ secrets.SSH_USERNAME }}
-    key: ${{ secrets.SSH_PRIVATE_KEY }}
-    script: |
-      touch /tmp/portfolio-api-deploy/test.txt
-      echo "ok" > /tmp/portfolio-api-deploy/test.txt
+name: Test
+
+on:
+  push:
+    branches: [main]
+    
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: prod  # Add this line to reference the "prod" environment
+    
+    steps:
+    - name: Test write permission
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: 186.32.90.71
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          touch /tmp/portfolio-api-deploy/test.txt
+          echo "ok" > /tmp/portfolio-api-deploy/test.txt
