@@ -24,7 +24,8 @@
     "migration:revert": "npx ts-node -P ./tsconfig.json -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:revert -d ./src/config/typeorm.config.ts",
     "migration:run:prod": "node ./node_modules/typeorm/cli.js migration:run -d ./dist/src/config/typeorm.config.prod.js",
     "migration:revert:prod": "node ./node_modules/typeorm/cli.js migration:revert -d ./dist/src/config/typeorm.config.prod.js",
-    "seed:test": "npx ts-node -r tsconfig-paths/register src/database/seeder.ts"
+    "seed:test": "npx ts-node -r tsconfig-paths/register src/database/seeder.ts",
+    "seed:test:prod": "TS_NODE_PROJECT=./tsconfig.prod.json node -r tsconfig-paths/register dist/src/database/seeder.prod.js"
   },
   "dependencies": {
     "@nestjs/axios": "^4.0.0",
