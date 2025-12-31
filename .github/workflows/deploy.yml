@@ -53,8 +53,9 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
-          source: "compose.prod.yml"
+          source: "./compose.prod.yml"
           target: "/tmp/portfolio-api-deploy/"
+          debug: true
 
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
