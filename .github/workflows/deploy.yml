@@ -47,7 +47,7 @@ jobs:
           cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/portfolio-api:buildcache,mode=max
 
       - name: Copy compose file to server
-        uses: appleboy/scp-action@v0.1.7
+        uses: appleboy/scp-action@v1
         with:
           host: cativo.dev
           username: ${{ secrets.SSH_USERNAME }}
