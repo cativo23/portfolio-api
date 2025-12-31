@@ -49,7 +49,7 @@ jobs:
       - name: Copy compose file to server
         uses: appleboy/scp-action@v1
         with:
-          host: cativo.dev
+          host: 186.32.90.71
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           port: 22
