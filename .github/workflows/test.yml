@@ -17,7 +17,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
-          source: "./compose.prod.yml"
+          source: "compose.prod.yml"
           target: "/home/cativo23/deploy/portfolio-api-deploy"
           debug: true
           timeout: 120s
