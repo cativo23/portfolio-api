@@ -16,6 +16,8 @@ jobs:
         host: 186.32.90.71
         username: ${{ secrets.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
+        timeout: 120s
+        command_timeout: 5m
         script: |
           set -eux
           mkdir -p /home/cativo23/deploy/portfolio-api-deploy
