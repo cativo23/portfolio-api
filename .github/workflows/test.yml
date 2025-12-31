@@ -25,3 +25,4 @@ jobs:
           debug: true
           timeout: 120s
           command_timeout: 5m
+          tar_exec: tar
