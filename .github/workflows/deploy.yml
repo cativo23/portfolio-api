@@ -53,11 +53,12 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
-          source: "./compose.prod.yml"
-          target: "/tmp/portfolio-api-deploy/"
+          source: "compose.prod.yml"
+          target: "/home/cativo23/deploy/portfolio-api-deploy"
           debug: true
           timeout: 120s
           command_timeout: 5m
+          tar_exec: tar
 
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
