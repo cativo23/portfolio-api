@@ -18,12 +18,15 @@ import {
   ApiOperation,
   ApiResponse,
   ApiTags,
+  ApiUnauthorizedResponse,
+  ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
 import { CreateUserDto } from '@users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from './auth.guard';
 import { User } from '@users/entities/user.entity';
 import { User as UserDecorator } from './decorators/user.decorator';
+import { ApiCustomResponses } from '@core/decorators';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -40,28 +43,34 @@ export class AuthController {
   @Post('login')
   @UsePipes(new ValidationPipe())
   @ApiOperation({ summary: 'User Login' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'The record found',
-    type: SuccessResponseDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.UNPROCESSABLE_ENTITY,
-    description: 'Validation failed',
-    type: ErrorResponseDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED,
-    description: 'Invalid credentials',
-    type: ErrorResponseDto,
-    example: {
-      status: 'error',
-      error: {
-        code: ErrorCode.AUTHENTICATION_ERROR,
-        message: 'Password does not match',
+  @ApiCustomResponses(
+    ApiResponse({
+      status: HttpStatus.OK,
+      description:
+        'Login successful - returns authentication token and user data',
+      type: SuccessResponseDto,
+    }),
+    ApiUnprocessableEntityResponse({
+      description: 'Validation failed - Invalid input data',
+      type: ErrorResponseDto,
+    }),
+    ApiUnauthorizedResponse({
+      description: 'Invalid credentials - Email or password incorrect',
+      type: ErrorResponseDto,
+      schema: {
+        example: {
+          status: 'error',
+          request_id: 'req_88229911aabb',
+          error: {
+            code: ErrorCode.AUTHENTICATION_ERROR,
+            message: 'Password does not match',
+            path: '/api/v1/auth/login',
+            timestamp: '2026-01-08T14:05:00Z',
+          },
+        },
       },
-    },
-  })
+    }),
+  )
   async login(@Body() loginDto: LoginDto): Promise<any> {
     return this.authService.login(loginDto.email, loginDto.password);
   }
@@ -70,16 +79,17 @@ export class AuthController {
   @Post('register')
   @UsePipes(new ValidationPipe())
   @ApiOperation({ summary: 'User Registration' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'The record found',
-    type: CreateUserDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.UNPROCESSABLE_ENTITY,
-    description: 'Validation failed',
-    type: ErrorResponseDto,
-  })
+  @ApiCustomResponses(
+    ApiResponse({
+      status: HttpStatus.OK,
+      description: 'User registered successfully',
+      type: User,
+    }),
+    ApiUnprocessableEntityResponse({
+      description: 'Validation failed - Invalid input data',
+      type: ErrorResponseDto,
+    }),
+  )
   register(
     @Body() signUpDto: CreateUserDto,
   ): Promise<User> | BadRequestException {
@@ -94,6 +104,30 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get User Profile' })
+  @ApiCustomResponses(
+    ApiResponse({
+      status: HttpStatus.OK,
+      description: 'User profile retrieved successfully',
+      schema: {
+        example: {
+          user: {
+            id: 1,
+            email: 'user@example.com',
+            username: 'username',
+          },
+          req_user: {
+            id: 1,
+            email: 'user@example.com',
+            username: 'username',
+          },
+        },
+      },
+    }),
+    ApiUnauthorizedResponse({
+      description: 'Unauthorized - Missing or invalid authentication token',
+      type: ErrorResponseDto,
+    }),
+  )
   profile(@Request() req: any, @UserDecorator() user: any) {
     return {
       user: user,

@@ -11,3 +11,4 @@ export * from './context/request-context.interface';
 export * from './context/request-context.service';
 export * from './context/request-context.decorator';
 export * from './context/request-context.module';
+export * from './decorators';

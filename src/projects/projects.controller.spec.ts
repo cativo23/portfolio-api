@@ -102,11 +102,11 @@ describe('ProjectsController', () => {
         repoUrl: 'url',
       };
 
-      mockService.create.mockResolvedValue(mockSingleProjectResponseDto);
+      mockService.create.mockResolvedValue(mockProject);
 
       const result = await controller.create(dto);
 
-      expect(result).toBe(mockSingleProjectResponseDto);
+      expect(result).toEqual(mockSingleProjectResponseDto);
       expect(service.create).toHaveBeenCalledWith(dto);
     });
 
@@ -126,10 +126,15 @@ describe('ProjectsController', () => {
 
   describe('findAll', () => {
     it('should return a paginated list of projects', async () => {
-      mockService.findAll.mockResolvedValue(mockProjectsListResponseDto);
+      mockService.findAll.mockResolvedValue({
+        items: [mockProject],
+        total: 1,
+        page: 1,
+        per_page: 10,
+      });
 
       const response = await controller.findAll('1', '10');
-      expect(response).toBe(mockProjectsListResponseDto);
+      expect(response).toEqual(mockProjectsListResponseDto);
       expect(service.findAll).toHaveBeenCalledWith({
         page: 1,
         per_page: 10,
@@ -146,10 +151,10 @@ describe('ProjectsController', () => {
 
   describe('findOne', () => {
     it('should return a single project', async () => {
-      mockService.findOne.mockResolvedValue(mockSingleProjectResponseDto);
+      mockService.findOne.mockResolvedValue(mockProject);
       const result = await controller.findOne('1');
 
-      expect(result).toBe(mockSingleProjectResponseDto);
+      expect(result).toEqual(mockSingleProjectResponseDto);
       expect(service.findOne).toHaveBeenCalledWith(1);
     });
 
@@ -167,15 +172,15 @@ describe('ProjectsController', () => {
         description: 'Updated',
       };
 
-      // Create a new mock response with updated data
+      // Create a new mock entity with updated data
       const updatedProject = { ...mockProject, ...dto };
       const updatedResponseDto =
         SingleProjectResponseDto.fromEntity(updatedProject);
-      mockService.update.mockResolvedValue(updatedResponseDto);
+      mockService.update.mockResolvedValue(updatedProject);
 
       const result = await controller.update('1', dto);
 
-      expect(result).toBe(updatedResponseDto);
+      expect(result).toEqual(updatedResponseDto);
       expect(service.update).toHaveBeenCalledWith(1, dto);
     });
 

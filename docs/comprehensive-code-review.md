@@ -1,0 +1,1261 @@
+# Comprehensive Code Review - Portfolio API
+
+**Date**: 2026-01-08  
+**Reviewer**: Senior Backend Developer - API Design Specialist  
+**Focus**: Code quality, architecture, best practices, industry standards
+
+---
+
+## Executive Summary
+
+This comprehensive code review identifies code duplication, architectural issues, and areas for improvement following industry best practices and NestJS conventions. The API demonstrates good response standardization and documentation practices, but there are significant opportunities to improve code maintainability, reduce duplication, and enhance type safety.
+
+**Key Findings:**
+- ⚠️ **Critical**: Significant code duplication across services (pagination, query building, error handling)
+- ⚠️ **High**: Missing query parameter validation DTOs
+- ⚠️ **High**: Inefficient update operations (double database queries)
+- ⚠️ **Medium**: Type safety issues with `any` types
+- ⚠️ **Medium**: Guards not using custom exceptions consistently
+- ✅ **Good**: Response standardization is well-implemented
+- ✅ **Good**: Swagger documentation patterns are consistent
+
+---
+
+## Table of Contents
+
+1. [Code Duplication Issues](#1-code-duplication-issues)
+2. [Architecture & Design Patterns](#2-architecture--design-patterns)
+3. [Error Handling](#3-error-handling)
+4. [Type Safety](#4-type-safety)
+5. [Validation & Input Handling](#5-validation--input-handling)
+6. [Database & Performance](#6-database--performance)
+7. [Guards & Authentication](#7-guards--authentication)
+8. [DTOs & Response Transformation](#8-dtos--response-transformation)
+9. [Interceptors & Middleware](#9-interceptors--middleware)
+10. [Recommendations Priority Matrix](#10-recommendations-priority-matrix)
+
+---
+
+## 1. Code Duplication Issues
+
+### 1.1 Pagination Logic Duplication ⚠️ CRITICAL
+
+**Location**: `src/projects/projects.service.ts` and `src/contacts/contacts.service.ts`
+
+**Issue**: The `findAll` method contains nearly identical pagination, filtering, and query building logic in both services.
+
+**Current Implementation** (duplicated in both services):
+```typescript
+// ProjectsService.findAll and ContactsService.findAll
+async findAll(options: FindAllOptions): Promise<...> {
+  try {
+    const { page, per_page, search, ... } = options;
+    const query = this.repository.createQueryBuilder('table');
+    
+    // Filtering by search (duplicated logic)
+    if (search) {
+      query.andWhere('table.field LIKE :search OR table.field2 LIKE :search', {
+        search: `%${search}%`,
+      });
+    }
+    
+    // Filtering by boolean flag (duplicated logic)
+    if (typeof isFeatured !== 'undefined') {
+      query.andWhere('table.isFeatured = :isFeatured', { isFeatured });
+    }
+    
+    // Ordering (duplicated logic)
+    query.orderBy('table.createdAt', 'DESC');
+    
+    // Pagination (duplicated logic)
+    query.skip((page - 1) * per_page).take(per_page);
+    const [items, totalItems] = await query.getManyAndCount();
+    
+    // DTO mapping (duplicated pattern)
+    const dtos = items.map(item => ResponseDto.fromEntity(item));
+    
+    // Response creation (duplicated pattern)
+    return ListResponseDto.fromEntities(dtos, page, per_page, totalItems);
+  } catch (error) {
+    // Error handling (duplicated pattern)
+    this.logger.error('Error finding items', error.stack);
+    throw new InternalServerException('Error finding items');
+  }
+}
+```
+
+**Why This Is Bad:**
+1. **Violates DRY Principle**: Changes to pagination logic must be made in multiple places
+2. **Maintenance Burden**: Bug fixes need to be applied to multiple services
+3. **Inconsistency Risk**: Services may diverge over time
+4. **Testing Overhead**: Same logic tested multiple times
+
+**Recommendation**: Create a base service or utility class for common CRUD operations.
+
+**Suggested Solution**:
+```typescript
+// src/core/services/base-crud.service.ts
+@Injectable()
+export abstract class BaseCrudService<TEntity, TCreateDto, TUpdateDto, TResponseDto> {
+  protected abstract repository: Repository<TEntity>;
+  protected abstract logger: Logger;
+
+  protected abstract getSearchFields(): string[]; // ['title', 'description'] or ['name', 'email', 'message']
+  protected abstract entityToDto(entity: TEntity): TResponseDto;
+  protected abstract getEntityName(): string; // 'projects' or 'contacts'
+
+  async findAll(
+    options: PaginationOptions,
+    filters?: Record<string, any>,
+  ): Promise<{ items: TResponseDto[]; total: number; page: number; per_page: number }> {
+    const { page, per_page, search } = options;
+    const query = this.repository.createQueryBuilder(this.getEntityName());
+
+    // Apply search
+    if (search && this.getSearchFields().length > 0) {
+      const searchConditions = this.getSearchFields()
+        .map(field => `${this.getEntityName()}.${field} LIKE :search`)
+        .join(' OR ');
+      query.andWhere(`(${searchConditions})`, { search: `%${search}%` });
+    }
+
+    // Apply filters
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (typeof value !== 'undefined') {
+          query.andWhere(`${this.getEntityName()}.${key} = :${key}`, { [key]: value });
+        }
+      });
+    }
+
+    // Ordering
+    query.orderBy(`${this.getEntityName()}.createdAt`, 'DESC');
+
+    // Pagination
+    query.skip((page - 1) * per_page).take(per_page);
+
+    const [items, total] = await query.getManyAndCount();
+
+    return {
+      items: items.map(item => this.entityToDto(item)),
+      total,
+      page,
+      per_page,
+    };
+  }
+}
+
+// Usage in ProjectsService
+@Injectable()
+export class ProjectsService extends BaseCrudService<Project, CreateProjectDto, UpdateProjectDto, ProjectResponseDto> {
+  protected getSearchFields(): string[] {
+    return ['title', 'description'];
+  }
+  
+  protected entityToDto(entity: Project): ProjectResponseDto {
+    return ProjectResponseDto.fromEntity(entity);
+  }
+  
+  protected getEntityName(): string {
+    return 'projects';
+  }
+  
+  async findAll(options: FindAllOptions): Promise<ProjectsListResponseDto> {
+    const result = await super.findAll(options, { isFeatured: options.isFeatured });
+    return ProjectsListResponseDto.fromEntities(result.items, result.page, result.per_page, result.total);
+  }
+}
+```
+
+**Alternative (Lighter) Solution**: Create a pagination utility:
+```typescript
+// src/core/utils/pagination.util.ts
+export class PaginationUtil {
+  static async paginate<TEntity, TDto>(
+    repository: Repository<TEntity>,
+    options: {
+      page: number;
+      per_page: number;
+      search?: string;
+      searchFields?: string[];
+      filters?: Record<string, any>;
+      orderBy?: { field: string; direction: 'ASC' | 'DESC' };
+      alias?: string;
+    },
+    mapper: (entity: TEntity) => TDto,
+  ): Promise<{ items: TDto[]; total: number }> {
+    const { page, per_page, search, searchFields = [], filters, orderBy, alias = 'entity' } = options;
+    const query = repository.createQueryBuilder(alias);
+
+    // Search
+    if (search && searchFields.length > 0) {
+      const conditions = searchFields.map(field => `${alias}.${field} LIKE :search`).join(' OR ');
+      query.andWhere(`(${conditions})`, { search: `%${search}%` });
+    }
+
+    // Filters
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (typeof value !== 'undefined') {
+          query.andWhere(`${alias}.${key} = :${key}`, { [key]: value });
+        }
+      });
+    }
+
+    // Ordering
+    query.orderBy(
+      orderBy ? `${alias}.${orderBy.field}` : `${alias}.createdAt`,
+      orderBy?.direction || 'DESC',
+    );
+
+    // Pagination
+    query.skip((page - 1) * per_page).take(per_page);
+
+    const [items, total] = await query.getManyAndCount();
+    return { items: items.map(mapper), total };
+  }
+}
+```
+
+---
+
+### 1.2 Response DTO Factory Methods Duplication ⚠️ HIGH
+
+**Location**: 
+- `src/projects/dto/projects-list-response.dto.ts:35-53`
+- `src/contacts/dto/contacts-list-response.dto.ts:35-53`
+
+**Issue**: The `fromEntities` method is identical in both classes.
+
+**Current Implementation** (duplicated):
+```typescript
+// ProjectsListResponseDto.fromEntities and ContactsListResponseDto.fromEntities
+static fromEntities(
+  items: TResponseDto[],
+  page: number,
+  limit: number,
+  totalItems: number,
+): TListResponseDto {
+  const total_pages = Math.ceil(totalItems / limit);
+  const paginationMeta: PaginationMetaDto = {
+    page,
+    limit,
+    total_items: totalItems,
+    total_pages,
+  };
+  return new SuccessResponseDto(items, {
+    pagination: paginationMeta,
+  }) as TListResponseDto;
+}
+```
+
+**Why This Is Bad:**
+1. Code duplication
+2. Type assertions (`as TListResponseDto`) reduce type safety
+3. Changes to pagination metadata format require updates in multiple places
+
+**Recommendation**: Create a base paginated response DTO class.
+
+**Suggested Solution**:
+```typescript
+// src/core/dto/paginated-response.dto.ts
+export abstract class PaginatedResponseDto<TItem> extends SuccessResponseDto<TItem[]> {
+  @ApiProperty({
+    description: 'Response metadata',
+    type: ResponseMetaDto,
+  })
+  meta: ResponseMetaDto;
+
+  protected static createPaginatedResponse<TItem, TResponse extends PaginatedResponseDto<TItem>>(
+    items: TItem[],
+    page: number,
+    limit: number,
+    totalItems: number,
+    ResponseClass: new (items: TItem[], meta: ResponseMetaDto) => TResponse,
+  ): TResponse {
+    const total_pages = Math.ceil(totalItems / limit);
+    const paginationMeta: PaginationMetaDto = {
+      page,
+      limit,
+      total_items: totalItems,
+      total_pages,
+    };
+    return new ResponseClass(items, { pagination: paginationMeta });
+  }
+}
+
+// Usage
+export class ProjectsListResponseDto extends PaginatedResponseDto<ProjectResponseDto> {
+  static fromEntities(
+    projects: ProjectResponseDto[],
+    page: number,
+    limit: number,
+    totalItems: number,
+  ): ProjectsListResponseDto {
+    return PaginatedResponseDto.createPaginatedResponse(
+      projects,
+      page,
+      limit,
+      totalItems,
+      ProjectsListResponseDto,
+    );
+  }
+
+  constructor(data: ProjectResponseDto[], meta: ResponseMetaDto) {
+    super(data, meta);
+  }
+}
+```
+
+---
+
+### 1.3 Query Parameter Parsing Duplication ⚠️ MEDIUM
+
+**Location**:
+- `src/projects/projects.controller.ts:75-84`
+- `src/contacts/contacts.controller.ts:90-105`
+
+**Issue**: Query parameter parsing and validation logic is duplicated across controllers.
+
+**Current Implementation**:
+```typescript
+// Duplicated in both controllers
+async findAll(
+  @Query('page') page?: string,
+  @Query('per_page') per_page?: string,
+  @Query('search') search?: string,
+  @Query('is_featured') is_featured?: string, // or is_read
+): Promise<...> {
+  const pageNumber = parseInt(page, 10) || 1;
+  const perPage = parseInt(per_page, 10) || 10;
+  const isFeatured = is_featured === undefined ? undefined : is_featured === 'true';
+  // ...
+}
+```
+
+**Why This Is Bad:**
+1. No validation for negative numbers, zero, or maximum limits
+2. Inconsistent parsing (using `parseInt` instead of pipes)
+3. Boolean parsing is error-prone (`'true'` string comparison)
+4. Duplicated logic
+
+**Recommendation**: Create query parameter DTOs with proper validation.
+
+**Suggested Solution**:
+```typescript
+// src/core/dto/pagination-query.dto.ts
+import { IsOptional, IsInt, Min, Max, IsString, IsBooleanString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+
+export class PaginationQueryDto {
+  @ApiPropertyOptional({ description: 'Page number', example: 1, minimum: 1, default: 1 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page?: number = 1;
+
+  @ApiPropertyOptional({ description: 'Items per page', example: 10, minimum: 1, maximum: 100, default: 10 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  per_page?: number = 10;
+
+  @ApiPropertyOptional({ description: 'Search term' })
+  @IsOptional()
+  @IsString()
+  search?: string;
+}
+
+// src/projects/dto/find-all-projects-query.dto.ts
+export class FindAllProjectsQueryDto extends PaginationQueryDto {
+  @ApiPropertyOptional({ description: 'Filter by featured status', type: Boolean })
+  @IsOptional()
+  @IsBooleanString()
+  is_featured?: string; // Keep as string, parse in controller or use Transform decorator
+}
+
+// Controller usage
+@Get()
+async findAll(
+  @Query() query: FindAllProjectsQueryDto,
+): Promise<ProjectsListResponseDto> {
+  return this.projectsService.findAll({
+    page: query.page || 1,
+    per_page: query.per_page || 10,
+    search: query.search,
+    isFeatured: query.is_featured ? query.is_featured === 'true' : undefined,
+  });
+}
+```
+
+**Better Solution** (using Transform decorator):
+```typescript
+import { Transform } from 'class-transformer';
+
+export class FindAllProjectsQueryDto extends PaginationQueryDto {
+  @ApiPropertyOptional({ description: 'Filter by featured status', type: Boolean })
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return undefined;
+  })
+  is_featured?: boolean;
+}
+```
+
+---
+
+### 1.4 Error Handling Pattern Duplication ⚠️ HIGH
+
+**Location**: All service methods in `projects.service.ts` and `contacts.service.ts`
+
+**Issue**: Every service method wraps operations in try-catch blocks and converts all errors to `InternalServerException`, losing the original exception context.
+
+**Current Implementation** (duplicated pattern):
+```typescript
+async create(dto: CreateDto): Promise<ResponseDto> {
+  try {
+    const entity = this.repository.create(dto);
+    const saved = await this.repository.save(entity);
+    this.logger.log(`Entity created with ID ${saved.id}`);
+    return ResponseDto.fromEntity(saved);
+  } catch (error) {
+    this.logger.error('Error creating entity', error.stack);
+    throw new InternalServerException('Error creating entity'); // ❌ Loses original error
+  }
+}
+
+async findOne(id: number): Promise<ResponseDto> {
+  try {
+    const entity = await this.repository.findOne({ where: { id } });
+    if (!entity) {
+      throw new NotFoundException(`Entity with ID ${id} not found`);
+    }
+    return ResponseDto.fromEntity(entity);
+  } catch (error) {
+    if (error instanceof NotFoundException) {
+      throw error; // Re-throw
+    }
+    this.logger.error(`Error finding entity with ID ${id}`, error.stack);
+    throw new InternalServerException(`Error finding entity with ID ${id}`); // ❌ Loses context
+  }
+}
+```
+
+**Why This Is Bad:**
+1. **Loses Error Context**: Original database errors, constraint violations, etc. are lost
+2. **Poor Debugging**: Can't distinguish between different types of failures
+3. **Incorrect Error Types**: TypeORM errors, validation errors, etc. all become InternalServerException
+4. **Violates Exception Filter Purpose**: Global exception filter should handle this, not services
+
+**Recommendation**: Remove try-catch blocks from services and let exceptions bubble up to the global exception filter.
+
+**Suggested Solution**:
+```typescript
+// Remove try-catch from service methods
+async create(dto: CreateDto): Promise<ResponseDto> {
+  const entity = this.repository.create(dto);
+  const saved = await this.repository.save(entity);
+  this.logger.log(`Entity created with ID ${saved.id}`);
+  return ResponseDto.fromEntity(saved);
+  // Let database errors bubble up - GlobalExceptionFilter will handle them
+}
+
+async findOne(id: number): Promise<ResponseDto> {
+  const entity = await this.repository.findOne({ where: { id } });
+  
+  if (!entity) {
+    throw new NotFoundException(`Entity with ID ${id} not found`);
+  }
+  
+  this.logger.log(`Found entity with ID ${id}`);
+  return ResponseDto.fromEntity(entity);
+}
+```
+
+**Exception**: Only catch errors if you need to transform them into domain-specific exceptions:
+```typescript
+async create(dto: CreateDto): Promise<ResponseDto> {
+  try {
+    const entity = this.repository.create(dto);
+    const saved = await this.repository.save(entity);
+    return ResponseDto.fromEntity(saved);
+  } catch (error) {
+    // Only catch specific errors that need transformation
+    if (error.code === '23505') { // PostgreSQL unique violation
+      throw new ConflictException('Entity with this identifier already exists');
+    }
+    // Re-throw other errors to be handled by global filter
+    throw error;
+  }
+}
+```
+
+---
+
+## 2. Architecture & Design Patterns
+
+### 2.1 Response DTOs in Service Layer ⚠️ MEDIUM
+
+**Location**: All service methods return DTOs instead of entities
+
+**Issue**: Services are responsible for both business logic and response transformation, violating separation of concerns.
+
+**Current Implementation**:
+```typescript
+// Service returns DTO
+async findOne(id: number): Promise<ProjectResponseDto> {
+  const project = await this.repository.findOne({ where: { id } });
+  return ProjectResponseDto.fromEntity(project); // ❌ Transformation in service
+}
+```
+
+**Why This Is Bad:**
+1. **Violates Separation of Concerns**: Services should handle business logic, not presentation
+2. **Reduces Reusability**: Service can't be used for internal operations that need entities
+3. **Makes Testing Harder**: Must mock DTO transformations
+4. **Inconsistent with NestJS Best Practices**: Controllers/Interceptors should handle DTOs
+
+**Recommendation**: Services should return entities; controllers/interceptors should handle DTO transformation.
+
+**Suggested Solution**:
+```typescript
+// Service returns entity
+async findOne(id: number): Promise<Project> {
+  const project = await this.repository.findOne({ where: { id } });
+  
+  if (!project) {
+    throw new NotFoundException(`Project with ID ${id} not found`);
+  }
+  
+  return project;
+}
+
+// Controller handles DTO transformation
+@Get(':id')
+async findOne(@Param('id', ParseIntPipe) id: number): Promise<SingleProjectResponseDto> {
+  const project = await this.projectsService.findOne(id);
+  return SingleProjectResponseDto.fromEntity(project);
+}
+```
+
+**Note**: This is a design choice. If the API schema must not be modified (as stated), keeping DTOs in services is acceptable, but document this architectural decision.
+
+---
+
+### 2.2 Inefficient Update Operations ⚠️ HIGH
+
+**Location**: 
+- `src/projects/projects.service.ts:160-192`
+- `src/contacts/contacts.service.ts:158-195`
+
+**Issue**: Update methods perform three database queries instead of one: `findOne` → `update` → `findOne`.
+
+**Current Implementation**:
+```typescript
+async update(id: number, updateDto: UpdateDto): Promise<ResponseDto> {
+  // Query 1: Check existence
+  const existing = await this.repository.findOne({ where: { id } });
+  if (!existing) {
+    throw new NotFoundException(`Entity with ID ${id} not found`);
+  }
+
+  // Query 2: Update
+  await this.repository.update(id, updateDto);
+
+  // Query 3: Fetch updated entity
+  const updated = await this.repository.findOne({ where: { id } });
+  
+  return ResponseDto.fromEntity(updated); // ❌ Three queries!
+}
+```
+
+**Why This Is Bad:**
+1. **Performance**: Three database round-trips instead of one
+2. **Race Conditions**: Entity could be modified between update and fetch
+3. **Unnecessary Load**: Extra queries for no functional benefit
+
+**Recommendation**: Use TypeORM's `save` method or `update` with `returning` clause (if supported).
+
+**Suggested Solution** (Option 1 - Use save):
+```typescript
+async update(id: number, updateDto: UpdateDto): Promise<ResponseDto> {
+  const existing = await this.repository.findOne({ where: { id } });
+  
+  if (!existing) {
+    throw new NotFoundException(`Entity with ID ${id} not found`);
+  }
+
+  // Merge and save in one operation
+  const updated = this.repository.merge(existing, updateDto);
+  const saved = await this.repository.save(updated);
+  
+  return ResponseDto.fromEntity(saved); // Single query
+}
+```
+
+**Suggested Solution** (Option 2 - PostgreSQL RETURNING):
+```typescript
+async update(id: number, updateDto: UpdateDto): Promise<ResponseDto> {
+  const result = await this.repository
+    .createQueryBuilder()
+    .update(Entity)
+    .set(updateDto)
+    .where('id = :id', { id })
+    .returning('*')
+    .execute();
+
+  if (result.affected === 0) {
+    throw new NotFoundException(`Entity with ID ${id} not found`);
+  }
+
+  return ResponseDto.fromEntity(result.raw[0]); // Single query with returning
+}
+```
+
+---
+
+### 2.3 Missing Base Service Class ⚠️ MEDIUM
+
+**Issue**: No abstraction for common CRUD operations, leading to duplication.
+
+**Recommendation**: Create a generic base service for standard CRUD operations (as shown in section 1.1).
+
+---
+
+## 3. Error Handling
+
+### 3.1 Guards Not Using Custom Exceptions ⚠️ MEDIUM
+
+**Location**:
+- `src/auth/auth.guard.ts:23,31`
+- `src/core/api-key.guard.ts:30,35`
+
+**Issue**: Guards throw `UnauthorizedException` directly instead of using custom exceptions from the core exceptions module.
+
+**Current Implementation**:
+```typescript
+// AuthGuard
+if (!token) {
+  throw new UnauthorizedException(); // ❌ Generic exception
+}
+
+// ApiKeyGuard
+if (!apiKey) {
+  throw new UnauthorizedException('API key is missing'); // ❌ Generic exception
+}
+```
+
+**Why This Is Bad:**
+1. **Inconsistent Error Format**: Custom exceptions provide consistent error codes and structure
+2. **Missing Error Codes**: `UnauthorizedException` doesn't include error codes
+3. **Different from Service Layer**: Services use custom exceptions, but guards don't
+
+**Recommendation**: Use custom authentication exceptions.
+
+**Suggested Solution**:
+```typescript
+// src/core/exceptions/authentication.exception.ts (should already exist)
+// Use it in guards
+
+// AuthGuard
+import { AuthenticationException } from '@core/exceptions';
+
+if (!token) {
+  throw new AuthenticationException('Authentication token is missing');
+}
+
+// ApiKeyGuard
+if (!apiKey) {
+  throw new AuthenticationException('API key is missing');
+}
+```
+
+---
+
+### 3.2 JwtOrApiKeyGuard Swallows Errors ⚠️ MEDIUM
+
+**Location**: `src/core/jwt-or-api-key.guard.ts:16-26`
+
+**Issue**: The guard uses empty catch blocks, silently swallowing errors.
+
+**Current Implementation**:
+```typescript
+async canActivate(context: ExecutionContext): Promise<boolean> {
+  const authGuard = this.moduleRef.get(AuthGuard, { strict: false });
+  const apiKeyGuard = this.moduleRef.get(ApiKeyGuard, { strict: false });
+
+  // Try JWT first
+  try {
+    if (authGuard && (await authGuard.canActivate(context))) {
+      return true;
+    }
+  } catch {} // ❌ Silently swallows errors
+
+  // Try API Key
+  try {
+    if (apiKeyGuard && (await apiKeyGuard.canActivate(context))) {
+      return true;
+    }
+  } catch {} // ❌ Silently swallows errors
+
+  return false;
+}
+```
+
+**Why This Is Bad:**
+1. **Hides Errors**: Unexpected errors (network issues, database errors, etc.) are silently ignored
+2. **Poor Debugging**: Can't diagnose why authentication fails
+3. **Security Risk**: Could mask security-related errors
+
+**Recommendation**: Only catch specific expected exceptions, log others.
+
+**Suggested Solution**:
+```typescript
+async canActivate(context: ExecutionContext): Promise<boolean> {
+  const authGuard = this.moduleRef.get(AuthGuard, { strict: false });
+  const apiKeyGuard = this.moduleRef.get(ApiKeyGuard, { strict: false });
+
+  // Try JWT first
+  if (authGuard) {
+    try {
+      if (await authGuard.canActivate(context)) {
+        return true;
+      }
+    } catch (error) {
+      // Only catch authentication errors, not unexpected errors
+      if (error instanceof AuthenticationException || error instanceof UnauthorizedException) {
+        // Expected - try API key
+      } else {
+        // Unexpected error - log and re-throw
+        this.logger.error('Unexpected error in JWT guard', error);
+        throw error;
+      }
+    }
+  }
+
+  // Try API Key
+  if (apiKeyGuard) {
+    try {
+      if (await apiKeyGuard.canActivate(context)) {
+        return true;
+      }
+    } catch (error) {
+      // Only catch authentication errors
+      if (error instanceof AuthenticationException || error instanceof UnauthorizedException) {
+        // Both failed - return false
+      } else {
+        // Unexpected error - log and re-throw
+        this.logger.error('Unexpected error in API key guard', error);
+        throw error;
+      }
+    }
+  }
+
+  return false;
+}
+```
+
+---
+
+### 3.3 Error Context Loss in Services ⚠️ HIGH
+
+**Issue**: As mentioned in section 1.4, services catch all errors and convert them to `InternalServerException`, losing important context.
+
+**Recommendation**: Remove unnecessary try-catch blocks (see section 1.4).
+
+---
+
+## 4. Type Safety
+
+### 4.1 Use of `any` Types ⚠️ MEDIUM
+
+**Location**:
+- `src/auth/auth.controller.ts:74,95,131,134`
+- `src/core/api-key.controller.ts:100`
+- `src/core/interceptors/response-transform.interceptor.ts:56` (type assertion)
+
+**Issue**: Using `any` types reduces type safety and can lead to runtime errors.
+
+**Examples**:
+```typescript
+// auth.controller.ts
+async login(@Body() loginDto: LoginDto): Promise<any> { // ❌
+  return this.authService.login(loginDto.email, loginDto.password);
+}
+
+profile(@Request() req: any, @UserDecorator() user: any) { // ❌
+  return { user: user, req_user: req.user };
+}
+
+// api-key.controller.ts
+async findAll(): Promise<SuccessResponseDto<any[]>> { // ❌
+  return new SuccessResponseDto(keys);
+}
+```
+
+**Why This Is Bad:**
+1. **Loses Type Safety**: TypeScript can't catch errors at compile time
+2. **Poor IDE Support**: No autocomplete or type hints
+3. **Runtime Errors**: Errors only discovered at runtime
+
+**Recommendation**: Create proper types/interfaces.
+
+**Suggested Solution**:
+```typescript
+// src/auth/dto/login-response.dto.ts
+export class LoginResponseDto {
+  access_token: string;
+  expires_at: Date;
+  user: {
+    id: number;
+    username: string;
+    email: string;
+  };
+}
+
+// src/auth/auth.controller.ts
+async login(@Body() loginDto: LoginDto): Promise<SuccessResponseDto<LoginResponseDto>> {
+  return this.authService.login(loginDto.email, loginDto.password);
+}
+
+// src/core/types/authenticated-request.interface.ts
+import { Request } from 'express';
+import { User } from '@users/entities/user.entity';
+
+export interface AuthenticatedRequest extends Request {
+  user: User;
+}
+
+// auth.controller.ts
+profile(@Request() req: AuthenticatedRequest, @UserDecorator() user: User) {
+  return { user }; // Remove req_user, it's redundant
+}
+
+// src/core/api-key.controller.ts
+interface ApiKeyListItem {
+  id: number;
+  description?: string;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+async findAll(): Promise<SuccessResponseDto<ApiKeyListItem[]>> {
+  const keys = await this.apiKeyService.findAll();
+  return new SuccessResponseDto(keys);
+}
+```
+
+---
+
+### 4.2 Type Assertions in DTOs ⚠️ LOW
+
+**Location**: 
+- `src/projects/dto/projects-list-response.dto.ts:52`
+- `src/contacts/dto/contacts-list-response.dto.ts:52`
+
+**Issue**: Using `as` type assertions reduces type safety.
+
+**Current Implementation**:
+```typescript
+return new SuccessResponseDto(items, {
+  pagination: paginationMeta,
+}) as ProjectsListResponseDto; // ❌ Type assertion
+```
+
+**Why This Is Bad:**
+1. Bypasses TypeScript's type checking
+2. Could hide type mismatches
+
+**Recommendation**: Use proper constructors (see section 1.2 solution).
+
+---
+
+## 5. Validation & Input Handling
+
+### 5.1 Missing Query Parameter Validation ⚠️ HIGH
+
+**Location**: Controllers parsing query parameters manually
+
+**Issue**: As mentioned in section 1.3, query parameters are parsed without validation.
+
+**Recommendation**: Create query DTOs with class-validator decorators (see section 1.3).
+
+---
+
+### 5.2 Inconsistent Use of ValidationPipe ⚠️ LOW
+
+**Location**: Some endpoints use `@UsePipes(new ValidationPipe())`, others rely on global pipe
+
+**Issue**: `ValidationPipe` is instantiated in multiple places:
+- `src/main.ts:45` (global)
+- `src/contacts/contacts.controller.ts:48`
+- `src/projects/projects.controller.ts:114,132`
+- `src/auth/auth.controller.ts:44,80`
+- `src/core/api-key.controller.ts:38`
+
+**Why This Is Bad:**
+1. **Redundant**: Global pipe already applies validation
+2. **Inconsistent Configuration**: Could have different settings if instantiated differently
+3. **Unnecessary Decorators**: `@UsePipes(new ValidationPipe())` is redundant
+
+**Recommendation**: Remove `@UsePipes(new ValidationPipe())` decorators since global pipe is already configured.
+
+**Exception**: Keep if specific endpoints need different validation options, but document why.
+
+---
+
+### 5.3 Inconsistent Parameter Parsing ⚠️ MEDIUM
+
+**Location**: Controllers use different approaches for parsing ID parameters
+
+**Current Implementation**:
+```typescript
+// projects.controller.ts
+async findOne(@Param('id') id: string): Promise<...> {
+  return this.projectsService.findOne(+id); // ❌ Manual conversion with +
+}
+
+// contacts.controller.ts
+async findOne(@Param('id', ParseIntPipe) id: number): Promise<...> { // ✅ Uses pipe
+  return this.contactsService.findOne(id);
+}
+```
+
+**Why This Is Bad:**
+1. **Inconsistent**: Different approaches in different controllers
+2. **No Validation**: Manual `+id` conversion doesn't validate input (e.g., `+NaN` results in `NaN`)
+3. **Error Handling**: ParseIntPipe provides better error messages
+
+**Recommendation**: Always use `ParseIntPipe` for ID parameters.
+
+**Suggested Solution**:
+```typescript
+// Consistent across all controllers
+async findOne(@Param('id', ParseIntPipe) id: number): Promise<...> {
+  return this.projectsService.findOne(id);
+}
+```
+
+---
+
+## 6. Database & Performance
+
+### 6.1 Update Operations Inefficiency ⚠️ HIGH
+
+**Issue**: Already covered in section 2.2.
+
+---
+
+### 6.2 Missing Database Indexes (Potential) ⚠️ LOW
+
+**Note**: Cannot verify without examining entities and migrations, but common fields used in queries should be indexed:
+- `createdAt` (used in ordering)
+- `isFeatured`, `isRead` (used in filtering)
+- Email fields (used in lookups)
+
+**Recommendation**: Review entity definitions and ensure appropriate indexes are created.
+
+**Example**:
+```typescript
+// In entity
+@Index()
+@Column()
+email: string;
+
+@Index()
+@Column({ default: false })
+isFeatured: boolean;
+```
+
+---
+
+## 7. Guards & Authentication
+
+### 7.1 Guards Using Generic Exceptions ⚠️ MEDIUM
+
+**Issue**: Already covered in section 3.1.
+
+---
+
+### 7.2 JwtOrApiKeyGuard Error Handling ⚠️ MEDIUM
+
+**Issue**: Already covered in section 3.2.
+
+---
+
+### 7.3 Auth Service Error Types ⚠️ LOW
+
+**Location**: `src/auth/auth.service.ts:37,97,101`
+
+**Issue**: `AuthService` throws `BadRequestException` and `UnauthorizedException` instead of custom exceptions.
+
+**Current Implementation**:
+```typescript
+if (existingUser) {
+  throw new BadRequestException('Email already exists'); // ❌
+}
+
+if (!user) {
+  throw new BadRequestException('User not found'); // ❌ Should be NotFoundException
+}
+
+if (!isMatch) {
+  throw new UnauthorizedException('Password does not match'); // ❌ Should use custom exception
+}
+```
+
+**Recommendation**: Use custom exceptions for consistency:
+```typescript
+import { ConflictException, NotFoundException, AuthenticationException } from '@core/exceptions';
+
+if (existingUser) {
+  throw new ConflictException('Email already exists');
+}
+
+if (!user) {
+  throw new NotFoundException('User not found');
+}
+
+if (!isMatch) {
+  throw new AuthenticationException('Invalid credentials');
+}
+```
+
+---
+
+## 8. DTOs & Response Transformation
+
+### 8.1 Response DTOs in Service Layer ⚠️ MEDIUM
+
+**Issue**: Already covered in section 2.1.
+
+---
+
+### 8.2 Duplicated fromEntities Methods ⚠️ HIGH
+
+**Issue**: Already covered in section 1.2.
+
+---
+
+### 8.3 UpdateProjectDto Redundancy ⚠️ LOW
+
+**Location**: `src/projects/dto/update-project.dto.ts`
+
+**Issue**: `UpdateProjectDto` extends `PartialType(CreateProjectDto)` but then re-declares all properties as optional.
+
+**Current Implementation**:
+```typescript
+export class UpdateProjectDto extends PartialType(CreateProjectDto) {
+  @ApiPropertyOptional({ description: 'Project title' })
+  title?: string; // ❌ Redundant - already optional from PartialType
+
+  @ApiPropertyOptional({ description: 'Project description' })
+  description?: string; // ❌ Redundant
+  // ...
+}
+```
+
+**Why This Is Bad:**
+1. **Redundancy**: `PartialType` already makes all properties optional
+2. **Maintenance**: Must update both `CreateProjectDto` and `UpdateProjectDto` when adding fields
+
+**Recommendation**: Remove redundant property declarations if Swagger documentation is sufficient from base class, or use `PartialType` without redeclaring:
+```typescript
+// Option 1: Just use PartialType (if Swagger picks up from base)
+export class UpdateProjectDto extends PartialType(CreateProjectDto) {}
+
+// Option 2: Add ApiPropertyOptional only for Swagger if needed, but don't redeclare types
+export class UpdateProjectDto extends PartialType(CreateProjectDto) {
+  // Only add if you need different Swagger documentation
+  // Otherwise, PartialType handles it
+}
+```
+
+---
+
+## 9. Interceptors & Middleware
+
+### 9.1 Response Transform Interceptor Complexity ⚠️ LOW
+
+**Location**: `src/core/interceptors/response-transform.interceptor.ts:64-103`
+
+**Issue**: The interceptor has complex logic to detect pagination format, supporting multiple formats.
+
+**Why This Could Be Better:**
+1. **Complexity**: The pagination detection logic is complex and error-prone
+2. **Multiple Formats**: Supporting both NestJS pagination format and custom format adds complexity
+3. **Unclear Intent**: It's not immediately clear what format services should return
+
+**Recommendation**: Standardize on one pagination format. If services are already returning DTOs (as per current architecture), the interceptor might be doing unnecessary work.
+
+**Suggested Simplification**:
+```typescript
+intercept(context: ExecutionContext, next: CallHandler): Observable<SuccessResponseDto<T>> {
+  const requestId = this.requestContext.getRequestId();
+
+  return next.handle().pipe(
+    map((data) => {
+      // If already a response DTO, just ensure request_id
+      if (data && typeof data === 'object' && 'status' in data) {
+        if (!data.request_id) {
+          data.request_id = requestId;
+        }
+        return data;
+      }
+
+      // Otherwise, wrap in SuccessResponseDto
+      // Services should return DTOs directly, so this should rarely happen
+      const response = new SuccessResponseDto(data);
+      response.request_id = requestId;
+      return response;
+    }),
+  );
+}
+```
+
+**Note**: This assumes services return DTOs. If changing architecture (section 2.1), adjust accordingly.
+
+---
+
+### 9.2 RequestIdMiddleware Implementation ⚠️ LOW
+
+**Location**: `src/core/middleware/request-id.middleware.ts:65`
+
+**Issue**: Request ID is stored in both CLS context and request object for "backward compatibility."
+
+**Current Implementation**:
+```typescript
+// Set context in CLS (AsyncLocalStorage)
+this.cls.set('requestContext', context);
+
+// Also attach to request object for backward compatibility
+// (in case any code still accesses it directly)
+(req as any).requestId = requestId; // ❌ Type assertion + backward compatibility code
+```
+
+**Why This Is Bad:**
+1. **Type Safety**: Using `(req as any)` defeats type safety
+2. **Technical Debt**: "Backward compatibility" code should be temporary
+3. **Inconsistency**: Two ways to access the same data
+
+**Recommendation**: Remove backward compatibility code and use `RequestContextService` consistently. If there's code accessing `req.requestId`, update it to use the service.
+
+---
+
+## 10. Recommendations Priority Matrix
+
+### Critical Priority (Do First)
+
+1. **Remove try-catch blocks from services** (Section 1.4, 3.3)
+   - Impact: High - Improves error handling and debugging
+   - Effort: Low - Simple refactoring
+   - Risk: Low - Global exception filter already handles errors
+
+2. **Fix inefficient update operations** (Section 2.2)
+   - Impact: High - Performance improvement
+   - Effort: Low - Use `save` instead of `update` + `findOne`
+   - Risk: Low - Well-tested TypeORM pattern
+
+3. **Create query parameter DTOs** (Section 1.3, 5.1)
+   - Impact: High - Input validation and consistency
+   - Effort: Medium - Create DTOs for all endpoints
+   - Risk: Low - Adds validation, doesn't break existing functionality
+
+### High Priority
+
+4. **Extract pagination logic to utility/base service** (Section 1.1)
+   - Impact: High - Reduces duplication
+   - Effort: Medium - Refactoring required
+   - Risk: Medium - Must test thoroughly
+
+5. **Create base paginated response DTO** (Section 1.2)
+   - Impact: Medium - Reduces duplication
+   - Effort: Low - Extract common method
+   - Risk: Low - Mostly refactoring
+
+6. **Fix JwtOrApiKeyGuard error handling** (Section 3.2)
+   - Impact: Medium - Better error visibility
+   - Effort: Low - Add logging and specific exception handling
+   - Risk: Low - Improves behavior
+
+### Medium Priority
+
+7. **Use custom exceptions in guards** (Section 3.1, 7.3)
+   - Impact: Medium - Consistency
+   - Effort: Low - Replace exception types
+   - Risk: Low - Should already have custom exceptions
+
+8. **Fix type safety issues** (Section 4.1)
+   - Impact: Medium - Better developer experience
+   - Effort: Medium - Create types/interfaces
+   - Risk: Low - Improves type safety
+
+9. **Consistent parameter parsing** (Section 5.3)
+   - Impact: Low - Consistency
+   - Effort: Low - Add ParseIntPipe where missing
+   - Risk: Low - Should validate better
+
+10. **Consider service layer returning entities** (Section 2.1)
+    - Impact: Medium - Better architecture
+    - Effort: High - Requires refactoring controllers
+    - Risk: Medium - Significant change, but more aligned with NestJS best practices
+
+### Low Priority
+
+11. **Remove redundant ValidationPipe decorators** (Section 5.2)
+    - Impact: Low - Code cleanliness
+    - Effort: Low - Remove decorators
+    - Risk: Low
+
+12. **Simplify response transform interceptor** (Section 9.1)
+    - Impact: Low - Code clarity
+    - Effort: Low - Remove unused complexity
+    - Risk: Low
+
+13. **Remove backward compatibility code** (Section 9.2)
+    - Impact: Low - Code cleanliness
+    - Effort: Low - Find and replace with RequestContextService
+    - Risk: Low
+
+14. **Fix UpdateProjectDto redundancy** (Section 8.3)
+    - Impact: Low - Code cleanliness
+    - Effort: Low - Remove redundant properties
+    - Risk: Low
+
+---
+
+## Conclusion
+
+The Portfolio API demonstrates good understanding of response standardization and Swagger documentation patterns. However, there are significant opportunities to improve code maintainability, reduce duplication, and follow NestJS best practices more closely.
+
+**Key Strengths:**
+- ✅ Consistent response format
+- ✅ Good Swagger documentation patterns
+- ✅ Proper use of interceptors and filters
+- ✅ Request ID tracking implementation
+
+**Key Areas for Improvement:**
+- ⚠️ Code duplication (pagination, error handling, query building)
+- ⚠️ Missing input validation for query parameters
+- ⚠️ Inefficient database operations
+- ⚠️ Type safety issues
+- ⚠️ Inconsistent error handling patterns
+
+**Recommended Approach:**
+1. Start with critical priority items (error handling, update operations, query validation)
+2. Then address high-priority refactoring (pagination utilities, base DTOs)
+3. Finally, tackle medium and low-priority improvements for consistency and code quality
+
+All recommendations maintain the existing API response schema as required.
+
+---
+
+**Document Version**: 1.0  
+**Last Updated**: 2026-01-08

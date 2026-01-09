@@ -9,14 +9,12 @@ import {
   UsePipes,
   Query,
   UseGuards,
-  HttpStatus,
 } from '@nestjs/common';
 import {
   ApiOperation,
   ApiParam,
   ApiQuery,
   ApiTags,
-  ApiResponse,
   ApiBody,
   ApiBearerAuth,
   ApiSecurity,
@@ -32,13 +30,19 @@ import {
 import { ProjectsService } from './projects.service';
 import { AuthGuard } from '@auth/auth.guard';
 import { JwtOrApiKeyGuard } from '@core/jwt-or-api-key.guard';
-import { ErrorResponseDto } from '@core/dto';
 import { ValidationPipe } from '@core/pipes';
+import {
+  ApiGetSingleResource,
+  ApiGetPaginatedList,
+  ApiCreateResource,
+  ApiUpdateResource,
+  ApiDeleteResource,
+} from '@core/decorators';
 
 @ApiTags('Projects')
 @Controller('projects')
 export class ProjectsController {
-  constructor(private readonly projectsService: ProjectsService) {}
+  constructor(private readonly projectsService: ProjectsService) { }
 
   @Get()
   @UseGuards(JwtOrApiKeyGuard)
@@ -64,16 +68,10 @@ export class ProjectsController {
     description: 'Filter by featured projects',
     type: Boolean,
   })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'List of projects',
-    type: ProjectsListResponseDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    description: 'Internal server error',
-    type: ErrorResponseDto,
-  })
+  @ApiGetPaginatedList(
+    'Returns a paginated list of projects',
+    ProjectsListResponseDto,
+  )
   async findAll(
     @Query('page') page?: string,
     @Query('per_page') per_page?: string,
@@ -85,12 +83,25 @@ export class ProjectsController {
     const isFeatured =
       is_featured === undefined ? undefined : is_featured === 'true';
 
-    return this.projectsService.findAll({
+    const result = await this.projectsService.findAll({
       page: pageNumber,
       per_page: perPage,
       search,
       isFeatured: isFeatured,
     });
+
+    // Transform entities to DTOs
+    const projectDtos = result.items.map((project) =>
+      ProjectResponseDto.fromEntity(project),
+    );
+
+    // Return standardized response
+    return ProjectsListResponseDto.fromEntities(
+      projectDtos,
+      result.page,
+      result.per_page,
+      result.total,
+    );
   }
 
   @Get(':id')
@@ -99,23 +110,15 @@ export class ProjectsController {
   @ApiSecurity('x-api-key')
   @ApiOperation({ summary: 'Get a project by ID' })
   @ApiParam({ name: 'id', type: String, description: 'Project ID' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'The found project',
-    type: SingleProjectResponseDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Project not found',
-    type: ErrorResponseDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    description: 'Internal server error',
-    type: ErrorResponseDto,
-  })
-  async findOne(@Param('id') id: string): Promise<ProjectResponseDto> {
-    return this.projectsService.findOne(+id);
+  @ApiGetSingleResource(
+    200,
+    'The found project',
+    SingleProjectResponseDto,
+    ProjectResponseDto,
+  )
+  async findOne(@Param('id') id: string): Promise<SingleProjectResponseDto> {
+    const project = await this.projectsService.findOne(+id);
+    return SingleProjectResponseDto.fromEntity(project);
   }
 
   @Post()
@@ -124,25 +127,17 @@ export class ProjectsController {
   @ApiOperation({ summary: 'Create a new project' })
   @UsePipes(new ValidationPipe())
   @ApiBody({ type: CreateProjectDto })
-  @ApiResponse({
-    status: HttpStatus.CREATED,
-    description: 'The project has been successfully created.',
-    type: SingleProjectResponseDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.UNPROCESSABLE_ENTITY,
-    description: 'Validation failed',
-    type: ErrorResponseDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    description: 'Internal server error',
-    type: ErrorResponseDto,
-  })
+  @ApiCreateResource(
+    201,
+    'The project has been successfully created',
+    SingleProjectResponseDto,
+    ProjectResponseDto,
+  )
   async create(
     @Body() createProjectDto: CreateProjectDto,
   ): Promise<SingleProjectResponseDto> {
-    return this.projectsService.create(createProjectDto);
+    const project = await this.projectsService.create(createProjectDto);
+    return SingleProjectResponseDto.fromEntity(project);
   }
 
   @Patch(':id')
@@ -152,31 +147,17 @@ export class ProjectsController {
   @UsePipes(new ValidationPipe())
   @ApiParam({ name: 'id', type: String, description: 'Project ID' })
   @ApiBody({ type: UpdateProjectDto })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'The project has been successfully updated.',
-    type: SingleProjectResponseDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.UNPROCESSABLE_ENTITY,
-    description: 'Validation failed',
-    type: ErrorResponseDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Project not found',
-    type: ErrorResponseDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    description: 'Internal server error',
-    type: ErrorResponseDto,
-  })
+  @ApiUpdateResource(
+    'The project has been successfully updated',
+    SingleProjectResponseDto,
+    ProjectResponseDto,
+  )
   async update(
     @Param('id') id: string,
     @Body() updateProjectDto: UpdateProjectDto,
   ): Promise<SingleProjectResponseDto> {
-    return this.projectsService.update(+id, updateProjectDto);
+    const project = await this.projectsService.update(+id, updateProjectDto);
+    return SingleProjectResponseDto.fromEntity(project);
   }
 
   @Delete(':id')
@@ -184,21 +165,10 @@ export class ProjectsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a project by ID' })
   @ApiParam({ name: 'id', type: String, description: 'Project ID' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'The project has been successfully deleted.',
-    type: DeleteResponseDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Project not found',
-    type: ErrorResponseDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    description: 'Internal server error',
-    type: ErrorResponseDto,
-  })
+  @ApiDeleteResource(
+    'The project has been successfully deleted',
+    DeleteResponseDto,
+  )
   async remove(@Param('id') id: string): Promise<DeleteResponseDto> {
     return this.projectsService.remove(+id);
   }

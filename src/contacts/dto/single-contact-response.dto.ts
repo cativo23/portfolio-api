@@ -1,18 +1,14 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { ContactResponseDto } from './contact-response.dto';
-import { SuccessResponseDto } from '@core/dto';
+import { SingleResourceResponseDto } from '@core/dto';
 import { Contact } from '../entities/contact.entity';
 
 /**
  * DTO for a single contact response
+ *
+ * Uses SingleResourceResponseDto base class to eliminate code duplication.
+ * Single resource responses don't include pagination metadata.
  */
-export class SingleContactResponseDto extends SuccessResponseDto<ContactResponseDto> {
-  @ApiProperty({
-    description: 'Contact data',
-    type: ContactResponseDto,
-  })
-  data: ContactResponseDto;
-
+export class SingleContactResponseDto extends SingleResourceResponseDto<ContactResponseDto> {
   /**
    * Create a SingleContactResponseDto from a Contact entity
    * @param contact Contact entity
@@ -20,6 +16,6 @@ export class SingleContactResponseDto extends SuccessResponseDto<ContactResponse
    */
   static fromEntity(contact: Contact): SingleContactResponseDto {
     const contactDto = ContactResponseDto.fromEntity(contact);
-    return new SuccessResponseDto(contactDto) as SingleContactResponseDto;
+    return new SingleContactResponseDto(contactDto);
   }
 }

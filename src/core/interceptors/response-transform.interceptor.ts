@@ -48,6 +48,7 @@ export class ResponseTransformInterceptor<T>
       map((data) => {
         // If the response is already a SuccessResponseDto or ErrorResponseDto, return it as is
         // but ensure it has request_id
+        console.log(data);
         if (
           data &&
           typeof data === 'object' &&

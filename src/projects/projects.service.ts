@@ -4,9 +4,6 @@ import { Project } from './entities/project.entity';
 import {
   CreateProjectDto,
   UpdateProjectDto,
-  ProjectResponseDto,
-  ProjectsListResponseDto,
-  SingleProjectResponseDto,
   DeleteResponseDto,
 } from './dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -45,17 +42,15 @@ export class ProjectsService {
    * Creates a new project
    *
    * @param createProjectDto - Data transfer object containing project details
-   * @returns Promise resolving to the created project wrapped in a standardized response
+   * @returns Promise resolving to the created project entity
    * @throws InternalServerException if there's an error during creation
    */
-  async create(
-    createProjectDto: CreateProjectDto,
-  ): Promise<SingleProjectResponseDto> {
+  async create(createProjectDto: CreateProjectDto): Promise<Project> {
     try {
       const project = this.projectsRepository.create(createProjectDto);
       const savedProject = await this.projectsRepository.save(project);
       this.logger.log(`Project created with ID ${savedProject.id}`);
-      return SingleProjectResponseDto.fromEntity(savedProject);
+      return savedProject;
     } catch (error) {
       this.logger.error('Error creating project', error.stack);
       throw new InternalServerException('Error creating project');
@@ -66,10 +61,17 @@ export class ProjectsService {
    * Retrieves a paginated list of projects with optional filtering
    *
    * @param options - Object containing pagination, search, and filtering options
-   * @returns Promise resolving to a list of projects with pagination metadata
+   * @returns Promise resolving to projects entities with pagination metadata
    * @throws InternalServerException if there's an error during retrieval
    */
-  async findAll(options: FindAllOptions): Promise<ProjectsListResponseDto> {
+  async findAll(
+    options: FindAllOptions,
+  ): Promise<{
+    items: Project[];
+    total: number;
+    page: number;
+    per_page: number;
+  }> {
     try {
       const { page, per_page, search, isFeatured } = options;
       const query = this.projectsRepository.createQueryBuilder('projects');
@@ -96,22 +98,16 @@ export class ProjectsService {
       query.skip((page - 1) * per_page).take(per_page);
 
       // Execute the query and get [data, total count]
-      const [projects, totalItems] = await query.getManyAndCount();
+      const [items, total] = await query.getManyAndCount();
 
-      this.logger.log(`Found ${totalItems} projects`);
+      this.logger.log(`Found ${total} projects`);
 
-      // Convert entities to DTOs
-      const projectDtos = projects.map((project) =>
-        ProjectResponseDto.fromEntity(project),
-      );
-
-      // Return standardized response
-      return ProjectsListResponseDto.fromEntities(
-        projectDtos,
+      return {
+        items,
+        total,
         page,
         per_page,
-        totalItems,
-      );
+      };
     } catch (error) {
       this.logger.error('Error finding projects', error.stack);
       throw new InternalServerException('Error finding projects');
@@ -122,11 +118,11 @@ export class ProjectsService {
    * Retrieves a single project by its ID
    *
    * @param id - The ID of the project to retrieve
-   * @returns Promise resolving to the project wrapped in a standardized response
+   * @returns Promise resolving to the project entity
    * @throws NotFoundException if the project doesn't exist
    * @throws InternalServerException if there's an error during retrieval
    */
-  async findOne(id: number): Promise<ProjectResponseDto> {
+  async findOne(id: number): Promise<Project> {
     try {
       const project = await this.projectsRepository.findOne({
         where: { id: id },
@@ -138,7 +134,7 @@ export class ProjectsService {
       }
 
       this.logger.log(`Found project with ID ${id}`);
-      return ProjectResponseDto.fromEntity(project);
+      return project;
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
@@ -153,14 +149,11 @@ export class ProjectsService {
    *
    * @param id - The ID of the project to update
    * @param updateProjectDto - DTO containing the fields to update
-   * @returns Promise resolving to the updated project wrapped in a standardized response
+   * @returns Promise resolving to the updated project entity
    * @throws NotFoundException if the project doesn't exist
    * @throws InternalServerException if there's an error during update
    */
-  async update(
-    id: number,
-    updateProjectDto: UpdateProjectDto,
-  ): Promise<SingleProjectResponseDto> {
+  async update(id: number, updateProjectDto: UpdateProjectDto): Promise<Project> {
     try {
       // Check if the project exists
       const existingProject = await this.projectsRepository.findOne({
@@ -172,16 +165,15 @@ export class ProjectsService {
         throw new NotFoundException(`Project with ID ${id} not found`);
       }
 
-      // Update project
-      await this.projectsRepository.update(id, updateProjectDto);
+      // Merge and save in one operation
+      const updatedProject = this.projectsRepository.merge(
+        existingProject,
+        updateProjectDto,
+      );
+      const savedProject = await this.projectsRepository.save(updatedProject);
       this.logger.log(`Updated project with ID ${id}`);
 
-      // Get the updated project
-      const updatedProject = await this.projectsRepository.findOne({
-        where: { id },
-      });
-
-      return SingleProjectResponseDto.fromEntity(updatedProject);
+      return savedProject;
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
