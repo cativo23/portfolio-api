@@ -126,7 +126,7 @@ export class ProjectsService {
    * @throws NotFoundException if the project doesn't exist
    * @throws InternalServerException if there's an error during retrieval
    */
-  async findOne(id: number): Promise<SingleProjectResponseDto> {
+  async findOne(id: number): Promise<ProjectResponseDto> {
     try {
       const project = await this.projectsRepository.findOne({
         where: { id: id },
@@ -138,7 +138,7 @@ export class ProjectsService {
       }
 
       this.logger.log(`Found project with ID ${id}`);
-      return SingleProjectResponseDto.fromEntity(project);
+      return ProjectResponseDto.fromEntity(project);
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;

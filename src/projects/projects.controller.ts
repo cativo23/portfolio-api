@@ -27,6 +27,7 @@ import {
   ProjectsListResponseDto,
   SingleProjectResponseDto,
   DeleteResponseDto,
+  ProjectResponseDto,
 } from './dto';
 import { ProjectsService } from './projects.service';
 import { AuthGuard } from '@auth/auth.guard';
@@ -113,7 +114,7 @@ export class ProjectsController {
     description: 'Internal server error',
     type: ErrorResponseDto,
   })
-  async findOne(@Param('id') id: string): Promise<SingleProjectResponseDto> {
+  async findOne(@Param('id') id: string): Promise<ProjectResponseDto> {
     return this.projectsService.findOne(+id);
   }
 
