@@ -6,7 +6,6 @@ import { Project } from './entities/project.entity';
 import { CreateProjectDto } from '@projects/dto';
 import { UpdateProjectDto } from '@projects/dto';
 import { NotFoundException, Logger } from '@nestjs/common';
-import { InternalServerException } from '@core/exceptions/internal-server.exception';
 import { SuccessResponseDto } from '@core/dto';
 
 describe('ProjectsService', () => {
@@ -72,7 +71,7 @@ describe('ProjectsService', () => {
       );
     });
 
-    it('should throw InternalServerException when repository.save throws an error', async () => {
+    it('should let errors bubble up when repository.save throws an error', async () => {
       const createProjectDto: CreateProjectDto = {
         title: 'Test Project',
         description: 'Test Description',
@@ -85,13 +84,8 @@ describe('ProjectsService', () => {
       jest.spyOn(repository, 'create').mockReturnValue(project as any);
       jest.spyOn(repository, 'save').mockRejectedValue(error);
 
-      await expect(service.create(createProjectDto)).rejects.toThrow(
-        InternalServerException,
-      );
-      expect(errorSpy).toHaveBeenCalledWith(
-        'Error creating project',
-        error.stack,
-      );
+      // Errors should bubble up naturally - let global exception filter handle them
+      await expect(service.create(createProjectDto)).rejects.toThrow(error);
     });
   });
 
@@ -197,7 +191,7 @@ describe('ProjectsService', () => {
       );
     });
 
-    it('should throw InternalServerException when query fails', async () => {
+    it('should let errors bubble up when query fails', async () => {
       const options = {
         page: 1,
         per_page: 10,
@@ -217,13 +211,8 @@ describe('ProjectsService', () => {
           }) as any,
       );
 
-      await expect(service.findAll(options)).rejects.toThrow(
-        InternalServerException,
-      );
-      expect(errorSpy).toHaveBeenCalledWith(
-        'Error finding projects',
-        error.stack,
-      );
+      // Errors should bubble up naturally - let global exception filter handle them
+      await expect(service.findAll(options)).rejects.toThrow(error);
     });
   });
 
@@ -258,28 +247,23 @@ describe('ProjectsService', () => {
       expect(warnSpy).toHaveBeenCalledWith(`Project with ID 1 not found`);
     });
 
-    it('should throw InternalServerException when repository.findOne throws an error', async () => {
+    it('should let errors bubble up when repository.findOne throws an error', async () => {
       const error = new Error('Database error');
       error.stack = 'Error stack';
 
       jest.spyOn(repository, 'findOne').mockRejectedValue(error);
 
-      await expect(service.findOne(1)).rejects.toThrow(InternalServerException);
-      expect(errorSpy).toHaveBeenCalledWith(
-        `Error finding project with ID 1`,
-        error.stack,
-      );
+      // Errors should bubble up naturally - let global exception filter handle them
+      await expect(service.findOne(1)).rejects.toThrow(error);
     });
 
-    it('should throw InternalServerException when NotFoundException is caught', async () => {
+    it('should let NotFoundException bubble up when repository.findOne throws it', async () => {
       const error = new NotFoundException(`Project with ID 1 not found`);
 
       jest.spyOn(repository, 'findOne').mockRejectedValue(error);
 
-      await expect(service.findOne(1)).rejects.toThrow(
-        `Error finding project with ID 1`,
-      );
-      expect(errorSpy).toHaveBeenCalled();
+      // NotFoundException should bubble up naturally
+      await expect(service.findOne(1)).rejects.toThrow(error);
     });
   });
 
@@ -336,7 +320,7 @@ describe('ProjectsService', () => {
       expect(saveSpy).not.toHaveBeenCalled();
     });
 
-    it('should throw InternalServerException when repository.save throws an error', async () => {
+    it('should let errors bubble up when repository.save throws an error', async () => {
       const updateProjectDto: UpdateProjectDto = {
         title: 'Updated Title',
         description: 'Updated Description',
@@ -355,16 +339,11 @@ describe('ProjectsService', () => {
       jest.spyOn(repository, 'merge').mockReturnValue(existingProject as any);
       jest.spyOn(repository, 'save').mockRejectedValue(error);
 
-      await expect(service.update(1, updateProjectDto)).rejects.toThrow(
-        InternalServerException,
-      );
-      expect(errorSpy).toHaveBeenCalledWith(
-        `Error updating project with ID 1`,
-        error.stack,
-      );
+      // Errors should bubble up naturally - let global exception filter handle them
+      await expect(service.update(1, updateProjectDto)).rejects.toThrow(error);
     });
 
-    it('should throw InternalServerException when NotFoundException is caught', async () => {
+    it('should let NotFoundException bubble up when repository.findOne throws it', async () => {
       const updateProjectDto: UpdateProjectDto = {
         title: 'Updated Title',
         description: 'Updated Description',
@@ -373,10 +352,8 @@ describe('ProjectsService', () => {
 
       jest.spyOn(repository, 'findOne').mockRejectedValue(error);
 
-      await expect(service.update(1, updateProjectDto)).rejects.toThrow(
-        `Error updating project with ID 1`,
-      );
-      expect(errorSpy).toHaveBeenCalled();
+      // NotFoundException should bubble up naturally
+      await expect(service.update(1, updateProjectDto)).rejects.toThrow(error);
     });
   });
 
@@ -413,7 +390,7 @@ describe('ProjectsService', () => {
       expect(deleteSpy).not.toHaveBeenCalled();
     });
 
-    it('should throw InternalServerException if delete operation fails', async () => {
+    it('should throw NotFoundException if delete operation fails (no rows affected)', async () => {
       const existingProject = {
         id: 1,
         title: 'Test Project',
@@ -427,13 +404,14 @@ describe('ProjectsService', () => {
         .spyOn(repository, 'delete')
         .mockResolvedValue({ affected: 0 } as any);
 
-      await expect(service.remove(1)).rejects.toThrow(InternalServerException);
-      expect(errorSpy).toHaveBeenCalledWith(
-        `Failed to delete project with ID 1`,
+      // If no rows affected, treat as not found
+      await expect(service.remove(1)).rejects.toThrow(NotFoundException);
+      expect(warnSpy).toHaveBeenCalledWith(
+        `Failed to delete project with ID 1 - no rows affected`,
       );
     });
 
-    it('should throw InternalServerException when repository.delete throws an error', async () => {
+    it('should let errors bubble up when repository.delete throws an error', async () => {
       const existingProject = {
         id: 1,
         title: 'Test Project',
@@ -447,22 +425,17 @@ describe('ProjectsService', () => {
         .mockResolvedValue(existingProject as any);
       jest.spyOn(repository, 'delete').mockRejectedValue(error);
 
-      await expect(service.remove(1)).rejects.toThrow(InternalServerException);
-      expect(errorSpy).toHaveBeenCalledWith(
-        `Error deleting project with ID 1`,
-        error.stack,
-      );
+      // Errors should bubble up naturally - let global exception filter handle them
+      await expect(service.remove(1)).rejects.toThrow(error);
     });
 
-    it('should throw InternalServerException when NotFoundException is caught', async () => {
+    it('should let NotFoundException bubble up when repository.findOne throws it', async () => {
       const error = new NotFoundException(`Project with ID 1 not found`);
 
       jest.spyOn(repository, 'findOne').mockRejectedValue(error);
 
-      await expect(service.remove(1)).rejects.toThrow(
-        `Error deleting project with ID 1`,
-      );
-      expect(errorSpy).toHaveBeenCalled();
+      // NotFoundException should bubble up naturally
+      await expect(service.remove(1)).rejects.toThrow(error);
     });
   });
 });

@@ -500,55 +500,7 @@ async create(dto: CreateDto): Promise<ResponseDto> {
 
 ## 2. Architecture & Design Patterns
 
-### 2.1 Response DTOs in Service Layer ⚠️ MEDIUM
-
-**Location**: All service methods return DTOs instead of entities
-
-**Issue**: Services are responsible for both business logic and response transformation, violating separation of concerns.
-
-**Current Implementation**:
-```typescript
-// Service returns DTO
-async findOne(id: number): Promise<ProjectResponseDto> {
-  const project = await this.repository.findOne({ where: { id } });
-  return ProjectResponseDto.fromEntity(project); // ❌ Transformation in service
-}
-```
-
-**Why This Is Bad:**
-1. **Violates Separation of Concerns**: Services should handle business logic, not presentation
-2. **Reduces Reusability**: Service can't be used for internal operations that need entities
-3. **Makes Testing Harder**: Must mock DTO transformations
-4. **Inconsistent with NestJS Best Practices**: Controllers/Interceptors should handle DTOs
-
-**Recommendation**: Services should return entities; controllers/interceptors should handle DTO transformation.
-
-**Suggested Solution**:
-```typescript
-// Service returns entity
-async findOne(id: number): Promise<Project> {
-  const project = await this.repository.findOne({ where: { id } });
-  
-  if (!project) {
-    throw new NotFoundException(`Project with ID ${id} not found`);
-  }
-  
-  return project;
-}
-
-// Controller handles DTO transformation
-@Get(':id')
-async findOne(@Param('id', ParseIntPipe) id: number): Promise<SingleProjectResponseDto> {
-  const project = await this.projectsService.findOne(id);
-  return SingleProjectResponseDto.fromEntity(project);
-}
-```
-
-**Note**: This is a design choice. If the API schema must not be modified (as stated), keeping DTOs in services is acceptable, but document this architectural decision.
-
----
-
-### 2.2 Inefficient Update Operations ⚠️ HIGH
+### 2.1 Inefficient Update Operations ⚠️ HIGH
 
 **Location**: 
 - `src/projects/projects.service.ts:160-192`
@@ -620,7 +572,7 @@ async update(id: number, updateDto: UpdateDto): Promise<ResponseDto> {
 
 ---
 
-### 2.3 Missing Base Service Class ⚠️ MEDIUM
+### 2.2 Missing Base Service Class ⚠️ MEDIUM
 
 **Issue**: No abstraction for common CRUD operations, leading to duplication.
 
