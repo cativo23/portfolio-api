@@ -2,11 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Logger } from '@nestjs/common';
-import {
-  ResponseTransformInterceptor,
-  GlobalExceptionFilter,
-  ValidationPipe,
-} from './core';
+import { ValidationPipe } from './core';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -43,10 +39,10 @@ async function bootstrap() {
     exposedHeaders: ['Content-Range', 'X-Content-Range'],
   });
 
-  // Set up global pipes, interceptors, and filters
+  // Set up global pipes
+  // Note: Interceptors and filters are registered in AppModule using APP_INTERCEPTOR
+  // and APP_FILTER tokens for proper DI support
   app.useGlobalPipes(new ValidationPipe());
-  app.useGlobalInterceptors(new ResponseTransformInterceptor());
-  app.useGlobalFilters(new GlobalExceptionFilter());
 
   // Set up Swagger
 

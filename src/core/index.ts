@@ -7,3 +7,7 @@ export * from './api-key.service';
 export * from './api-key.guard';
 export * from './jwt-or-api-key.guard';
 export * from './api-key.module';
+export * from './context/request-context.interface';
+export * from './context/request-context.service';
+export * from './context/request-context.decorator';
+export * from './context/request-context.module';

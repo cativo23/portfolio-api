@@ -38,13 +38,13 @@ export class ContactsListResponseDto extends SuccessResponseDto<
     limit: number,
     totalItems: number,
   ): ContactsListResponseDto {
-    const totalPages = Math.ceil(totalItems / limit);
+    const total_pages = Math.ceil(totalItems / limit);
 
     const paginationMeta: PaginationMetaDto = {
       page,
       limit,
-      totalItems,
-      totalPages,
+      total_items: totalItems,
+      total_pages,
     };
 
     return new SuccessResponseDto(contacts, {

@@ -11,7 +11,7 @@ export class ValidationException extends BaseException {
    * @param message Error message
    * @param details Validation error details
    */
-  constructor(message = 'Validation failed', details?: Record<string, any>) {
+  constructor(message = 'Invalid input data', details?: Record<string, any>) {
     super(
       message,
       ErrorCode.VALIDATION_ERROR,
