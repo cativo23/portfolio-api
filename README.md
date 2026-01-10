@@ -254,9 +254,10 @@ This provides an interactive interface to explore and test all API endpoints.
 
 ### Additional Documentation
 
-- **[API Documentation](./docs/api-documentation.md)**: Detailed endpoint documentation with request/response examples
-- **[Frontend Integration Guide](./docs/frontend-integration-guide.md)**: Step-by-step guide for frontend developers
+- **[Release Workflow](./docs/RELEASE_WORKFLOW.md)**: Professional release workflow guide with GitFlow pattern
+- **[API Documentation](./docs/api/endpoints.md)**: Detailed endpoint documentation with request/response examples
 - **[Code Review](./docs/code-review.md)**: Comprehensive code review and recommendations
+- **[API Standards](./docs/standardization/api-standards.md)**: API design standards and conventions
 
 ## Authentication Flow
 
