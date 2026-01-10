@@ -956,26 +956,28 @@ async findAll(): Promise<SuccessResponseDto<ApiKeyListItem[]>> {
 
 ---
 
-### 4.2 Type Assertions in DTOs ⚠️ LOW
+### 4.2 Type Assertions in DTOs ✅ FIXED
 
 **Location**: 
 - `src/projects/dto/projects-list-response.dto.ts:52`
 - `src/contacts/dto/contacts-list-response.dto.ts:52`
 
-**Issue**: Using `as` type assertions reduces type safety.
+**Status**: ✅ **RESOLVED** - Type assertions have been eliminated by implementing the solution from section 1.2, using proper constructors with generics.
 
-**Current Implementation**:
+**Issue**: Using `as` type assertions reduced type safety.
+
+**Previous Implementation**:
 ```typescript
 return new SuccessResponseDto(items, {
   pagination: paginationMeta,
 }) as ProjectsListResponseDto; // ❌ Type assertion
 ```
 
-**Why This Is Bad:**
+**Why This Was Bad:**
 1. Bypasses TypeScript's type checking
 2. Could hide type mismatches
 
-**Recommendation**: Use proper constructors (see section 1.2 solution).
+**Solution Applied**: Fixed in section 1.2 by creating `PaginatedResponseDto` base class with proper generic types, eliminating the need for type assertions.
 
 ---
 
@@ -1097,9 +1099,9 @@ isFeatured: boolean;
 
 ---
 
-### 7.2 JwtOrApiKeyGuard Error Handling ⚠️ MEDIUM
+### 7.2 JwtOrApiKeyGuard Error Handling ✅ FIXED
 
-**Issue**: Already covered in section 3.2.
+**Status**: ✅ **RESOLVED** - Already fixed in section 3.2. The guard now properly handles errors, only catching expected authentication exceptions and logging/re-throwing unexpected errors.
 
 ---
 
@@ -1145,15 +1147,22 @@ if (!isMatch) {
 
 ## 8. DTOs & Response Transformation
 
-### 8.1 Response DTOs in Service Layer ⚠️ MEDIUM
+### 8.1 Response DTOs in Service Layer ✅ FIXED
 
-**Issue**: Already covered in section 2.1.
+**Status**: ✅ **RESOLVED** - Services now return entities instead of DTOs, with controllers handling the transformation to DTOs. This improves separation of concerns and follows NestJS best practices.
+
+**Issue**: Services were returning DTOs, violating separation of concerns.
+
+**Solution Applied**: 
+- Services (`ProjectsService`, `ContactsService`) now return entity types (`Project`, `Contact`)
+- Controllers handle DTO transformation using `fromEntity` methods
+- Better separation of concerns - services focus on business logic, controllers handle presentation
 
 ---
 
-### 8.2 Duplicated fromEntities Methods ⚠️ HIGH
+### 8.2 Duplicated fromEntities Methods ✅ FIXED
 
-**Issue**: Already covered in section 1.2.
+**Status**: ✅ **RESOLVED** - Already fixed in section 1.2. The duplication has been eliminated by creating the `PaginatedResponseDto` base class.
 
 ---
 
@@ -1357,10 +1366,12 @@ The Portfolio API demonstrates good understanding of response standardization an
 
 **Key Areas for Improvement:**
 - ✅ Code duplication - pagination logic (Section 1.1 - Fixed)
-- ✅ Code duplication - response DTO factory methods (Section 1.2 - Fixed)
-- ✅ Error handling - guard error swallowing (Section 3.2 - Fixed)
+- ✅ Code duplication - response DTO factory methods (Section 1.2, 8.2 - Fixed)
+- ✅ Services returning entities instead of DTOs (Section 8.1 - Fixed)
+- ✅ Error handling - guard error swallowing (Section 3.2, 7.2 - Fixed)
+- ✅ Type assertions in DTOs (Section 4.2 - Fixed)
 - ⚠️ Code duplication - query building (other areas)
-- ⚠️ Type safety issues
+- ⚠️ Type safety issues (Section 4.1 - still has `any` types)
 - ✅ Error handling patterns (Sections 1.4, 3.2, 3.3 - Fixed)
 - ✅ Inefficient database operations (Section 2.1 - Fixed)
 - ✅ Missing input validation for query parameters (Sections 1.3, 5.1 - Fixed)
@@ -1374,7 +1385,7 @@ All recommendations maintain the existing API response schema as required.
 
 ---
 
-**Document Version**: 1.6  
+**Document Version**: 1.7  
 **Last Updated**: 2026-01-08
 
 **Updates:**
@@ -1385,4 +1396,8 @@ All recommendations maintain the existing API response schema as required.
 - ✅ Section 2.1 (Inefficient Update Operations) - Fixed
 - ✅ Section 3.2 (JwtOrApiKeyGuard Swallows Errors) - Fixed
 - ✅ Section 3.3 (Error Context Loss in Services) - Fixed
+- ✅ Section 4.2 (Type Assertions in DTOs) - Fixed
 - ✅ Section 5.1 (Missing Query Parameter Validation) - Fixed
+- ✅ Section 7.2 (JwtOrApiKeyGuard Error Handling) - Fixed
+- ✅ Section 8.1 (Response DTOs in Service Layer) - Fixed
+- ✅ Section 8.2 (Duplicated fromEntities Methods) - Fixed
