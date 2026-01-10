@@ -1,10 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GlobalExceptionFilter } from './global-exception.filter';
 import { RequestContextService } from '@core/context/request-context.service';
-import { ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  ArgumentsHost,
+  HttpException,
+  HttpStatus,
+  Logger,
+} from '@nestjs/common';
 import { Response, Request } from 'express';
-import { BaseException, NotFoundException, AuthenticationException } from './';
-import { ErrorResponseDto, ErrorCode } from '@core/dto';
+import { NotFoundException } from './';
+import { ErrorCode } from '@core/dto';
 
 describe('GlobalExceptionFilter', () => {
   let filter: GlobalExceptionFilter;
@@ -16,7 +21,7 @@ describe('GlobalExceptionFilter', () => {
 
   beforeEach(async () => {
     loggerErrorSpy = jest
-      .spyOn(require('@nestjs/common').Logger.prototype, 'error')
+      .spyOn(Logger.prototype, 'error')
       .mockImplementation(jest.fn());
 
     const module: TestingModule = await Test.createTestingModule({
@@ -87,7 +92,10 @@ describe('GlobalExceptionFilter', () => {
     });
 
     it('should handle HttpException with BAD_REQUEST status', () => {
-      const exception = new HttpException('Bad request', HttpStatus.BAD_REQUEST);
+      const exception = new HttpException(
+        'Bad request',
+        HttpStatus.BAD_REQUEST,
+      );
 
       filter.catch(exception, mockHost);
 

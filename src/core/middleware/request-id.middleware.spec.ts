@@ -48,11 +48,7 @@ describe('RequestIdMiddleware', () => {
   });
 
   it('should generate a request ID and set it in context', () => {
-    middleware.use(
-      mockRequest as Request,
-      mockResponse as Response,
-      mockNext,
-    );
+    middleware.use(mockRequest as Request, mockResponse as Response, mockNext);
 
     expect(clsService.set).toHaveBeenCalledWith(
       'requestContext',
@@ -67,11 +63,7 @@ describe('RequestIdMiddleware', () => {
   });
 
   it('should set X-Request-ID header in response', () => {
-    middleware.use(
-      mockRequest as Request,
-      mockResponse as Response,
-      mockNext,
-    );
+    middleware.use(mockRequest as Request, mockResponse as Response, mockNext);
 
     expect(mockResponse.setHeader).toHaveBeenCalledWith(
       'X-Request-ID',
@@ -80,11 +72,7 @@ describe('RequestIdMiddleware', () => {
   });
 
   it('should call next()', () => {
-    middleware.use(
-      mockRequest as Request,
-      mockResponse as Response,
-      mockNext,
-    );
+    middleware.use(mockRequest as Request, mockResponse as Response, mockNext);
 
     expect(mockNext).toHaveBeenCalled();
   });
@@ -95,11 +83,7 @@ describe('RequestIdMiddleware', () => {
       ip: '192.168.1.1',
     };
 
-    middleware.use(
-      mockRequest as Request,
-      mockResponse as Response,
-      mockNext,
-    );
+    middleware.use(mockRequest as Request, mockResponse as Response, mockNext);
 
     expect(clsService.set).toHaveBeenCalledWith(
       'requestContext',
@@ -118,11 +102,7 @@ describe('RequestIdMiddleware', () => {
       } as any,
     };
 
-    middleware.use(
-      mockRequest as Request,
-      mockResponse as Response,
-      mockNext,
-    );
+    middleware.use(mockRequest as Request, mockResponse as Response, mockNext);
 
     expect(clsService.set).toHaveBeenCalledWith(
       'requestContext',
@@ -139,11 +119,7 @@ describe('RequestIdMiddleware', () => {
       socket: undefined,
     };
 
-    middleware.use(
-      mockRequest as Request,
-      mockResponse as Response,
-      mockNext,
-    );
+    middleware.use(mockRequest as Request, mockResponse as Response, mockNext);
 
     expect(clsService.set).toHaveBeenCalledWith(
       'requestContext',
@@ -158,19 +134,11 @@ describe('RequestIdMiddleware', () => {
     const setSpy = clsService.set as jest.Mock;
 
     // First call
-    middleware.use(
-      mockRequest as Request,
-      mockResponse as Response,
-      mockNext,
-    );
+    middleware.use(mockRequest as Request, mockResponse as Response, mockNext);
     requestIds.push(setSpy.mock.calls[0][1].requestId);
 
     // Second call
-    middleware.use(
-      mockRequest as Request,
-      mockResponse as Response,
-      mockNext,
-    );
+    middleware.use(mockRequest as Request, mockResponse as Response, mockNext);
     requestIds.push(setSpy.mock.calls[1][1].requestId);
 
     // They should be different

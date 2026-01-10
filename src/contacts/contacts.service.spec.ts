@@ -4,7 +4,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Contact } from './entities/contact.entity';
 import { CreateContactDto } from './dto/create-contact.dto';
-import { NotFoundException, Logger } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 
 describe('ContactsService', () => {
   let service: ContactsService;
@@ -63,7 +63,9 @@ describe('ContactsService', () => {
           message: contact.message,
         }),
       );
-      expect(logSpy).toHaveBeenCalledWith(`Contact created with ID ${contact.id}`);
+      expect(logSpy).toHaveBeenCalledWith(
+        `Contact created with ID ${contact.id}`,
+      );
     });
 
     it('should create a contact without optional subject', async () => {
@@ -182,10 +184,9 @@ describe('ContactsService', () => {
 
       await service.findAll(options);
 
-      expect(andWhereMock).toHaveBeenCalledWith(
-        'contacts.isRead = :isRead',
-        { isRead: true },
-      );
+      expect(andWhereMock).toHaveBeenCalledWith('contacts.isRead = :isRead', {
+        isRead: true,
+      });
     });
   });
 
