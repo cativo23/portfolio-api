@@ -758,11 +758,13 @@ if (!apiKey) {
 
 ---
 
-### 3.2 JwtOrApiKeyGuard Swallows Errors ⚠️ MEDIUM
+### 3.2 JwtOrApiKeyGuard Swallows Errors ✅ FIXED
 
 **Location**: `src/core/jwt-or-api-key.guard.ts:16-26`
 
-**Issue**: The guard uses empty catch blocks, silently swallowing errors.
+**Status**: ✅ **RESOLVED** - The guard now only catches expected authentication errors and logs/re-throws unexpected errors, improving error visibility and debugging.
+
+**Issue**: The guard used empty catch blocks, silently swallowing errors.
 
 **Current Implementation**:
 ```typescript
@@ -795,7 +797,7 @@ async canActivate(context: ExecutionContext): Promise<boolean> {
 
 **Recommendation**: Only catch specific expected exceptions, log others.
 
-**Suggested Solution**:
+**Solution Applied**:
 ```typescript
 async canActivate(context: ExecutionContext): Promise<boolean> {
   const authGuard = this.moduleRef.get(AuthGuard, { strict: false });
@@ -811,6 +813,7 @@ async canActivate(context: ExecutionContext): Promise<boolean> {
       // Only catch authentication errors, not unexpected errors
       if (error instanceof AuthenticationException || error instanceof UnauthorizedException) {
         // Expected - try API key
+        this.logger.debug('JWT authentication failed, trying API key');
       } else {
         // Unexpected error - log and re-throw
         this.logger.error('Unexpected error in JWT guard', error);
@@ -829,6 +832,7 @@ async canActivate(context: ExecutionContext): Promise<boolean> {
       // Only catch authentication errors
       if (error instanceof AuthenticationException || error instanceof UnauthorizedException) {
         // Both failed - return false
+        this.logger.debug('API key authentication also failed');
       } else {
         // Unexpected error - log and re-throw
         this.logger.error('Unexpected error in API key guard', error);
@@ -840,6 +844,15 @@ async canActivate(context: ExecutionContext): Promise<boolean> {
   return false;
 }
 ```
+
+**Changes Made**:
+- ✅ Added `Logger` to the guard for error logging
+- ✅ Removed empty catch blocks that silently swallowed errors
+- ✅ Added checks for expected authentication exceptions (`AuthenticationException`, `UnauthorizedException`)
+- ✅ Added logging for unexpected errors before re-throwing
+- ✅ Added debug logging for expected authentication failures
+- ✅ Only authentication errors are caught and handled; other errors bubble up
+- ✅ Improved error visibility and debugging capabilities
 
 ---
 
@@ -1285,10 +1298,11 @@ this.cls.set('requestContext', context);
    - Risk: Low - Mostly refactoring
    - **Status**: Base `PaginatedResponseDto` class created. Both `ProjectsListResponseDto` and `ContactsListResponseDto` refactored to extend it, eliminating duplication and type assertions.
 
-6. **Fix JwtOrApiKeyGuard error handling** (Section 3.2)
+6. **Fix JwtOrApiKeyGuard error handling** (Section 3.2) ✅ **COMPLETED**
    - Impact: Medium - Better error visibility
    - Effort: Low - Add logging and specific exception handling
    - Risk: Low - Improves behavior
+   - **Status**: Guard now catches only expected authentication errors. Unexpected errors are logged and re-thrown, improving error visibility and debugging.
 
 ### Medium Priority
 
@@ -1344,9 +1358,10 @@ The Portfolio API demonstrates good understanding of response standardization an
 **Key Areas for Improvement:**
 - ✅ Code duplication - pagination logic (Section 1.1 - Fixed)
 - ✅ Code duplication - response DTO factory methods (Section 1.2 - Fixed)
+- ✅ Error handling - guard error swallowing (Section 3.2 - Fixed)
 - ⚠️ Code duplication - query building (other areas)
 - ⚠️ Type safety issues
-- ✅ Error handling patterns (Sections 1.4, 3.3 - Fixed)
+- ✅ Error handling patterns (Sections 1.4, 3.2, 3.3 - Fixed)
 - ✅ Inefficient database operations (Section 2.1 - Fixed)
 - ✅ Missing input validation for query parameters (Sections 1.3, 5.1 - Fixed)
 
@@ -1359,14 +1374,15 @@ All recommendations maintain the existing API response schema as required.
 
 ---
 
-**Document Version**: 1.5  
+**Document Version**: 1.6  
 **Last Updated**: 2026-01-08
 
 **Updates:**
 - ✅ Section 1.1 (Pagination Logic Duplication) - Fixed
 - ✅ Section 1.2 (Response DTO Factory Methods Duplication) - Fixed
-- ✅ Section 1.4 (Error Handling Pattern Duplication) - Fixed
-- ✅ Section 3.3 (Error Context Loss in Services) - Fixed
-- ✅ Section 2.1 (Inefficient Update Operations) - Fixed
 - ✅ Section 1.3 (Query Parameter Parsing Duplication) - Fixed
+- ✅ Section 1.4 (Error Handling Pattern Duplication) - Fixed
+- ✅ Section 2.1 (Inefficient Update Operations) - Fixed
+- ✅ Section 3.2 (JwtOrApiKeyGuard Swallows Errors) - Fixed
+- ✅ Section 3.3 (Error Context Loss in Services) - Fixed
 - ✅ Section 5.1 (Missing Query Parameter Validation) - Fixed
