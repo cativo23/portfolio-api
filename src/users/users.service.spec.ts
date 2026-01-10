@@ -83,13 +83,12 @@ describe('UsersService', () => {
       expect(loggerSpy).toHaveBeenCalledWith(`User with email ${email} found.`);
     });
 
-    it('should throw NotFoundException and log when user is not found', async () => {
+    it('should return undefined and log when user is not found', async () => {
       const email = 'notfound@email.com';
       jest.spyOn(repository, 'findOneBy').mockResolvedValue(undefined);
 
-      await expect(service.findOneByEmail(email)).rejects.toThrow(
-        NotFoundException,
-      );
+      const result = await service.findOneByEmail(email);
+      expect(result).toBeUndefined();
       expect(repository.findOneBy).toHaveBeenCalledWith({ email });
       expect(loggerSpy).toHaveBeenCalledWith(
         `User with email ${email} not found.`,

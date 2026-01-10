@@ -149,7 +149,7 @@ describe('ProjectsService', () => {
       await service.findAll(options);
 
       expect(andWhereMock).toHaveBeenCalledWith(
-        'projects.title LIKE :search OR projects.description LIKE :search',
+        '(projects.title LIKE :search OR projects.description LIKE :search)',
         { search: '%test%' },
       );
     });
@@ -405,7 +405,9 @@ describe('ProjectsService', () => {
         .mockResolvedValue({ affected: 0 } as any);
 
       // If no rows affected, treat as not found
-      await expect(service.remove(1)).rejects.toThrow(NotFoundException);
+      await expect(service.remove(1)).rejects.toThrow(
+        'Project with ID 1 not found',
+      );
       expect(warnSpy).toHaveBeenCalledWith(
         `Failed to delete project with ID 1 - no rows affected`,
       );

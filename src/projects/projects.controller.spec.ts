@@ -133,7 +133,8 @@ describe('ProjectsController', () => {
         per_page: 10,
       });
 
-      const response = await controller.findAll('1', '10');
+      const query = { page: 1, per_page: 10 };
+      const response = await controller.findAll(query as any);
       expect(response).toEqual(mockProjectsListResponseDto);
       expect(service.findAll).toHaveBeenCalledWith({
         page: 1,
@@ -145,14 +146,15 @@ describe('ProjectsController', () => {
 
     it('should throw if service fails', async () => {
       mockService.findAll.mockRejectedValue(new Error('Find error'));
-      await expect(controller.findAll('1', '10')).rejects.toThrow('Find error');
+      const query = { page: 1, per_page: 10 };
+      await expect(controller.findAll(query as any)).rejects.toThrow('Find error');
     });
   });
 
   describe('findOne', () => {
     it('should return a single project', async () => {
       mockService.findOne.mockResolvedValue(mockProject);
-      const result = await controller.findOne('1');
+      const result = await controller.findOne(1);
 
       expect(result).toEqual(mockSingleProjectResponseDto);
       expect(service.findOne).toHaveBeenCalledWith(1);
@@ -161,7 +163,7 @@ describe('ProjectsController', () => {
     it('should throw if not found', async () => {
       mockService.findOne.mockRejectedValue(new NotFoundException('Not found'));
 
-      await expect(controller.findOne('2')).rejects.toThrow('Not found');
+      await expect(controller.findOne(2)).rejects.toThrow('Not found');
     });
   });
 
@@ -178,7 +180,7 @@ describe('ProjectsController', () => {
         SingleProjectResponseDto.fromEntity(updatedProject);
       mockService.update.mockResolvedValue(updatedProject);
 
-      const result = await controller.update('1', dto);
+      const result = await controller.update(1, dto);
 
       expect(result).toEqual(updatedResponseDto);
       expect(service.update).toHaveBeenCalledWith(1, dto);
@@ -187,7 +189,7 @@ describe('ProjectsController', () => {
     it('should throw if update fails', async () => {
       mockService.update.mockRejectedValue(new Error('Update failed'));
 
-      await expect(controller.update('1', { title: 'fail' })).rejects.toThrow(
+      await expect(controller.update(1, { title: 'fail' })).rejects.toThrow(
         'Update failed',
       );
     });
@@ -197,7 +199,7 @@ describe('ProjectsController', () => {
     it('should return success message on deletion', async () => {
       mockService.remove.mockResolvedValue(mockDeleteResponseDto);
 
-      const result = await controller.remove('1');
+      const result = await controller.remove(1);
 
       expect(result).toBe(mockDeleteResponseDto);
       expect(service.remove).toHaveBeenCalledWith(1);
@@ -208,7 +210,7 @@ describe('ProjectsController', () => {
         new InternalServerException('Cannot delete'),
       );
 
-      await expect(controller.remove('99')).rejects.toThrow('Cannot delete');
+      await expect(controller.remove(99)).rejects.toThrow('Cannot delete');
     });
   });
 });

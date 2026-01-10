@@ -37,7 +37,7 @@ import { RequestContext } from '../context/request-context.interface';
  */
 @Injectable()
 export class RequestIdMiddleware implements NestMiddleware {
-  constructor(private readonly cls: ClsService) {}
+  constructor(private readonly cls: ClsService) { }
 
   use(req: Request, res: Response, next: NextFunction) {
     // Generate a unique request ID
@@ -53,7 +53,7 @@ export class RequestIdMiddleware implements NestMiddleware {
       requestId,
       path: req.url,
       method: req.method,
-      ip: req.ip || req.socket.remoteAddress || 'unknown',
+      ip: req.ip || req.socket?.remoteAddress || 'unknown',
       timestamp: new Date().toISOString(),
     };
 

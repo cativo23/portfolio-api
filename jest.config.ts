@@ -18,6 +18,10 @@ const config: Config = {
     '.module.ts$',
     '.eslintrc.js',
     'jest.config.ts',
+    'main.ts',
+    'migrations/',
+    'seeder',
+    'typeorm.config',
   ],
   testEnvironment: 'node',
   moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, {
