@@ -98,6 +98,7 @@ Paginated endpoints include \`meta.pagination\` with:
     )
     .setVersion('1.0')
     .addServer('http://localhost:3001', 'Development')
+    .addServer('https://api.cativo.dev', 'Production')
     .addBearerAuth(
       {
         type: 'http',

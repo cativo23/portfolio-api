@@ -22,6 +22,7 @@ services:
       - "traefik.http.routers.portfolio-api.entrypoints=websecure"
       - "traefik.http.routers.portfolio-api.tls.certresolver=letsencryptresolver"
       - "traefik.http.services.portfolio-api.loadbalancer.server.port=3000"
+      - "traefik.docker.network=space-server_web"
     networks:
       - space-server_web
       - portfolio-internal
