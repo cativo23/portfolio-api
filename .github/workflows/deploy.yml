@@ -63,8 +63,9 @@ jobs:
           source: "compose.prod.yml"
           target: "/home/cativo23/deploy/portfolio-api-deploy"
           debug: true
-          timeout: 120s
-          command_timeout: 5m
+          timeout: 10m
+          command_timeout: 10m
+          proxy_timeout: 10m
           tar_exec: tar
           tar_dereference: true
       - name: Deploy to server
@@ -85,7 +86,7 @@ jobs:
             export JWT_EXPIRES_IN=${{ secrets.JWT_EXPIRES_IN }}
             export CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
             
-            cd /tmp/portfolio-api-deploy/
+            cd /home/cativo23/deploy/portfolio-api-deploy
             
             # Login to Docker Hub on server
             echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
