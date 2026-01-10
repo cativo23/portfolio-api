@@ -3,6 +3,7 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
+      "@core": ["src/core/index"],
       "@core/*": ["dist/src/core/*"],
       "@auth/*": ["dist/src/auth/*"],
       "@users/*": ["dist/src/users/*"],
