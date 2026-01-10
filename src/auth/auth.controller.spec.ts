@@ -126,9 +126,10 @@ describe('AuthController', () => {
   });
 
   describe('profile', () => {
-    it('should return both user from decorator and req.user', () => {
+    it('should return user from decorator', () => {
       const mockRequest = { user: mockUser };
-      const mockUserDecorator = {
+      const mockUserDecorator: User = {
+        ...mockUser,
         id: 2,
         username: 'decorator',
         email: 'decorator@example.com',
@@ -138,7 +139,6 @@ describe('AuthController', () => {
 
       expect(result).toEqual({
         user: mockUserDecorator,
-        req_user: mockUser,
       });
     });
 
@@ -149,24 +149,6 @@ describe('AuthController', () => {
 
       expect(result).toEqual({
         user: undefined,
-        req_user: mockUser,
-      });
-    });
-
-    it('should handle missing req.user gracefully', () => {
-      const mockRequest = {};
-
-      const mockUserDecorator = {
-        id: 3,
-        username: 'decorator2',
-        email: 'decorator2@example.com',
-      };
-
-      const result = controller.profile(mockRequest as any, mockUserDecorator);
-
-      expect(result).toEqual({
-        user: mockUserDecorator,
-        req_user: undefined,
       });
     });
   });

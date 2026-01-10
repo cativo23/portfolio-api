@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ApiKey } from './entities/api-key.entity';
-import { ApiKeyController } from './api-key.controller';
-import { ApiKeyService } from './api-key.service';
+import { ApiKey } from '@core/entities/api-key.entity';
+import { ApiKeyController } from '@core/api-key.controller';
+import { ApiKeyService } from '@core/api-key.service';
 
 import { AuthModule } from '@auth/auth.module';
 

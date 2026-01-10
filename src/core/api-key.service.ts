@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ApiKey } from '@core/entities/api-key.entity';
+import { ApiKeyListItem } from '@core/types/api-key-list-item.interface';
 
 import * as crypto from 'crypto';
 
@@ -18,7 +19,7 @@ export class ApiKeyService {
     return this.apiKeyRepository.save(apiKey);
   }
 
-  async findAll(): Promise<Partial<ApiKey>[]> {
+  async findAll(): Promise<ApiKeyListItem[]> {
     const keys = await this.apiKeyRepository.find();
     // Do not expose the actual key for security, only show id, description, isActive, createdAt, updatedAt
     return keys.map(({ id, description, isActive, createdAt, updatedAt }) => ({

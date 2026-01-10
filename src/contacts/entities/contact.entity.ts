@@ -1,14 +1,16 @@
 import { BaseEntity } from '@core/entities/base.entity';
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, Index } from 'typeorm';
 
 /**
  * Contact entity representing a contact form submission
  */
 @Entity('contacts')
+@Index(['createdAt'])
 export class Contact extends BaseEntity {
   @Column()
   name: string;
 
+  @Index()
   @Column()
   email: string;
 
@@ -18,6 +20,7 @@ export class Contact extends BaseEntity {
   @Column({ nullable: true })
   subject?: string;
 
+  @Index()
   @Column({ default: false })
   isRead: boolean;
 

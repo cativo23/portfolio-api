@@ -1,4 +1,4 @@
-import { BaseEntity } from './base.entity';
+import { BaseEntity } from '@core/entities/base.entity';
 import { Entity, Column, Index } from 'typeorm';
 
 @Entity('api_keys')

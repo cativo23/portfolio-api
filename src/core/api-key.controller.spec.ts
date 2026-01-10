@@ -37,7 +37,7 @@ describe('ApiKeyController (unit)', () => {
 
   it('should revoke an API key', async () => {
     (service.revokeById as jest.Mock).mockResolvedValue(undefined);
-    const result = await controller.revoke('1');
+    const result = await controller.revoke(1);
     expect(result.status).toBe('success');
     expect(result.data.id).toBe(1);
   });

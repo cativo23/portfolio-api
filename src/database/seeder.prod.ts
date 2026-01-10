@@ -1,4 +1,4 @@
-import AppDataSource from '../config/typeorm.config.prod';
+import AppDataSource from '@config/typeorm.config.prod';
 import { User } from '@users/entities/user.entity';
 import { Project } from '@projects/entities/project.entity';
 import { Contact } from '@contacts/entities/contact.entity';
