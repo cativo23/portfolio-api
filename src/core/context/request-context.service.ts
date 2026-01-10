@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ClsService } from 'nestjs-cls';
-import { RequestContext } from './request-context.interface';
+import { RequestContext } from '@core/context/request-context.interface';
 
 /**
  * Service for accessing request context in a type-safe manner

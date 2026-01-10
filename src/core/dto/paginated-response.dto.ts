@@ -3,7 +3,7 @@ import {
   SuccessResponseDto,
   ResponseMetaDto,
   PaginationMetaDto,
-} from './success-response.dto';
+} from '@core/dto/success-response.dto';
 
 /**
  * Base DTO for paginated list responses

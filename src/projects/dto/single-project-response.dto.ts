@@ -1,6 +1,6 @@
-import { ProjectResponseDto } from './project-response.dto';
+import { ProjectResponseDto } from '@projects/dto/project-response.dto';
 import { SingleResourceResponseDto } from '@core/dto';
-import { Project } from '../entities/project.entity';
+import { Project } from '@projects/entities/project.entity';
 
 /**
  * DTO for a single project response

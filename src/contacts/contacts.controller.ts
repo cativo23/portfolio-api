@@ -23,8 +23,8 @@ import {
   SingleContactResponseDto,
   ContactResponseDto,
   FindAllContactsQueryDto,
-} from './dto';
-import { ContactsService } from './contacts.service';
+} from '@contacts/dto';
+import { ContactsService } from '@contacts/contacts.service';
 import { AuthGuard } from '@auth/auth.guard';
 import { DeleteResponseDto } from '@projects/dto/delete-response.dto';
 import { Public } from '@auth/decorators/public.decorator';

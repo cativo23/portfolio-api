@@ -1,6 +1,6 @@
 import { Module, Global } from '@nestjs/common';
 import { ClsModule } from 'nestjs-cls';
-import { RequestContextService } from './request-context.service';
+import { RequestContextService } from '@core/context/request-context.service';
 import { RequestIdMiddleware } from '@core/middleware/request-id.middleware';
 
 /**

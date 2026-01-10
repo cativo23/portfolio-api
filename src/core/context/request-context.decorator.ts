@@ -1,6 +1,6 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { ClsService } from 'nestjs-cls';
-import { RequestContext } from './request-context.interface';
+import { RequestContext } from '@core/context/request-context.interface';
 
 /**
  * Decorator to inject request context into controller methods

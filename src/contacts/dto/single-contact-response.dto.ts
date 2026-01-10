@@ -1,6 +1,6 @@
-import { ContactResponseDto } from './contact-response.dto';
+import { ContactResponseDto } from '@contacts/dto/contact-response.dto';
 import { SingleResourceResponseDto } from '@core/dto';
-import { Contact } from '../entities/contact.entity';
+import { Contact } from '@contacts/entities/contact.entity';
 
 /**
  * DTO for a single contact response

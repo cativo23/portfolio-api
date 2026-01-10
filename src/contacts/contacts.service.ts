@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { Contact } from './entities/contact.entity';
-import { CreateContactDto } from './dto';
+import { Contact } from '@contacts/entities/contact.entity';
+import { CreateContactDto } from '@contacts/dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationUtil } from '@core/utils/pagination.util';
 import { BaseCrudService } from '@core/services/base-crud.service';

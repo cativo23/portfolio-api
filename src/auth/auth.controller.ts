@@ -9,7 +9,7 @@ import {
   Get,
 } from '@nestjs/common';
 import { ErrorCode, ErrorResponseDto, SuccessResponseDto } from '@core/dto';
-import { AuthService } from './auth.service';
+import { AuthService } from '@auth/auth.service';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -19,18 +19,18 @@ import {
   ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
 import { CreateUserDto } from '@users/dto/create-user.dto';
-import { LoginDto } from './dto/login.dto';
-import { LoginResponseDto } from './dto/login-response.dto';
-import { AuthGuard } from './auth.guard';
+import { LoginDto } from '@auth/dto/login.dto';
+import { LoginResponseDto } from '@auth/dto/login-response.dto';
+import { AuthGuard } from '@auth/auth.guard';
 import { User } from '@users/entities/user.entity';
-import { User as UserDecorator } from './decorators/user.decorator';
+import { User as UserDecorator } from '@auth/decorators/user.decorator';
 import { ApiCustomResponses } from '@core/decorators';
 import { AuthenticatedRequest } from '@core/types/authenticated-request.interface';
 
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
   /**
    * Handles user login by validating credentials and returning an authentication token.

@@ -1,5 +1,5 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { ApiKeyService } from './api-key.service';
+import { ApiKeyService } from '@core/api-key.service';
 import { AuthenticationException } from '@core/exceptions';
 
 @Injectable()

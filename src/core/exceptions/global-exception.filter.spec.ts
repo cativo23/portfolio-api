@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GlobalExceptionFilter } from './global-exception.filter';
-import { RequestContextService } from '../context/request-context.service';
+import { RequestContextService } from '@core/context/request-context.service';
 import { ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { BaseException, NotFoundException, AuthenticationException } from './';
-import { ErrorResponseDto, ErrorCode } from '../dto';
+import { ErrorResponseDto, ErrorCode } from '@core/dto';
 
 describe('GlobalExceptionFilter', () => {
   let filter: GlobalExceptionFilter;

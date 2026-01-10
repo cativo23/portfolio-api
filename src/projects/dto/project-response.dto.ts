@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Project } from '../entities/project.entity';
+import { Project } from '@projects/entities/project.entity';
 
 /**
  * DTO for project response

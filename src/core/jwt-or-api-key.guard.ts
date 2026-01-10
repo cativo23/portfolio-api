@@ -6,7 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { AuthGuard } from '@auth/auth.guard';
-import { ApiKeyGuard } from './api-key.guard';
+import { ApiKeyGuard } from '@core/api-key.guard';
 import { ModuleRef } from '@nestjs/core';
 import { AuthenticationException } from '@core/exceptions';
 

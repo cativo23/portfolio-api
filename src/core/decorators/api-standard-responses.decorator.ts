@@ -9,8 +9,8 @@ import {
   ApiUnprocessableEntityResponse,
   getSchemaPath,
 } from '@nestjs/swagger';
-import { ErrorResponseDto } from '../dto/error-response.dto';
-import { BaseResponseDto } from '../dto/base-response.dto';
+import { ErrorResponseDto } from '@core/dto/error-response.dto';
+import { BaseResponseDto } from '@core/dto/base-response.dto';
 
 /**
  * Standard error responses that are common across all endpoints

@@ -7,9 +7,9 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { ErrorResponseDto, ErrorCode } from '../dto';
+import { ErrorResponseDto, ErrorCode } from '@core/dto';
 import { BaseException } from '@core/exceptions';
-import { RequestContextService } from '../context/request-context.service';
+import { RequestContextService } from '@core/context/request-context.service';
 
 /**
  * Global exception filter that transforms all exceptions into standardized error responses

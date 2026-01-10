@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { RequestContextService } from '../context/request-context.service';
-import { SuccessResponseDto } from '../dto';
+import { RequestContextService } from '@core/context/request-context.service';
+import { SuccessResponseDto } from '@core/dto';
 
 /**
  * Interceptor that transforms all successful responses to follow the standardized format

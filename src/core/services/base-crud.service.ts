@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Repository, FindOptionsWhere, DeepPartial } from 'typeorm';
-import { NotFoundException } from '../exceptions/not-found.exception';
+import { NotFoundException } from '@core/exceptions/not-found.exception';
 import { DeleteResponseDto } from '@projects/dto/delete-response.dto';
 
 /**

@@ -1,5 +1,5 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { CreateProjectDto } from './create-project.dto';
+import { CreateProjectDto } from '@projects/dto/create-project.dto';
 
 /**
  * DTO for updating a project

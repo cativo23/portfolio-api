@@ -1,5 +1,5 @@
 import { ApiHideProperty } from '@nestjs/swagger';
-import { SuccessResponseDto } from './success-response.dto';
+import { SuccessResponseDto } from '@core/dto/success-response.dto';
 
 /**
  * Base DTO for single resource responses

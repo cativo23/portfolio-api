@@ -1,5 +1,5 @@
 import { ValidationPipe } from './validation.pipe';
-import { ValidationException } from '../exceptions/validation.exception';
+import { ValidationException } from '@core/exceptions/validation.exception';
 
 describe('ValidationPipe', () => {
   let pipe: ValidationPipe;

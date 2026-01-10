@@ -2,7 +2,7 @@ import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { randomBytes } from 'crypto';
 import { ClsService } from 'nestjs-cls';
-import { RequestContext } from '../context/request-context.interface';
+import { RequestContext } from '@core/context/request-context.interface';
 
 /**
  * Middleware that generates a unique request ID and stores request context

@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ResponseTransformInterceptor } from './response-transform.interceptor';
-import { RequestContextService } from '../context/request-context.service';
+import { RequestContextService } from '@core/context/request-context.service';
 import { ExecutionContext, CallHandler } from '@nestjs/common';
 import { of } from 'rxjs';
-import { SuccessResponseDto } from '../dto';
+import { SuccessResponseDto } from '@core/dto';
 
 describe('ResponseTransformInterceptor', () => {
   let interceptor: ResponseTransformInterceptor<any>;

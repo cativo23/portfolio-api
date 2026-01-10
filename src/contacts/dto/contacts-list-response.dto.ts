@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ContactResponseDto } from './contact-response.dto';
+import { ContactResponseDto } from '@contacts/dto/contact-response.dto';
 import { PaginatedResponseDto, ResponseMetaDto } from '@core/dto';
 
 /**
