@@ -5,13 +5,12 @@ on:
     branches: [main]
   pull_request:
     types: [closed]
-    branches: [main]
 
 jobs:
   build:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     environment: prod  # Add this line to reference the "prod" environment
-    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -63,8 +62,9 @@ jobs:
           source: "compose.prod.yml"
           target: "/home/cativo23/deploy/portfolio-api-deploy"
           debug: true
-          timeout: 120s
-          command_timeout: 5m
+          timeout: 10m
+          command_timeout: 10m
+          proxy_timeout: 10m
           tar_exec: tar
           tar_dereference: true
       - name: Deploy to server
@@ -85,7 +85,7 @@ jobs:
             export JWT_EXPIRES_IN=${{ secrets.JWT_EXPIRES_IN }}
             export CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
             
-            cd /tmp/portfolio-api-deploy/
+            cd /home/cativo23/deploy/portfolio-api-deploy
             
             # Login to Docker Hub on server
             echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
@@ -95,6 +95,16 @@ jobs:
             
             # Stop and remove old containers (but keep volumes)
             docker compose -f compose.prod.yml down || true
+
+            # Print Environment Variables for Debugging
+            echo "=== Environment Variables ==="
+            echo "DB_USERNAME: $DB_USERNAME"
+            echo "DB_NAME: $DB_NAME"
+            echo "DB_PASSWORD: $DB_PASSWORD"
+            echo "MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD"
+            echo "JWT_SECRET: $JWT_SECRET
+            echo "JWT_EXPIRES_IN: $JWT_EXPIRES_IN"
+            echo "CORS_ORIGINS: $CORS_ORIGINS"
             
             # Start new containers
             docker compose -f compose.prod.yml up -d
