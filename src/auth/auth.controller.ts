@@ -6,10 +6,8 @@ import {
   Request,
   HttpCode,
   HttpStatus,
-  UsePipes,
   Get,
 } from '@nestjs/common';
-import { ValidationPipe } from '@core/pipes';
 import { ErrorCode, ErrorResponseDto, SuccessResponseDto } from '@core/dto';
 import { AuthService } from './auth.service';
 import {
@@ -42,7 +40,6 @@ export class AuthController {
    */
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  @UsePipes(new ValidationPipe())
   @ApiOperation({ summary: 'User Login' })
   @ApiCustomResponses(
     ApiResponse({
@@ -78,7 +75,6 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('register')
-  @UsePipes(new ValidationPipe())
   @ApiOperation({ summary: 'User Registration' })
   @ApiCustomResponses(
     ApiResponse({

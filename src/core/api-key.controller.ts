@@ -6,7 +6,6 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
-  UsePipes,
   Param,
   Delete,
   ParseIntPipe,
@@ -18,7 +17,6 @@ import {
   ApiResponse,
   ApiParam,
 } from '@nestjs/swagger';
-import { ValidationPipe } from '@core/pipes';
 import { AuthGuard } from '@auth/auth.guard';
 import { ApiKeyService } from '@core/api-key.service';
 import { SuccessResponseDto, ErrorResponseDto } from '@core/dto';
@@ -30,14 +28,13 @@ import { ApiKeyListItem } from '@core/types/api-key-list-item.interface';
 @UseGuards(AuthGuard)
 @ApiBearerAuth()
 export class ApiKeyController {
-  constructor(private readonly apiKeyService: ApiKeyService) { }
+  constructor(private readonly apiKeyService: ApiKeyService) {}
 
   /**
    * Create a new API key (admin only)
    */
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @UsePipes(new ValidationPipe())
   @ApiOperation({ summary: 'Create a new API key (admin only)' })
   @ApiCustomResponses(
     ApiResponse({

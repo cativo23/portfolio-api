@@ -5,7 +5,6 @@ import {
   Body,
   Param,
   Delete,
-  UsePipes,
   Query,
   UseGuards,
   Patch,
@@ -28,7 +27,6 @@ import {
 import { ContactsService } from './contacts.service';
 import { AuthGuard } from '@auth/auth.guard';
 import { DeleteResponseDto } from '@projects/dto/delete-response.dto';
-import { ValidationPipe } from '@core/pipes';
 import { Public } from '@auth/decorators/public.decorator';
 import {
   ApiGetSingleResource,
@@ -45,7 +43,6 @@ export class ContactsController {
 
   @Post()
   @Public()
-  @UsePipes(new ValidationPipe())
   @ApiOperation({ summary: 'Submit a contact form' })
   @ApiBody({ type: CreateContactDto })
   @ApiCreateResource(

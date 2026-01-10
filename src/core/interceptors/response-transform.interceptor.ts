@@ -46,8 +46,7 @@ export class ResponseTransformInterceptor<T>
 
     return next.handle().pipe(
       map((data) => {
-        // If the response is already a SuccessResponseDto or ErrorResponseDto, return it as is
-        // but ensure it has request_id
+        // If already a response DTO (has status property), just ensure request_id
         if (
           data &&
           typeof data === 'object' &&
@@ -64,50 +63,9 @@ export class ResponseTransformInterceptor<T>
           return responseData;
         }
 
-        // Check if the response includes pagination metadata
-        // Supports both NestJS pagination format and custom format
-        const isPaginated =
-          data &&
-          typeof data === 'object' &&
-          'items' in data &&
-          'meta' in data &&
-          data.meta &&
-          typeof data.meta === 'object' &&
-          ('totalItems' in data.meta || 'total_items' in data.meta) &&
-          ('itemCount' in data.meta || 'currentPage' in data.meta) &&
-          ('itemsPerPage' in data.meta || 'limit' in data.meta) &&
-          ('totalPages' in data.meta || 'total_pages' in data.meta);
-
-        // Transform paginated response
-        if (isPaginated) {
-          const paginationMeta = {
-            page:
-              data.meta.currentPage ||
-              data.meta.page ||
-              (data.meta.itemCount ? 1 : 1),
-            limit:
-              data.meta.itemsPerPage ||
-              data.meta.limit ||
-              data.meta.itemCount ||
-              10,
-            total_items: data.meta.totalItems || data.meta.total_items || 0,
-            total_pages:
-              data.meta.totalPages ||
-              data.meta.total_pages ||
-              Math.ceil(
-                (data.meta.totalItems || data.meta.total_items || 0) /
-                  (data.meta.itemsPerPage || data.meta.limit || 10),
-              ),
-          };
-
-          const response = new SuccessResponseDto(data.items, {
-            pagination: paginationMeta,
-          });
-          response.request_id = requestId;
-          return response;
-        }
-
-        // Transform regular response (no meta field for individual resources)
+        // Otherwise, wrap in SuccessResponseDto
+        // Controllers should return DTOs directly, so this should rarely happen
+        // (e.g., auth.login() returns LoginResponseDto, auth.register() returns User entity)
         const response = new SuccessResponseDto(data);
         response.request_id = requestId;
         return response;

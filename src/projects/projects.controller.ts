@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  UsePipes,
   Query,
   UseGuards,
   ParseIntPipe,
@@ -43,7 +42,7 @@ import {
 @ApiTags('Projects')
 @Controller('projects')
 export class ProjectsController {
-  constructor(private readonly projectsService: ProjectsService) { }
+  constructor(private readonly projectsService: ProjectsService) {}
 
   @Get()
   @UseGuards(JwtOrApiKeyGuard)
@@ -101,7 +100,6 @@ export class ProjectsController {
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new project' })
-  @UsePipes(new ValidationPipe())
   @ApiBody({ type: CreateProjectDto })
   @ApiCreateResource(
     201,
@@ -120,7 +118,6 @@ export class ProjectsController {
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a project by ID' })
-  @UsePipes(new ValidationPipe())
   @ApiParam({ name: 'id', type: Number, description: 'Project ID' })
   @ApiBody({ type: UpdateProjectDto })
   @ApiUpdateResource(

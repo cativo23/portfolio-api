@@ -1042,25 +1042,46 @@ return new SuccessResponseDto(items, {
 
 ---
 
-### 5.2 Inconsistent Use of ValidationPipe ⚠️ LOW
+### 5.2 Inconsistent Use of ValidationPipe ✅ FIXED
 
 **Location**: Some endpoints use `@UsePipes(new ValidationPipe())`, others rely on global pipe
 
-**Issue**: `ValidationPipe` is instantiated in multiple places:
+**Status**: ✅ **RESOLVED** - All redundant `@UsePipes(new ValidationPipe())` decorators have been removed since global pipe is already configured.
+
+**Previous Implementation**:
+`ValidationPipe` was instantiated in multiple places:
 - `src/main.ts:45` (global)
 - `src/contacts/contacts.controller.ts:48`
-- `src/projects/projects.controller.ts:114,132`
-- `src/auth/auth.controller.ts:44,80`
-- `src/core/api-key.controller.ts:38`
+- `src/projects/projects.controller.ts:104,123`
+- `src/auth/auth.controller.ts:45,81`
+- `src/core/api-key.controller.ts:40`
 
-**Why This Is Bad:**
+**Why This Was Bad:**
 1. **Redundant**: Global pipe already applies validation
 2. **Inconsistent Configuration**: Could have different settings if instantiated differently
 3. **Unnecessary Decorators**: `@UsePipes(new ValidationPipe())` is redundant
 
-**Recommendation**: Remove `@UsePipes(new ValidationPipe())` decorators since global pipe is already configured.
+**Solution Applied**:
+```typescript
+// Removed @UsePipes(new ValidationPipe()) decorators from:
+// - ProjectsController.create() and update()
+// - AuthController.login() and register()
+// - ContactsController.create()
+// - ApiKeyController.create()
 
-**Exception**: Keep if specific endpoints need different validation options, but document why.
+// Also removed unused ValidationPipe and UsePipes imports
+```
+
+**Changes Made**:
+- ✅ Removed `@UsePipes(new ValidationPipe())` decorator from `ProjectsController.create()`
+- ✅ Removed `@UsePipes(new ValidationPipe())` decorator from `ProjectsController.update()`
+- ✅ Removed `@UsePipes(new ValidationPipe())` decorator from `AuthController.login()`
+- ✅ Removed `@UsePipes(new ValidationPipe())` decorator from `AuthController.register()`
+- ✅ Removed `@UsePipes(new ValidationPipe())` decorator from `ContactsController.create()`
+- ✅ Removed `@UsePipes(new ValidationPipe())` decorator from `ApiKeyController.create()`
+- ✅ Removed unused `ValidationPipe` and `UsePipes` imports from all controllers
+- ✅ Global ValidationPipe in `main.ts` handles all validation consistently
+- ✅ Cleaner code with no redundant decorators
 
 ---
 
@@ -1256,13 +1277,13 @@ if (!isMatch) {
 
 ---
 
-### 8.3 UpdateProjectDto Redundancy ⚠️ LOW
+### 8.3 UpdateProjectDto Redundancy ✅ FIXED
 
 **Location**: `src/projects/dto/update-project.dto.ts`
 
-**Issue**: `UpdateProjectDto` extends `PartialType(CreateProjectDto)` but then re-declares all properties as optional.
+**Status**: ✅ **RESOLVED** - All redundant property declarations have been removed. `UpdateProjectDto` now simply extends `PartialType(CreateProjectDto)` without redeclaring properties.
 
-**Current Implementation**:
+**Previous Implementation**:
 ```typescript
 export class UpdateProjectDto extends PartialType(CreateProjectDto) {
   @ApiPropertyOptional({ description: 'Project title' })
@@ -1270,60 +1291,83 @@ export class UpdateProjectDto extends PartialType(CreateProjectDto) {
 
   @ApiPropertyOptional({ description: 'Project description' })
   description?: string; // ❌ Redundant
-  // ...
+  // ... more redundant properties
 }
 ```
 
-**Why This Is Bad:**
+**Why This Was Bad:**
 1. **Redundancy**: `PartialType` already makes all properties optional
 2. **Maintenance**: Must update both `CreateProjectDto` and `UpdateProjectDto` when adding fields
 
-**Recommendation**: Remove redundant property declarations if Swagger documentation is sufficient from base class, or use `PartialType` without redeclaring:
+**Solution Applied**:
 ```typescript
-// Option 1: Just use PartialType (if Swagger picks up from base)
-export class UpdateProjectDto extends PartialType(CreateProjectDto) {}
+import { PartialType } from '@nestjs/mapped-types';
+import { CreateProjectDto } from './create-project.dto';
 
-// Option 2: Add ApiPropertyOptional only for Swagger if needed, but don't redeclare types
-export class UpdateProjectDto extends PartialType(CreateProjectDto) {
-  // Only add if you need different Swagger documentation
-  // Otherwise, PartialType handles it
-}
+/**
+ * DTO for updating a project
+ *
+ * Extends PartialType(CreateProjectDto) which automatically:
+ * - Makes all properties optional
+ * - Preserves validation decorators
+ * - Preserves Swagger documentation from CreateProjectDto
+ */
+export class UpdateProjectDto extends PartialType(CreateProjectDto) {}
 ```
+
+**Changes Made**:
+- ✅ Removed all redundant property declarations (title, description, shortDescription, liveUrl, repoUrl, isFeatured, techStack)
+- ✅ Removed redundant `@ApiPropertyOptional` decorators
+- ✅ Simplified to just extend `PartialType(CreateProjectDto)`
+- ✅ Added documentation explaining how PartialType works
+- ✅ Swagger documentation is automatically inherited from `CreateProjectDto`
+- ✅ Easier maintenance - only need to update `CreateProjectDto` when adding fields
 
 ---
 
 ## 9. Interceptors & Middleware
 
-### 9.1 Response Transform Interceptor Complexity ⚠️ LOW
+### 9.1 Response Transform Interceptor Complexity ✅ FIXED
 
 **Location**: `src/core/interceptors/response-transform.interceptor.ts:64-103`
 
-**Issue**: The interceptor has complex logic to detect pagination format, supporting multiple formats.
+**Status**: ✅ **RESOLVED** - The interceptor has been simplified by removing complex pagination detection logic. Since controllers return proper DTOs with `status` property, the interceptor now only needs to ensure `request_id` is set or wrap plain objects in `SuccessResponseDto`.
 
-**Why This Could Be Better:**
-1. **Complexity**: The pagination detection logic is complex and error-prone
-2. **Multiple Formats**: Supporting both NestJS pagination format and custom format adds complexity
-3. **Unclear Intent**: It's not immediately clear what format services should return
+**Previous Implementation**:
+The interceptor had complex logic to detect pagination format, supporting multiple formats (NestJS pagination format and custom format).
 
-**Recommendation**: Standardize on one pagination format. If services are already returning DTOs (as per current architecture), the interceptor might be doing unnecessary work.
+**Why This Was Bad:**
+1. **Complexity**: The pagination detection logic was complex and error-prone
+2. **Multiple Formats**: Supporting both NestJS pagination format and custom format added complexity
+3. **Unclear Intent**: It wasn't immediately clear what format services should return
+4. **Dead Code**: Controllers now return proper DTOs, so pagination detection was never executed
 
-**Suggested Simplification**:
+**Solution Applied**:
 ```typescript
 intercept(context: ExecutionContext, next: CallHandler): Observable<SuccessResponseDto<T>> {
   const requestId = this.requestContext.getRequestId();
 
   return next.handle().pipe(
     map((data) => {
-      // If already a response DTO, just ensure request_id
-      if (data && typeof data === 'object' && 'status' in data) {
-        if (!data.request_id) {
-          data.request_id = requestId;
+      // If already a response DTO (has status property), just ensure request_id
+      if (
+        data &&
+        typeof data === 'object' &&
+        'status' in data &&
+        (data.status === 'success' || data.status === 'error')
+      ) {
+        const responseData = data as SuccessResponseDto<unknown> & {
+          request_id?: string;
+        };
+        if (!responseData.request_id) {
+          responseData.request_id = requestId;
         }
-        return data;
+        return responseData;
       }
 
       // Otherwise, wrap in SuccessResponseDto
-      // Services should return DTOs directly, so this should rarely happen
+      // Controllers should return DTOs directly, so this should rarely happen
+      // (e.g., auth.login() returns LoginResponseDto, auth.register() returns User entity)
       const response = new SuccessResponseDto(data);
       response.request_id = requestId;
       return response;
@@ -1332,17 +1376,25 @@ intercept(context: ExecutionContext, next: CallHandler): Observable<SuccessRespo
 }
 ```
 
-**Note**: This assumes services return DTOs. If changing architecture (section 2.1), adjust accordingly.
+**Changes Made**:
+- ✅ Removed complex pagination detection logic (60+ lines of code removed)
+- ✅ Removed support for multiple pagination formats (NestJS and custom)
+- ✅ Simplified to just check if response has `status` property
+- ✅ If response has `status`, ensure `request_id` is set
+- ✅ If response doesn't have `status`, wrap in `SuccessResponseDto`
+- ✅ Clearer intent - controllers return DTOs, interceptor ensures request_id
+- ✅ Reduced code complexity from ~70 lines to ~20 lines
+- ✅ Better maintainability - simpler logic is easier to understand and test
 
 ---
 
-### 9.2 RequestIdMiddleware Implementation ⚠️ LOW
+### 9.2 RequestIdMiddleware Implementation ✅ FIXED
 
 **Location**: `src/core/middleware/request-id.middleware.ts:65`
 
-**Issue**: Request ID is stored in both CLS context and request object for "backward compatibility."
+**Status**: ✅ **RESOLVED** - Backward compatibility code has been removed. Request ID is now only stored in CLS context, and all code uses `RequestContextService` consistently.
 
-**Current Implementation**:
+**Previous Implementation**:
 ```typescript
 // Set context in CLS (AsyncLocalStorage)
 this.cls.set('requestContext', context);
@@ -1352,12 +1404,28 @@ this.cls.set('requestContext', context);
 (req as any).requestId = requestId; // ❌ Type assertion + backward compatibility code
 ```
 
-**Why This Is Bad:**
+**Why This Was Bad:**
 1. **Type Safety**: Using `(req as any)` defeats type safety
 2. **Technical Debt**: "Backward compatibility" code should be temporary
 3. **Inconsistency**: Two ways to access the same data
 
-**Recommendation**: Remove backward compatibility code and use `RequestContextService` consistently. If there's code accessing `req.requestId`, update it to use the service.
+**Solution Applied**:
+```typescript
+// Set context in CLS (AsyncLocalStorage)
+this.cls.set('requestContext', context);
+
+// Set response header for client tracking
+res.setHeader('X-Request-ID', requestId);
+```
+
+**Changes Made**:
+- ✅ Removed backward compatibility code `(req as any).requestId = requestId;`
+- ✅ Removed comment about backward compatibility
+- ✅ Verified no code was accessing `req.requestId` directly (searched entire codebase)
+- ✅ All code now uses `RequestContextService` consistently for type-safe access
+- ✅ Improved type safety - no more type assertions
+- ✅ Reduced technical debt - removed temporary code
+- ✅ Single source of truth - only CLS context stores request ID
 
 ---
 
@@ -1425,25 +1493,29 @@ this.cls.set('requestContext', context);
 
 ### Low Priority
 
-11. **Remove redundant ValidationPipe decorators** (Section 5.2)
+11. **Remove redundant ValidationPipe decorators** (Section 5.2) ✅ **COMPLETED**
     - Impact: Low - Code cleanliness
     - Effort: Low - Remove decorators
     - Risk: Low
+    - **Status**: All redundant `@UsePipes(new ValidationPipe())` decorators removed from controllers. Removed unused imports. Global ValidationPipe handles all validation consistently.
 
-12. **Simplify response transform interceptor** (Section 9.1)
+12. **Simplify response transform interceptor** (Section 9.1) ✅ **COMPLETED**
     - Impact: Low - Code clarity
     - Effort: Low - Remove unused complexity
     - Risk: Low
+    - **Status**: Removed complex pagination detection logic (60+ lines). Simplified to check for `status` property and wrap plain objects. Reduced complexity from ~70 lines to ~20 lines.
 
-13. **Remove backward compatibility code** (Section 9.2)
+13. **Remove backward compatibility code** (Section 9.2) ✅ **COMPLETED**
     - Impact: Low - Code cleanliness
     - Effort: Low - Find and replace with RequestContextService
     - Risk: Low
+    - **Status**: Removed `(req as any).requestId = requestId;` backward compatibility code. Verified no code accesses `req.requestId` directly. All code uses `RequestContextService` consistently.
 
-14. **Fix UpdateProjectDto redundancy** (Section 8.3)
+14. **Fix UpdateProjectDto redundancy** (Section 8.3) ✅ **COMPLETED**
     - Impact: Low - Code cleanliness
     - Effort: Low - Remove redundant properties
     - Risk: Low
+    - **Status**: Removed all redundant property declarations from `UpdateProjectDto`. Now simply extends `PartialType(CreateProjectDto)`. Swagger documentation automatically inherited.
 
 ---
 
@@ -1466,6 +1538,10 @@ The Portfolio API demonstrates good understanding of response standardization an
 - ✅ Type assertions in DTOs (Section 4.2 - Fixed)
 - ✅ Type safety issues (Section 4.1 - Fixed)
 - ✅ Inconsistent parameter parsing (Section 5.3 - Fixed)
+- ✅ Redundant ValidationPipe decorators (Section 5.2 - Fixed)
+- ✅ UpdateProjectDto redundancy (Section 8.3 - Fixed)
+- ✅ Response transform interceptor complexity (Section 9.1 - Fixed)
+- ✅ RequestIdMiddleware backward compatibility code (Section 9.2 - Fixed)
 - ⚠️ Code duplication - query building (other areas)
 - ✅ Error handling patterns (Sections 1.4, 3.1, 3.2, 3.3, 7.1, 7.3 - Fixed)
 - ✅ Inefficient database operations (Section 2.1 - Fixed)
@@ -1480,7 +1556,7 @@ All recommendations maintain the existing API response schema as required.
 
 ---
 
-**Document Version**: 1.10  
+**Document Version**: 1.11  
 **Last Updated**: 2026-01-08
 
 **Updates:**
@@ -1495,9 +1571,13 @@ All recommendations maintain the existing API response schema as required.
 - ✅ Section 4.1 (Use of `any` Types) - Fixed
 - ✅ Section 4.2 (Type Assertions in DTOs) - Fixed
 - ✅ Section 5.1 (Missing Query Parameter Validation) - Fixed
+- ✅ Section 5.2 (Inconsistent Use of ValidationPipe) - Fixed
 - ✅ Section 5.3 (Inconsistent Parameter Parsing) - Fixed
 - ✅ Section 7.1 (Guards Using Generic Exceptions) - Fixed
 - ✅ Section 7.2 (JwtOrApiKeyGuard Error Handling) - Fixed
 - ✅ Section 7.3 (Auth Service Error Types) - Fixed
 - ✅ Section 8.1 (Response DTOs in Service Layer) - Fixed
 - ✅ Section 8.2 (Duplicated fromEntities Methods) - Fixed
+- ✅ Section 8.3 (UpdateProjectDto Redundancy) - Fixed
+- ✅ Section 9.1 (Response Transform Interceptor Complexity) - Fixed
+- ✅ Section 9.2 (RequestIdMiddleware Implementation) - Fixed

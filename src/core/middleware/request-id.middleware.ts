@@ -60,10 +60,6 @@ export class RequestIdMiddleware implements NestMiddleware {
     // Set context in CLS (AsyncLocalStorage)
     this.cls.set('requestContext', context);
 
-    // Also attach to request object for backward compatibility
-    // (in case any code still accesses it directly)
-    (req as any).requestId = requestId;
-
     // Set response header for client tracking
     res.setHeader('X-Request-ID', requestId);
 
