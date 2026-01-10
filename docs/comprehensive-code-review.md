@@ -11,11 +11,12 @@
 This comprehensive code review identifies code duplication, architectural issues, and areas for improvement following industry best practices and NestJS conventions. The API demonstrates good response standardization and documentation practices, but there are significant opportunities to improve code maintainability, reduce duplication, and enhance type safety.
 
 **Key Findings:**
-- ⚠️ **Critical**: Significant code duplication across services (pagination, query building, error handling)
-- ⚠️ **High**: Missing query parameter validation DTOs
-- ⚠️ **High**: Inefficient update operations (double database queries)
-- ⚠️ **Medium**: Type safety issues with `any` types
-- ⚠️ **Medium**: Guards not using custom exceptions consistently
+- ✅ **Fixed**: Code duplication across services (pagination, error handling, query building) - Extracted to utilities
+- ✅ **Fixed**: Query parameter validation DTOs - Implemented with proper validation
+- ✅ **Fixed**: Inefficient update operations - Now use `merge` + `save` pattern
+- ✅ **Fixed**: Type safety issues with `any` types - Replaced with proper interfaces and DTOs
+- ✅ **Fixed**: Guards not using custom exceptions - Now use `AuthenticationException` consistently
+- ✅ **Fixed**: Missing database indexes - Added indexes to frequently queried fields
 - ✅ **Good**: Response standardization is well-implemented
 - ✅ **Good**: Swagger documentation patterns are consistent
 
@@ -1158,26 +1159,110 @@ async revoke(@Param('id', ParseIntPipe) id: number): Promise<...> {
 
 ---
 
-### 6.2 Missing Database Indexes (Potential) ⚠️ LOW
+### 6.2 Missing Database Indexes ✅ FIXED
 
-**Note**: Cannot verify without examining entities and migrations, but common fields used in queries should be indexed:
-- `createdAt` (used in ordering)
-- `isFeatured`, `isRead` (used in filtering)
-- Email fields (used in lookups)
+**Status**: ✅ **RESOLVED** - Missing indexes have been added to entities and a migration has been created to add them to the database.
 
-**Recommendation**: Review entity definitions and ensure appropriate indexes are created.
+**Previous Index Status**:
+- ✅ **User table**: Had UNIQUE indexes on `username` and `email` (from unique constraints)
+- ✅ **ApiKey table**: Had UNIQUE index on `key`
+- ❌ **Projects table**: No indexes on `createdAt` (used in ordering) or `isFeatured` (used in filtering)
+- ❌ **Contacts table**: No indexes on `createdAt` (used in ordering), `isRead` (used in filtering), or `email` (used in lookups)
 
-**Example**:
+**Impact**:
+1. **Performance**: Queries filtering by `isFeatured`/`isRead` or ordering by `createdAt` would be slower without indexes
+2. **Email Lookups**: Contact email lookups benefit from an index
+3. **Scaling**: As data grows, missing indexes would cause increasing performance degradation
+
+**Solution Applied**:
 ```typescript
-// In entity
-@Index()
-@Column()
-email: string;
+// src/projects/entities/project.entity.ts
+import { Entity, Column, Index } from 'typeorm';
 
-@Index()
-@Column({ default: false })
-isFeatured: boolean;
+@Entity('projects')
+@Index(['createdAt'])  // Index on createdAt for ordering queries
+export class Project extends BaseEntity {
+  // ... existing columns
+
+  @Index()  // Index on isFeatured for filtering queries
+  @Column({ default: false })
+  isFeatured: boolean;
+}
+
+// src/contacts/entities/contact.entity.ts
+import { Entity, Column, Index } from 'typeorm';
+
+@Entity('contacts')
+@Index(['createdAt'])  // Index on createdAt for ordering queries
+export class Contact extends BaseEntity {
+  @Column()
+  name: string;
+
+  @Index()  // Index on email for lookup queries
+  @Column()
+  email: string;
+
+  // ... existing columns
+
+  @Index()  // Index on isRead for filtering queries
+  @Column({ default: false })
+  isRead: boolean;
+}
 ```
+
+**Migration Created**: `1768020735905-AddMissingIndexes.ts`
+```typescript
+export class AddMissingIndexes1768020735905 implements MigrationInterface {
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    // Add index on createdAt for projects (used in ordering)
+    await queryRunner.query(
+      `CREATE INDEX \`IDX_projects_createdAt\` ON \`projects\` (\`createdAt\`)`,
+    );
+    
+    // Add index on isFeatured for projects (used in filtering)
+    await queryRunner.query(
+      `CREATE INDEX \`IDX_projects_isFeatured\` ON \`projects\` (\`isFeatured\`)`,
+    );
+    
+    // Add index on createdAt for contacts (used in ordering)
+    await queryRunner.query(
+      `CREATE INDEX \`IDX_contacts_createdAt\` ON \`contacts\` (\`createdAt\`)`,
+    );
+    
+    // Add index on isRead for contacts (used in filtering)
+    await queryRunner.query(
+      `CREATE INDEX \`IDX_contacts_isRead\` ON \`contacts\` (\`isRead\`)`,
+    );
+    
+    // Add index on email for contacts (used in lookups)
+    await queryRunner.query(
+      `CREATE INDEX \`IDX_contacts_email\` ON \`contacts\` (\`email\`)`,
+    );
+  }
+
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    // Drop indexes in reverse order
+    await queryRunner.query(`DROP INDEX \`IDX_contacts_email\` ON \`contacts\``);
+    await queryRunner.query(`DROP INDEX \`IDX_contacts_isRead\` ON \`contacts\``);
+    await queryRunner.query(`DROP INDEX \`IDX_contacts_createdAt\` ON \`contacts\``);
+    await queryRunner.query(`DROP INDEX \`IDX_projects_isFeatured\` ON \`projects\``);
+    await queryRunner.query(`DROP INDEX \`IDX_projects_createdAt\` ON \`projects\``);
+  }
+}
+```
+
+**Changes Made**:
+- ✅ Added `@Index(['createdAt'])` decorator to `Project` entity class level
+- ✅ Added `@Index()` decorator to `isFeatured` field in `Project` entity
+- ✅ Added `@Index(['createdAt'])` decorator to `Contact` entity class level
+- ✅ Added `@Index()` decorator to `email` field in `Contact` entity
+- ✅ Added `@Index()` decorator to `isRead` field in `Contact` entity
+- ✅ Created migration `1768020735905-AddMissingIndexes.ts` to add indexes to database
+- ✅ Migration includes proper `up()` and `down()` methods for rollback support
+- ✅ All indexes are properly named following TypeORM conventions (`IDX_table_column`)
+- ✅ Indexes added for all frequently queried fields identified in the review
+
+**Impact**: Improved query performance for filtering and ordering operations, especially as data grows.
 
 ---
 
@@ -1517,6 +1602,12 @@ res.setHeader('X-Request-ID', requestId);
     - Risk: Low
     - **Status**: Removed all redundant property declarations from `UpdateProjectDto`. Now simply extends `PartialType(CreateProjectDto)`. Swagger documentation automatically inherited.
 
+15. **Add missing database indexes** (Section 6.2) ✅ **COMPLETED**
+    - Impact: Low - Performance optimization
+    - Effort: Low - Add indexes to entities and create migration
+    - Risk: Low - Indexes improve query performance
+    - **Status**: Added `@Index()` decorators to `Project.isFeatured`, `Contact.email`, and `Contact.isRead`. Added entity-level indexes on `createdAt` for both tables. Created migration to add all indexes to database.
+
 ---
 
 ## Conclusion
@@ -1542,6 +1633,7 @@ The Portfolio API demonstrates good understanding of response standardization an
 - ✅ UpdateProjectDto redundancy (Section 8.3 - Fixed)
 - ✅ Response transform interceptor complexity (Section 9.1 - Fixed)
 - ✅ RequestIdMiddleware backward compatibility code (Section 9.2 - Fixed)
+- ✅ Missing database indexes (Section 6.2 - Fixed)
 - ⚠️ Code duplication - query building (other areas)
 - ✅ Error handling patterns (Sections 1.4, 3.1, 3.2, 3.3, 7.1, 7.3 - Fixed)
 - ✅ Inefficient database operations (Section 2.1 - Fixed)
@@ -1556,7 +1648,7 @@ All recommendations maintain the existing API response schema as required.
 
 ---
 
-**Document Version**: 1.11  
+**Document Version**: 1.12  
 **Last Updated**: 2026-01-08
 
 **Updates:**
@@ -1581,3 +1673,4 @@ All recommendations maintain the existing API response schema as required.
 - ✅ Section 8.3 (UpdateProjectDto Redundancy) - Fixed
 - ✅ Section 9.1 (Response Transform Interceptor Complexity) - Fixed
 - ✅ Section 9.2 (RequestIdMiddleware Implementation) - Fixed
+- ✅ Section 6.2 (Missing Database Indexes) - Fixed

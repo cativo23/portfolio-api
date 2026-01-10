@@ -1,7 +1,8 @@
 import { BaseEntity } from '@core/entities/base.entity';
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, Index } from 'typeorm';
 
 @Entity('projects')
+@Index(['createdAt'])
 export class Project extends BaseEntity {
   @Column()
   title: string;
@@ -18,6 +19,7 @@ export class Project extends BaseEntity {
   @Column()
   repoUrl: string;
 
+  @Index()
   @Column({ default: false })
   isFeatured: boolean;
 
