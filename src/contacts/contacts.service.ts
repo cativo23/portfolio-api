@@ -2,10 +2,10 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Contact } from './entities/contact.entity';
 import { CreateContactDto } from './dto';
-import { DeleteResponseDto } from '@projects/dto/delete-response.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { NotFoundException } from '@core/exceptions/not-found.exception';
 import { PaginationUtil } from '@core/utils/pagination.util';
+import { BaseCrudService } from '@core/services/base-crud.service';
+import { NotFoundException } from '@core/exceptions';
 
 /**
  * Interface defining options for finding contacts with pagination, search, and filtering
@@ -22,30 +22,38 @@ interface FindAllOptions {
 }
 
 /**
+ * Placeholder type for UpdateContactDto
+ * Contacts don't have a general update operation, only markAsRead
+ */
+type UpdateContactDto = never;
+
+/**
  * Service responsible for managing contact form submissions
  *
  * Provides methods for creating, retrieving, updating, and deleting contacts
+ * Extends BaseCrudService to eliminate code duplication for common CRUD operations
  */
 @Injectable()
-export class ContactsService {
-  private readonly logger = new Logger(ContactsService.name);
+export class ContactsService extends BaseCrudService<
+  Contact,
+  CreateContactDto,
+  UpdateContactDto
+> {
+  protected readonly logger = new Logger(ContactsService.name);
 
   constructor(
     @InjectRepository(Contact)
-    private contactsRepository: Repository<Contact>,
-  ) {}
+    protected readonly contactsRepository: Repository<Contact>,
+  ) {
+    super();
+  }
 
-  /**
-   * Creates a new contact form submission
-   *
-   * @param createContactDto - Data transfer object containing contact details
-   * @returns Promise resolving to the created contact entity
-   */
-  async create(createContactDto: CreateContactDto): Promise<Contact> {
-    const contact = this.contactsRepository.create(createContactDto);
-    const savedContact = await this.contactsRepository.save(contact);
-    this.logger.log(`Contact created with ID ${savedContact.id}`);
-    return savedContact;
+  protected get repository(): Repository<Contact> {
+    return this.contactsRepository;
+  }
+
+  protected getEntityName(): string {
+    return 'Contact';
   }
 
   /**
@@ -78,26 +86,7 @@ export class ContactsService {
     return result;
   }
 
-  /**
-   * Retrieves a single contact by its ID
-   *
-   * @param id - The ID of the contact to retrieve
-   * @returns Promise resolving to the contact entity
-   * @throws NotFoundException if the contact doesn't exist
-   */
-  async findOne(id: number): Promise<Contact> {
-    const contact = await this.contactsRepository.findOne({
-      where: { id: id },
-    });
-
-    if (!contact) {
-      this.logger.warn(`Contact with ID ${id} not found`);
-      throw new NotFoundException(`Contact with ID ${id} not found`);
-    }
-
-    this.logger.log(`Found contact with ID ${id}`);
-    return contact;
-  }
+  // create, findOne, and remove methods are inherited from BaseCrudService
 
   /**
    * Marks a contact as read
@@ -126,38 +115,5 @@ export class ContactsService {
     this.logger.log(`Marked contact with ID ${id} as read`);
 
     return savedContact;
-  }
-
-  /**
-   * Deletes a contact by its ID
-   *
-   * @param id - The ID of the contact to delete
-   * @returns Promise resolving to a standardized response with a success message
-   * @throws NotFoundException if the contact doesn't exist
-   */
-  async remove(id: number): Promise<DeleteResponseDto> {
-    // Check if a contact exists
-    const existingContact = await this.contactsRepository.findOne({
-      where: { id },
-    });
-
-    if (!existingContact) {
-      this.logger.warn(`Contact with ID ${id} not found`);
-      throw new NotFoundException(`Contact with ID ${id} not found`);
-    }
-
-    // Delete contact
-    const result = await this.contactsRepository.delete(id);
-
-    if (result.affected === 0) {
-      // This should rarely happen if findOne succeeded, but handle it just in case
-      this.logger.warn(
-        `Failed to delete contact with ID ${id} - no rows affected`,
-      );
-      throw new NotFoundException(`Contact with ID ${id} not found`);
-    }
-
-    this.logger.log(`Deleted contact with ID ${id}`);
-    return DeleteResponseDto.withMessage('Contact successfully deleted');
   }
 }

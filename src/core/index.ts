@@ -15,3 +15,4 @@ export * from './decorators';
 export * from './utils/pagination.util';
 export * from './types/authenticated-request.interface';
 export * from './types/api-key-list-item.interface';
+export * from './services/base-crud.service';
