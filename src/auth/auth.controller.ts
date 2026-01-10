@@ -30,7 +30,7 @@ import { AuthenticatedRequest } from '@core/types/authenticated-request.interfac
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService) {}
 
   /**
    * Handles user login by validating credentials and returning an authentication token.

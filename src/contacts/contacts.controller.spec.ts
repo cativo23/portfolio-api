@@ -215,9 +215,7 @@ describe('ContactsController', () => {
     });
 
     it('should throw if not found', async () => {
-      mockService.findOne.mockRejectedValue(
-        new NotFoundException('Not found'),
-      );
+      mockService.findOne.mockRejectedValue(new NotFoundException('Not found'));
 
       await expect(controller.findOne(2)).rejects.toThrow('Not found');
     });

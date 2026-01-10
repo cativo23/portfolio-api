@@ -1,5 +1,8 @@
 import { ExecutionContext } from '@nestjs/common';
-import { RequestContextDecorator, InjectRequestContext } from './request-context.decorator';
+import {
+  RequestContextDecorator,
+  InjectRequestContext,
+} from './request-context.decorator';
 import { ClsService } from 'nestjs-cls';
 import { RequestContext } from './request-context.interface';
 
@@ -43,7 +46,7 @@ describe('RequestContextDecorator', () => {
   // or by creating a test decorator that uses it
   it('should return a function (decorator)', () => {
     expect(typeof RequestContextDecorator).toBe('function');
-    
+
     // The decorator should be usable as a parameter decorator
     // We can't easily test the internal factory without accessing private internals
     // So we'll just verify it's a valid decorator function

@@ -37,7 +37,7 @@ import { RequestContext } from '@core/context/request-context.interface';
  */
 @Injectable()
 export class RequestIdMiddleware implements NestMiddleware {
-  constructor(private readonly cls: ClsService) { }
+  constructor(private readonly cls: ClsService) {}
 
   use(req: Request, res: Response, next: NextFunction) {
     // Generate a unique request ID

@@ -87,7 +87,10 @@ describe('GlobalExceptionFilter', () => {
     });
 
     it('should handle HttpException with BAD_REQUEST status', () => {
-      const exception = new HttpException('Bad request', HttpStatus.BAD_REQUEST);
+      const exception = new HttpException(
+        'Bad request',
+        HttpStatus.BAD_REQUEST,
+      );
 
       filter.catch(exception, mockHost);
 
