@@ -9,6 +9,7 @@ import {
   UsePipes,
   Param,
   Delete,
+  ParseIntPipe,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -29,7 +30,7 @@ import { ApiKeyListItem } from '@core/types/api-key-list-item.interface';
 @UseGuards(AuthGuard)
 @ApiBearerAuth()
 export class ApiKeyController {
-  constructor(private readonly apiKeyService: ApiKeyService) {}
+  constructor(private readonly apiKeyService: ApiKeyService) { }
 
   /**
    * Create a new API key (admin only)
@@ -110,7 +111,7 @@ export class ApiKeyController {
   @ApiOperation({
     summary: 'Revoke (deactivate) an API key by ID (admin only)',
   })
-  @ApiParam({ name: 'id', type: String, description: 'API key ID' })
+  @ApiParam({ name: 'id', type: Number, description: 'API key ID' })
   @ApiCustomResponses(
     ApiResponse({
       status: HttpStatus.OK,
@@ -131,9 +132,9 @@ export class ApiKeyController {
     }),
   )
   async revoke(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
   ): Promise<SuccessResponseDto<{ id: number }>> {
-    await this.apiKeyService.revokeById(Number(id));
-    return new SuccessResponseDto({ id: Number(id) });
+    await this.apiKeyService.revokeById(id);
+    return new SuccessResponseDto({ id });
   }
 }

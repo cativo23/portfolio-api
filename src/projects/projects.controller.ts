@@ -9,6 +9,7 @@ import {
   UsePipes,
   Query,
   UseGuards,
+  ParseIntPipe,
 } from '@nestjs/common';
 import {
   ApiOperation,
@@ -42,7 +43,7 @@ import {
 @ApiTags('Projects')
 @Controller('projects')
 export class ProjectsController {
-  constructor(private readonly projectsService: ProjectsService) {}
+  constructor(private readonly projectsService: ProjectsService) { }
 
   @Get()
   @UseGuards(JwtOrApiKeyGuard)
@@ -82,15 +83,17 @@ export class ProjectsController {
   @ApiBearerAuth()
   @ApiSecurity('x-api-key')
   @ApiOperation({ summary: 'Get a project by ID' })
-  @ApiParam({ name: 'id', type: String, description: 'Project ID' })
+  @ApiParam({ name: 'id', type: Number, description: 'Project ID' })
   @ApiGetSingleResource(
     200,
     'The found project',
     SingleProjectResponseDto,
     ProjectResponseDto,
   )
-  async findOne(@Param('id') id: string): Promise<SingleProjectResponseDto> {
-    const project = await this.projectsService.findOne(+id);
+  async findOne(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<SingleProjectResponseDto> {
+    const project = await this.projectsService.findOne(id);
     return SingleProjectResponseDto.fromEntity(project);
   }
 
@@ -118,7 +121,7 @@ export class ProjectsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a project by ID' })
   @UsePipes(new ValidationPipe())
-  @ApiParam({ name: 'id', type: String, description: 'Project ID' })
+  @ApiParam({ name: 'id', type: Number, description: 'Project ID' })
   @ApiBody({ type: UpdateProjectDto })
   @ApiUpdateResource(
     'The project has been successfully updated',
@@ -126,10 +129,10 @@ export class ProjectsController {
     ProjectResponseDto,
   )
   async update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateProjectDto: UpdateProjectDto,
   ): Promise<SingleProjectResponseDto> {
-    const project = await this.projectsService.update(+id, updateProjectDto);
+    const project = await this.projectsService.update(id, updateProjectDto);
     return SingleProjectResponseDto.fromEntity(project);
   }
 
@@ -137,12 +140,14 @@ export class ProjectsController {
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a project by ID' })
-  @ApiParam({ name: 'id', type: String, description: 'Project ID' })
+  @ApiParam({ name: 'id', type: Number, description: 'Project ID' })
   @ApiDeleteResource(
     'The project has been successfully deleted',
     DeleteResponseDto,
   )
-  async remove(@Param('id') id: string): Promise<DeleteResponseDto> {
-    return this.projectsService.remove(+id);
+  async remove(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<DeleteResponseDto> {
+    return this.projectsService.remove(id);
   }
 }

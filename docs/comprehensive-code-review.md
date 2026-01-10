@@ -1064,11 +1064,13 @@ return new SuccessResponseDto(items, {
 
 ---
 
-### 5.3 Inconsistent Parameter Parsing ⚠️ MEDIUM
+### 5.3 Inconsistent Parameter Parsing ✅ FIXED
 
 **Location**: Controllers use different approaches for parsing ID parameters
 
-**Current Implementation**:
+**Status**: ✅ **RESOLVED** - All controllers now consistently use `ParseIntPipe` for ID parameters, providing proper validation and better error messages.
+
+**Previous Implementation**:
 ```typescript
 // projects.controller.ts
 async findOne(@Param('id') id: string): Promise<...> {
@@ -1081,20 +1083,49 @@ async findOne(@Param('id', ParseIntPipe) id: number): Promise<...> { // ✅ Uses
 }
 ```
 
-**Why This Is Bad:**
+**Why This Was Bad:**
 1. **Inconsistent**: Different approaches in different controllers
 2. **No Validation**: Manual `+id` conversion doesn't validate input (e.g., `+NaN` results in `NaN`)
 3. **Error Handling**: ParseIntPipe provides better error messages
 
-**Recommendation**: Always use `ParseIntPipe` for ID parameters.
-
-**Suggested Solution**:
+**Solution Applied**:
 ```typescript
-// Consistent across all controllers
+// projects.controller.ts - Consistent across all controllers
 async findOne(@Param('id', ParseIntPipe) id: number): Promise<...> {
   return this.projectsService.findOne(id);
 }
+
+async update(@Param('id', ParseIntPipe) id: number, ...): Promise<...> {
+  return this.projectsService.update(id, updateProjectDto);
+}
+
+async remove(@Param('id', ParseIntPipe) id: number): Promise<...> {
+  return this.projectsService.remove(id);
+}
+
+// api-key.controller.ts - Also fixed
+async revoke(@Param('id', ParseIntPipe) id: number): Promise<...> {
+  await this.apiKeyService.revokeById(id);
+  return new SuccessResponseDto({ id });
+}
 ```
+
+**Changes Made**:
+- ✅ Added `ParseIntPipe` import to `ProjectsController`
+- ✅ Replaced `@Param('id') id: string` with `@Param('id', ParseIntPipe) id: number` in `findOne()` method
+- ✅ Replaced manual `+id` conversion with direct `id` usage in `findOne()` method
+- ✅ Replaced `@Param('id') id: string` with `@Param('id', ParseIntPipe) id: number` in `update()` method
+- ✅ Replaced manual `+id` conversion with direct `id` usage in `update()` method
+- ✅ Replaced `@Param('id') id: string` with `@Param('id', ParseIntPipe) id: number` in `remove()` method
+- ✅ Replaced manual `+id` conversion with direct `id` usage in `remove()` method
+- ✅ Updated `@ApiParam` decorators to use `type: Number` instead of `type: String` in `ProjectsController`
+- ✅ Added `ParseIntPipe` import to `ApiKeyController`
+- ✅ Replaced `@Param('id') id: string` with `@Param('id', ParseIntPipe) id: number` in `revoke()` method
+- ✅ Replaced manual `Number(id)` conversion with direct `id` usage in `revoke()` method
+- ✅ Updated `@ApiParam` decorator to use `type: Number` instead of `type: String` in `ApiKeyController`
+- ✅ Consistent parameter parsing across all controllers (Projects, Contacts, ApiKey)
+- ✅ Proper validation with automatic error handling for invalid IDs
+- ✅ Better error messages for invalid input
 
 ---
 
@@ -1386,10 +1417,11 @@ this.cls.set('requestContext', context);
    - Risk: Low - Improves type safety
    - **Status**: All `any` types replaced with proper types. Created `LoginResponseDto`, `AuthenticatedRequest`, and `ApiKeyListItem` interfaces. Improved type safety across controllers and interceptors.
 
-9. **Consistent parameter parsing** (Section 5.3)
+9. **Consistent parameter parsing** (Section 5.3) ✅ **COMPLETED**
    - Impact: Low - Consistency
    - Effort: Low - Add ParseIntPipe where missing
    - Risk: Low - Should validate better
+   - **Status**: All controllers now use `ParseIntPipe` consistently for ID parameters. Replaced manual `+id` and `Number(id)` conversions with proper validation pipes. Updated Swagger documentation to reflect correct parameter types.
 
 ### Low Priority
 
@@ -1433,6 +1465,7 @@ The Portfolio API demonstrates good understanding of response standardization an
 - ✅ Error handling - custom exceptions in guards (Sections 3.1, 7.1, 7.3 - Fixed)
 - ✅ Type assertions in DTOs (Section 4.2 - Fixed)
 - ✅ Type safety issues (Section 4.1 - Fixed)
+- ✅ Inconsistent parameter parsing (Section 5.3 - Fixed)
 - ⚠️ Code duplication - query building (other areas)
 - ✅ Error handling patterns (Sections 1.4, 3.1, 3.2, 3.3, 7.1, 7.3 - Fixed)
 - ✅ Inefficient database operations (Section 2.1 - Fixed)
@@ -1447,7 +1480,7 @@ All recommendations maintain the existing API response schema as required.
 
 ---
 
-**Document Version**: 1.9  
+**Document Version**: 1.10  
 **Last Updated**: 2026-01-08
 
 **Updates:**
@@ -1462,6 +1495,7 @@ All recommendations maintain the existing API response schema as required.
 - ✅ Section 4.1 (Use of `any` Types) - Fixed
 - ✅ Section 4.2 (Type Assertions in DTOs) - Fixed
 - ✅ Section 5.1 (Missing Query Parameter Validation) - Fixed
+- ✅ Section 5.3 (Inconsistent Parameter Parsing) - Fixed
 - ✅ Section 7.1 (Guards Using Generic Exceptions) - Fixed
 - ✅ Section 7.2 (JwtOrApiKeyGuard Error Handling) - Fixed
 - ✅ Section 7.3 (Auth Service Error Types) - Fixed
