@@ -8,6 +8,7 @@ This directory contains comprehensive documentation for the Portfolio API projec
 docs/
 ├── README.md (this file)
 ├── code-review.md          # Code review and current status
+├── RELEASE_WORKFLOW.md     # Professional release workflow guide
 │
 ├── api/                    # API Reference Documentation
 │   ├── endpoints.md        # Detailed API endpoint documentation
@@ -29,6 +30,7 @@ docs/
 
 - **New to the project?** Start with [`code-review.md`](./code-review.md) for an overview of the codebase status
 - **Want to use the API?** See [`api/endpoints.md`](./api/endpoints.md) for endpoint documentation
+- **Creating a release?** Follow [`RELEASE_WORKFLOW.md`](./RELEASE_WORKFLOW.md) for the professional release process
 - **Understanding standards?** Read [`standardization/api-standards.md`](./standardization/api-standards.md)
 - **Development roadmap?** Check [`planning/roadmap.md`](./planning/roadmap.md)
 
@@ -61,6 +63,7 @@ docs/
 #### Root Files
 
 - **`code-review.md`**: Current code review status, strengths, and remaining improvements
+- **`RELEASE_WORKFLOW.md`**: Comprehensive guide for creating releases following GitFlow pattern with PR review
 
 ## 🔗 Related Documentation
 
@@ -79,6 +82,7 @@ All documentation follows these principles:
 ## 🎯 Quick Links
 
 - [API Endpoints](./api/endpoints.md)
+- [Release Workflow](./RELEASE_WORKFLOW.md)
 - [API Standards](./standardization/api-standards.md)
 - [Code Review](./code-review.md)
 - [Roadmap](./planning/roadmap.md)
