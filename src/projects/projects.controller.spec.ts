@@ -147,7 +147,9 @@ describe('ProjectsController', () => {
     it('should throw if service fails', async () => {
       mockService.findAll.mockRejectedValue(new Error('Find error'));
       const query = { page: 1, per_page: 10 };
-      await expect(controller.findAll(query as any)).rejects.toThrow('Find error');
+      await expect(controller.findAll(query as any)).rejects.toThrow(
+        'Find error',
+      );
     });
   });
 
