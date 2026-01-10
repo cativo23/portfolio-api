@@ -223,13 +223,15 @@ async findAll(options: FindAllOptions): Promise<...> {
 
 ---
 
-### 1.2 Response DTO Factory Methods Duplication ⚠️ HIGH
+### 1.2 Response DTO Factory Methods Duplication ✅ FIXED
 
 **Location**: 
 - `src/projects/dto/projects-list-response.dto.ts:35-53`
 - `src/contacts/dto/contacts-list-response.dto.ts:35-53`
 
-**Issue**: The `fromEntities` method is identical in both classes.
+**Status**: ✅ **RESOLVED** - Common pagination logic has been extracted to a base `PaginatedResponseDto` class, eliminating duplication while maintaining type safety.
+
+**Issue**: The `fromEntities` method was identical in both classes.
 
 **Current Implementation** (duplicated):
 ```typescript
@@ -260,7 +262,7 @@ static fromEntities(
 
 **Recommendation**: Create a base paginated response DTO class.
 
-**Suggested Solution**:
+**Solution Applied**:
 ```typescript
 // src/core/dto/paginated-response.dto.ts
 export abstract class PaginatedResponseDto<TItem> extends SuccessResponseDto<TItem[]> {
@@ -284,11 +286,19 @@ export abstract class PaginatedResponseDto<TItem> extends SuccessResponseDto<TIt
       total_items: totalItems,
       total_pages,
     };
-    return new ResponseClass(items, { pagination: paginationMeta });
+    const meta: ResponseMetaDto = {
+      pagination: paginationMeta,
+    };
+    return new ResponseClass(items, meta);
+  }
+
+  constructor(data: TItem[], meta: ResponseMetaDto) {
+    super(data, meta);
+    this.meta = meta;
   }
 }
 
-// Usage
+// Usage in ProjectsListResponseDto
 export class ProjectsListResponseDto extends PaginatedResponseDto<ProjectResponseDto> {
   static fromEntities(
     projects: ProjectResponseDto[],
@@ -309,7 +319,40 @@ export class ProjectsListResponseDto extends PaginatedResponseDto<ProjectRespons
     super(data, meta);
   }
 }
+
+// Usage in ContactsListResponseDto (same pattern)
+export class ContactsListResponseDto extends PaginatedResponseDto<ContactResponseDto> {
+  static fromEntities(
+    contacts: ContactResponseDto[],
+    page: number,
+    limit: number,
+    totalItems: number,
+  ): ContactsListResponseDto {
+    return PaginatedResponseDto.createPaginatedResponse(
+      contacts,
+      page,
+      limit,
+      totalItems,
+      ContactsListResponseDto,
+    );
+  }
+
+  constructor(data: ContactResponseDto[], meta: ResponseMetaDto) {
+    super(data, meta);
+  }
+}
 ```
+
+**Changes Made**:
+- ✅ Created `PaginatedResponseDto` base abstract class extending `SuccessResponseDto<TItem[]>`
+- ✅ Extracted common `fromEntities` logic to protected static method `createPaginatedResponse`
+- ✅ Refactored `ProjectsListResponseDto` to extend `PaginatedResponseDto` and use the base method
+- ✅ Refactored `ContactsListResponseDto` to extend `PaginatedResponseDto` and use the base method
+- ✅ Removed duplicate pagination metadata creation logic
+- ✅ Eliminated type assertions (`as TListResponseDto`) by using proper generics
+- ✅ Maintained existing API - `fromEntities` method signature unchanged
+- ✅ Preserved type safety - no unsafe type casts needed
+- ✅ Exported `PaginatedResponseDto` from `@core/dto` module
 
 ---
 
@@ -1236,10 +1279,11 @@ this.cls.set('requestContext', context);
 
 ### High Priority
 
-5. **Create base paginated response DTO** (Section 1.2)
+5. **Create base paginated response DTO** (Section 1.2) ✅ **COMPLETED**
    - Impact: Medium - Reduces duplication
    - Effort: Low - Extract common method
    - Risk: Low - Mostly refactoring
+   - **Status**: Base `PaginatedResponseDto` class created. Both `ProjectsListResponseDto` and `ContactsListResponseDto` refactored to extend it, eliminating duplication and type assertions.
 
 6. **Fix JwtOrApiKeyGuard error handling** (Section 3.2)
    - Impact: Medium - Better error visibility
@@ -1299,6 +1343,7 @@ The Portfolio API demonstrates good understanding of response standardization an
 
 **Key Areas for Improvement:**
 - ✅ Code duplication - pagination logic (Section 1.1 - Fixed)
+- ✅ Code duplication - response DTO factory methods (Section 1.2 - Fixed)
 - ⚠️ Code duplication - query building (other areas)
 - ⚠️ Type safety issues
 - ✅ Error handling patterns (Sections 1.4, 3.3 - Fixed)
@@ -1314,11 +1359,12 @@ All recommendations maintain the existing API response schema as required.
 
 ---
 
-**Document Version**: 1.4  
+**Document Version**: 1.5  
 **Last Updated**: 2026-01-08
 
 **Updates:**
 - ✅ Section 1.1 (Pagination Logic Duplication) - Fixed
+- ✅ Section 1.2 (Response DTO Factory Methods Duplication) - Fixed
 - ✅ Section 1.4 (Error Handling Pattern Duplication) - Fixed
 - ✅ Section 3.3 (Error Context Loss in Services) - Fixed
 - ✅ Section 2.1 (Inefficient Update Operations) - Fixed

@@ -1,32 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ContactResponseDto } from './contact-response.dto';
-import {
-  SuccessResponseDto,
-  PaginationMetaDto,
-  ResponseMetaDto,
-} from '@core/dto';
+import { PaginatedResponseDto, ResponseMetaDto } from '@core/dto';
 
 /**
  * DTO for paginated contacts list response
  */
-export class ContactsListResponseDto extends SuccessResponseDto<
-  ContactResponseDto[]
-> {
+export class ContactsListResponseDto extends PaginatedResponseDto<ContactResponseDto> {
   @ApiProperty({
     description: 'List of contacts',
     type: [ContactResponseDto],
   })
   data: ContactResponseDto[];
 
-  @ApiProperty({
-    description: 'Response metadata',
-    type: ResponseMetaDto,
-  })
-  meta: ResponseMetaDto;
-
   /**
-   * Create a ContactsListResponseDto from an array of Contact entities and pagination metadata
-   * @param contacts Array of Contact entities
+   * Create a ContactsListResponseDto from an array of Contact response DTOs and pagination metadata
+   * @param contacts Array of Contact response DTOs
    * @param page Current page number
    * @param limit Items per page
    * @param totalItems Total number of items
@@ -38,17 +26,21 @@ export class ContactsListResponseDto extends SuccessResponseDto<
     limit: number,
     totalItems: number,
   ): ContactsListResponseDto {
-    const total_pages = Math.ceil(totalItems / limit);
-
-    const paginationMeta: PaginationMetaDto = {
+    return PaginatedResponseDto.createPaginatedResponse(
+      contacts,
       page,
       limit,
-      total_items: totalItems,
-      total_pages,
-    };
+      totalItems,
+      ContactsListResponseDto,
+    );
+  }
 
-    return new SuccessResponseDto(contacts, {
-      pagination: paginationMeta,
-    }) as ContactsListResponseDto;
+  /**
+   * Constructor for ContactsListResponseDto
+   * @param data Array of contact response DTOs
+   * @param meta Response metadata containing pagination info
+   */
+  constructor(data: ContactResponseDto[], meta: ResponseMetaDto) {
+    super(data, meta);
   }
 }
