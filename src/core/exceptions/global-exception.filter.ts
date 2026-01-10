@@ -91,6 +91,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         case HttpStatus.NOT_FOUND:
           code = ErrorCode.RESOURCE_NOT_FOUND;
           break;
+        case HttpStatus.CONFLICT:
+          code = ErrorCode.CONFLICT_ERROR;
+          break;
         default:
           code = ErrorCode.INTERNAL_SERVER_ERROR;
       }

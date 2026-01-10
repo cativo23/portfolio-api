@@ -1,14 +1,15 @@
-import {
-  BadRequestException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import * as bcryptjs from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '@users/users.service';
 import { RegisterDto } from './dto/register.dto';
 import { ConfigService } from '@nestjs/config';
 import { User } from '@users/entities/user.entity';
+import {
+  ConflictException,
+  NotFoundException,
+  AuthenticationException,
+} from '@core/exceptions';
 
 /**
  * Service responsible for authentication-related operations
@@ -28,13 +29,13 @@ export class AuthService {
    *
    * @param payload - Data transfer object containing user registration details
    * @returns Promise resolving to the created user entity
-   * @throws BadRequestException if the email already exists
+   * @throws ConflictException if the email already exists
    */
   async register(payload: RegisterDto): Promise<User> {
     const existingUser = await this.usersService.findOneByEmail(payload.email);
 
     if (existingUser) {
-      throw new BadRequestException('Email already exists');
+      throw new ConflictException('Email already exists');
     }
     const hashedPassword = await bcryptjs.hash(payload.password, 10);
 
@@ -51,8 +52,8 @@ export class AuthService {
    * @param email - User's email address
    * @param password - User's password
    * @returns Promise resolving to an object containing the access token, expiration time, and user information
-   * @throws BadRequestException if the user is not found
-   * @throws UnauthorizedException if the password is incorrect
+   * @throws NotFoundException if the user is not found
+   * @throws AuthenticationException if the password is incorrect
    */
   async login(
     email,
@@ -88,17 +89,17 @@ export class AuthService {
    * @param email - User's email address
    * @param password - User's password
    * @returns Promise resolving to the user entity if validation is successful
-   * @throws BadRequestException if the user is not found
-   * @throws UnauthorizedException if the password is incorrect
+   * @throws NotFoundException if the user is not found
+   * @throws AuthenticationException if the password is incorrect
    */
   async validateUser(email: string, password: string): Promise<User> {
     const user: User = await this.usersService.findOneByEmail(email);
     if (!user) {
-      throw new BadRequestException('User not found');
+      throw new NotFoundException('User not found');
     }
     const isMatch: boolean = await bcryptjs.compare(password, user.password);
     if (!isMatch) {
-      throw new UnauthorizedException('Password does not match');
+      throw new AuthenticationException('Invalid credentials');
     }
     return user;
   }

@@ -710,13 +710,15 @@ async update(id: number, updateDto: UpdateDto): Promise<ResponseDto> {
 
 ## 3. Error Handling
 
-### 3.1 Guards Not Using Custom Exceptions ⚠️ MEDIUM
+### 3.1 Guards Not Using Custom Exceptions ✅ FIXED
 
 **Location**:
 - `src/auth/auth.guard.ts:23,31`
 - `src/core/api-key.guard.ts:30,35`
 
-**Issue**: Guards throw `UnauthorizedException` directly instead of using custom exceptions from the core exceptions module.
+**Status**: ✅ **RESOLVED** - Both guards now use custom `AuthenticationException` instead of generic `UnauthorizedException`, providing consistent error codes and structure.
+
+**Issue**: Guards threw `UnauthorizedException` directly instead of using custom exceptions from the core exceptions module.
 
 **Current Implementation**:
 ```typescript
@@ -738,11 +740,8 @@ if (!apiKey) {
 
 **Recommendation**: Use custom authentication exceptions.
 
-**Suggested Solution**:
+**Solution Applied**:
 ```typescript
-// src/core/exceptions/authentication.exception.ts (should already exist)
-// Use it in guards
-
 // AuthGuard
 import { AuthenticationException } from '@core/exceptions';
 
@@ -750,11 +749,36 @@ if (!token) {
   throw new AuthenticationException('Authentication token is missing');
 }
 
+try {
+  request.user = await this.jwtService.verifyAsync(token, {
+    secret: this.configService.get<string>('JWT_SECRET'),
+  });
+} catch (error) {
+  throw new AuthenticationException(
+    error instanceof Error ? error.message : 'Invalid authentication token',
+  );
+}
+
 // ApiKeyGuard
+import { AuthenticationException } from '@core/exceptions';
+
 if (!apiKey) {
   throw new AuthenticationException('API key is missing');
 }
+
+const valid = await this.apiKeyService.validate(apiKey);
+if (!valid) {
+  throw new AuthenticationException('Invalid API key');
+}
 ```
+
+**Changes Made**:
+- ✅ Replaced `UnauthorizedException` with `AuthenticationException` in `AuthGuard`
+- ✅ Replaced `UnauthorizedException` with `AuthenticationException` in `ApiKeyGuard`
+- ✅ Removed `UnauthorizedException` imports from both guards
+- ✅ Updated error messages to be more descriptive
+- ✅ Consistent error format across all authentication failures
+- ✅ Proper error codes included in error responses
 
 ---
 
@@ -1093,9 +1117,9 @@ isFeatured: boolean;
 
 ## 7. Guards & Authentication
 
-### 7.1 Guards Using Generic Exceptions ⚠️ MEDIUM
+### 7.1 Guards Using Generic Exceptions ✅ FIXED
 
-**Issue**: Already covered in section 3.1.
+**Status**: ✅ **RESOLVED** - Already fixed in section 3.1. Both `AuthGuard` and `ApiKeyGuard` now use custom `AuthenticationException` instead of generic `UnauthorizedException`.
 
 ---
 
@@ -1105,11 +1129,13 @@ isFeatured: boolean;
 
 ---
 
-### 7.3 Auth Service Error Types ⚠️ LOW
+### 7.3 Auth Service Error Types ✅ FIXED
 
 **Location**: `src/auth/auth.service.ts:37,97,101`
 
-**Issue**: `AuthService` throws `BadRequestException` and `UnauthorizedException` instead of custom exceptions.
+**Status**: ✅ **RESOLVED** - `AuthService` now uses custom exceptions (`ConflictException`, `NotFoundException`, `AuthenticationException`) for consistent error handling.
+
+**Issue**: `AuthService` threw `BadRequestException` and `UnauthorizedException` instead of custom exceptions.
 
 **Current Implementation**:
 ```typescript
@@ -1126,14 +1152,22 @@ if (!isMatch) {
 }
 ```
 
-**Recommendation**: Use custom exceptions for consistency:
-```typescript
-import { ConflictException, NotFoundException, AuthenticationException } from '@core/exceptions';
+**Recommendation**: Use custom exceptions for consistency.
 
+**Solution Applied**:
+```typescript
+import {
+  ConflictException,
+  NotFoundException,
+  AuthenticationException,
+} from '@core/exceptions';
+
+// In register method
 if (existingUser) {
   throw new ConflictException('Email already exists');
 }
 
+// In validateUser method
 if (!user) {
   throw new NotFoundException('User not found');
 }
@@ -1142,6 +1176,17 @@ if (!isMatch) {
   throw new AuthenticationException('Invalid credentials');
 }
 ```
+
+**Changes Made**:
+- ✅ Created `ConflictException` custom exception for resource conflicts
+- ✅ Added `CONFLICT_ERROR` to `ErrorCode` enum
+- ✅ Replaced `BadRequestException` with `ConflictException` for email already exists (line 37)
+- ✅ Replaced `BadRequestException` with `NotFoundException` for user not found (line 97)
+- ✅ Replaced `UnauthorizedException` with `AuthenticationException` for invalid credentials (line 101)
+- ✅ Removed `BadRequestException` and `UnauthorizedException` imports
+- ✅ Updated method documentation to reflect new exception types
+- ✅ Updated global exception filter to handle `CONFLICT` status code
+- ✅ Consistent error format across all authentication and authorization operations
 
 ---
 
@@ -1315,10 +1360,11 @@ this.cls.set('requestContext', context);
 
 ### Medium Priority
 
-7. **Use custom exceptions in guards** (Section 3.1, 7.3)
+7. **Use custom exceptions in guards** (Section 3.1, 7.3) ✅ **COMPLETED**
    - Impact: Medium - Consistency
    - Effort: Low - Replace exception types
    - Risk: Low - Should already have custom exceptions
+   - **Status**: All guards and `AuthService` now use custom exceptions. Created `ConflictException` for resource conflicts. Consistent error format across authentication and authorization operations.
 
 8. **Fix type safety issues** (Section 4.1)
    - Impact: Medium - Better developer experience
@@ -1369,10 +1415,11 @@ The Portfolio API demonstrates good understanding of response standardization an
 - ✅ Code duplication - response DTO factory methods (Section 1.2, 8.2 - Fixed)
 - ✅ Services returning entities instead of DTOs (Section 8.1 - Fixed)
 - ✅ Error handling - guard error swallowing (Section 3.2, 7.2 - Fixed)
+- ✅ Error handling - custom exceptions in guards (Sections 3.1, 7.1, 7.3 - Fixed)
 - ✅ Type assertions in DTOs (Section 4.2 - Fixed)
 - ⚠️ Code duplication - query building (other areas)
 - ⚠️ Type safety issues (Section 4.1 - still has `any` types)
-- ✅ Error handling patterns (Sections 1.4, 3.2, 3.3 - Fixed)
+- ✅ Error handling patterns (Sections 1.4, 3.1, 3.2, 3.3, 7.1, 7.3 - Fixed)
 - ✅ Inefficient database operations (Section 2.1 - Fixed)
 - ✅ Missing input validation for query parameters (Sections 1.3, 5.1 - Fixed)
 
@@ -1385,7 +1432,7 @@ All recommendations maintain the existing API response schema as required.
 
 ---
 
-**Document Version**: 1.7  
+**Document Version**: 1.8  
 **Last Updated**: 2026-01-08
 
 **Updates:**
@@ -1394,10 +1441,13 @@ All recommendations maintain the existing API response schema as required.
 - ✅ Section 1.3 (Query Parameter Parsing Duplication) - Fixed
 - ✅ Section 1.4 (Error Handling Pattern Duplication) - Fixed
 - ✅ Section 2.1 (Inefficient Update Operations) - Fixed
+- ✅ Section 3.1 (Guards Not Using Custom Exceptions) - Fixed
 - ✅ Section 3.2 (JwtOrApiKeyGuard Swallows Errors) - Fixed
 - ✅ Section 3.3 (Error Context Loss in Services) - Fixed
 - ✅ Section 4.2 (Type Assertions in DTOs) - Fixed
 - ✅ Section 5.1 (Missing Query Parameter Validation) - Fixed
+- ✅ Section 7.1 (Guards Using Generic Exceptions) - Fixed
 - ✅ Section 7.2 (JwtOrApiKeyGuard Error Handling) - Fixed
+- ✅ Section 7.3 (Auth Service Error Types) - Fixed
 - ✅ Section 8.1 (Response DTOs in Service Layer) - Fixed
 - ✅ Section 8.2 (Duplicated fromEntities Methods) - Fixed

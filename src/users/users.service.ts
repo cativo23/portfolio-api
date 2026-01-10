@@ -29,7 +29,7 @@ export class UsersService {
     const user = await this.userRepository.findOneBy({ email: email });
     if (!user) {
       this.logger.log(`User with email ${email} not found.`);
-      throw new NotFoundException(`User with email ${email} not found.`);
+      return undefined;
     }
     this.logger.log(`User with email ${email} found.`);
     return user;
