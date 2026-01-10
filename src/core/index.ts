@@ -13,4 +13,5 @@ export * from './context/request-context.decorator';
 export * from './context/request-context.module';
 export * from './decorators';
 export * from './utils/pagination.util';
-export * from './utils/pagination.util';
+export * from './types/authenticated-request.interface';
+export * from './types/api-key-list-item.interface';

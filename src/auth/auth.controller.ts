@@ -8,7 +8,6 @@ import {
   HttpStatus,
   UsePipes,
   Get,
-  BadRequestException,
 } from '@nestjs/common';
 import { ValidationPipe } from '@core/pipes';
 import { ErrorCode, ErrorResponseDto, SuccessResponseDto } from '@core/dto';
@@ -23,10 +22,12 @@ import {
 } from '@nestjs/swagger';
 import { CreateUserDto } from '@users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
+import { LoginResponseDto } from './dto/login-response.dto';
 import { AuthGuard } from './auth.guard';
 import { User } from '@users/entities/user.entity';
 import { User as UserDecorator } from './decorators/user.decorator';
 import { ApiCustomResponses } from '@core/decorators';
+import { AuthenticatedRequest } from '@core/types/authenticated-request.interface';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -36,8 +37,8 @@ export class AuthController {
   /**
    * Handles user login by validating credentials and returning an authentication token.
    *
-   * @param {LoginDto} loginDto - The login details provided by the user.
-   * @returns {Promise<any>} A promise that resolves with the authentication token and user details if the login is successful.
+   * @param loginDto - The login details provided by the user
+   * @returns Promise resolving to the authentication token and user details if login is successful
    */
   @HttpCode(HttpStatus.OK)
   @Post('login')
@@ -71,7 +72,7 @@ export class AuthController {
       },
     }),
   )
-  async login(@Body() loginDto: LoginDto): Promise<any> {
+  async login(@Body() loginDto: LoginDto): Promise<LoginResponseDto> {
     return this.authService.login(loginDto.email, loginDto.password);
   }
 
@@ -90,9 +91,7 @@ export class AuthController {
       type: ErrorResponseDto,
     }),
   )
-  register(
-    @Body() signUpDto: CreateUserDto,
-  ): Promise<User> | BadRequestException {
+  register(@Body() signUpDto: CreateUserDto): Promise<User> {
     return this.authService.register({
       username: signUpDto.username,
       email: signUpDto.email,
@@ -128,10 +127,9 @@ export class AuthController {
       type: ErrorResponseDto,
     }),
   )
-  profile(@Request() req: any, @UserDecorator() user: any) {
+  profile(@Request() req: AuthenticatedRequest, @UserDecorator() user: User) {
     return {
       user: user,
-      req_user: req.user,
     };
   }
 }

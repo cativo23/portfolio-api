@@ -51,12 +51,17 @@ export class ResponseTransformInterceptor<T>
         if (
           data &&
           typeof data === 'object' &&
+          'status' in data &&
           (data.status === 'success' || data.status === 'error')
         ) {
-          if (!data.request_id) {
-            data.request_id = requestId;
+          // Type guard: data is a BaseResponseDto (has status property)
+          const responseData = data as SuccessResponseDto<unknown> & {
+            request_id?: string;
+          };
+          if (!responseData.request_id) {
+            responseData.request_id = requestId;
           }
-          return data;
+          return responseData;
         }
 
         // Check if the response includes pagination metadata

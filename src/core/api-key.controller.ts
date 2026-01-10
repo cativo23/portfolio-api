@@ -22,6 +22,7 @@ import { AuthGuard } from '@auth/auth.guard';
 import { ApiKeyService } from '@core/api-key.service';
 import { SuccessResponseDto, ErrorResponseDto } from '@core/dto';
 import { ApiCustomResponses } from '@core/decorators';
+import { ApiKeyListItem } from '@core/types/api-key-list-item.interface';
 
 @ApiTags('api-keys')
 @Controller('api-keys')
@@ -97,7 +98,7 @@ export class ApiKeyController {
       },
     }),
   )
-  async findAll(): Promise<SuccessResponseDto<any[]>> {
+  async findAll(): Promise<SuccessResponseDto<ApiKeyListItem[]>> {
     const keys = await this.apiKeyService.findAll();
     return new SuccessResponseDto(keys);
   }
