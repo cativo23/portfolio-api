@@ -3,10 +3,14 @@ name: Deploy
 on:
   push:
     branches: [main]
+  pull_request:
+    types: [closed]
+    branches: [main]
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
+    environment: prod  # Add this line to reference the "prod" environment
     
     steps:
       - name: Checkout repository
@@ -42,16 +46,27 @@ jobs:
           cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/portfolio-api:buildcache
           cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/portfolio-api:buildcache,mode=max
 
+  deploy:
+    name: Deploy to Home Server
+    needs: build
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - uses: actions/checkout@v4
       - name: Copy compose file to server
-        uses: appleboy/scp-action@v0.1.7
+        uses: appleboy/scp-action@v1
         with:
           host: 186.32.90.71
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           source: "compose.prod.yml"
-          target: "/tmp/portfolio-api-deploy/"
-
+          target: "/home/cativo23/deploy/portfolio-api-deploy"
+          debug: true
+          timeout: 120s
+          command_timeout: 5m
+          tar_exec: tar
+          tar_dereference: true
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
         with:

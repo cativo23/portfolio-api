@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Contact } from '../entities/contact.entity';
+import { Contact } from '@contacts/entities/contact.entity';
 
 /**
  * DTO for contact response

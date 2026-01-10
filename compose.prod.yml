@@ -1,6 +1,6 @@
 services:
   api:
-    image: ${DOCKER_USERNAME:-yourusername}/portfolio-api:latest
+    image: ${DOCKER_USERNAME:-cativo23}/portfolio-api:latest
     restart: unless-stopped
     environment:
       - NODE_ENV=production
@@ -27,7 +27,7 @@ services:
       - portfolio-internal
 
   mysql:
-    image: mysql:8.0
+    image: mariadb:10.11
     restart: unless-stopped
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}

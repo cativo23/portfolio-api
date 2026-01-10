@@ -1,12 +1,8 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { ConfigService } from '@nestjs/config';
+import { AuthenticationException } from '@core/exceptions';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -20,7 +16,7 @@ export class AuthGuard implements CanActivate {
     const token = this.extractTokenFromHeader(request);
 
     if (!token) {
-      throw new UnauthorizedException();
+      throw new AuthenticationException('Authentication token is missing');
     }
 
     try {
@@ -28,7 +24,9 @@ export class AuthGuard implements CanActivate {
         secret: this.configService.get<string>('JWT_SECRET'),
       });
     } catch (error) {
-      throw new UnauthorizedException(error.message);
+      throw new AuthenticationException(
+        error instanceof Error ? error.message : 'Invalid authentication token',
+      );
     }
 
     return true;

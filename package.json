@@ -11,7 +11,7 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "start:prod": "node dist/src/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -22,7 +22,10 @@
     "migration:create": "npx ts-node -P ./tsconfig.json -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:create -d ./src/config/typeorm.config.ts ./src/database/migrations/migration",
     "migration:run": "npx ts-node -P ./tsconfig.json -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d ./src/config/typeorm.config.ts",
     "migration:revert": "npx ts-node -P ./tsconfig.json -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:revert -d ./src/config/typeorm.config.ts",
-    "seed:test": "npx ts-node -r tsconfig-paths/register src/database/seeder.ts"
+    "migration:run:prod": "node ./node_modules/typeorm/cli.js migration:run -d ./dist/src/config/typeorm.config.prod.js",
+    "migration:revert:prod": "node ./node_modules/typeorm/cli.js migration:revert -d ./dist/src/config/typeorm.config.prod.js",
+    "seed:test": "npx ts-node -r tsconfig-paths/register src/database/seeder.ts",
+    "seed:test:prod": "TS_NODE_PROJECT=./tsconfig.prod.json node -r tsconfig-paths/register dist/src/database/seeder.prod.js"
   },
   "dependencies": {
     "@nestjs/axios": "^4.0.0",
@@ -44,6 +47,7 @@
     "class-validator": "^0.14.2",
     "express": "^5.1.0",
     "mysql2": "^3.14.1",
+    "nestjs-cls": "^6.2.0",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",

@@ -5,19 +5,15 @@ import {
   Body,
   Param,
   Delete,
-  UsePipes,
   Query,
   UseGuards,
-  HttpStatus,
   Patch,
   ParseIntPipe,
 } from '@nestjs/common';
 import {
   ApiOperation,
   ApiParam,
-  ApiQuery,
   ApiTags,
-  ApiResponse,
   ApiBody,
   ApiBearerAuth,
 } from '@nestjs/swagger';
@@ -25,13 +21,20 @@ import {
   CreateContactDto,
   ContactsListResponseDto,
   SingleContactResponseDto,
-} from './dto';
-import { ContactsService } from './contacts.service';
+  ContactResponseDto,
+  FindAllContactsQueryDto,
+} from '@contacts/dto';
+import { ContactsService } from '@contacts/contacts.service';
 import { AuthGuard } from '@auth/auth.guard';
-import { ErrorResponseDto } from '@core/dto';
 import { DeleteResponseDto } from '@projects/dto/delete-response.dto';
-import { ValidationPipe } from '@core/pipes';
 import { Public } from '@auth/decorators/public.decorator';
+import {
+  ApiGetSingleResource,
+  ApiGetPaginatedList,
+  ApiCreateResource,
+  ApiUpdateResource,
+  ApiDeleteResource,
+} from '@core/decorators';
 
 @ApiTags('Contacts')
 @Controller('contacts')
@@ -40,84 +43,51 @@ export class ContactsController {
 
   @Post()
   @Public()
-  @UsePipes(new ValidationPipe())
   @ApiOperation({ summary: 'Submit a contact form' })
   @ApiBody({ type: CreateContactDto })
-  @ApiResponse({
-    status: HttpStatus.CREATED,
-    description: 'The contact form has been successfully submitted.',
-    type: SingleContactResponseDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.UNPROCESSABLE_ENTITY,
-    description: 'Validation failed',
-    type: ErrorResponseDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    description: 'Internal server error',
-    type: ErrorResponseDto,
-  })
+  @ApiCreateResource(
+    201,
+    'The contact form has been successfully submitted',
+    SingleContactResponseDto,
+    ContactResponseDto,
+  )
   async create(
     @Body() createContactDto: CreateContactDto,
   ): Promise<SingleContactResponseDto> {
-    return this.contactsService.create(createContactDto);
+    const contact = await this.contactsService.create(createContactDto);
+    return SingleContactResponseDto.fromEntity(contact);
   }
 
   @Get()
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get all contacts (Admin only)' })
-  @ApiQuery({
-    name: 'page',
-    required: false,
-    description: 'Page number',
-    example: 1,
-  })
-  @ApiQuery({
-    name: 'per_page',
-    required: false,
-    description: 'Number of items per page',
-    example: 10,
-  })
-  @ApiQuery({ name: 'search', required: false, description: 'Search term' })
-  @ApiQuery({
-    name: 'is_read',
-    required: false,
-    description: 'Filter by read status (true/false)',
-    type: Boolean,
-  })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'List of contacts',
-    type: ContactsListResponseDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED,
-    description: 'Unauthorized',
-    type: ErrorResponseDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    description: 'Internal server error',
-    type: ErrorResponseDto,
-  })
+  @ApiGetPaginatedList(
+    'Returns a paginated list of contacts',
+    ContactsListResponseDto,
+  )
   async findAll(
-    @Query('page') page?: string,
-    @Query('per_page') per_page?: string,
-    @Query('search') search?: string,
-    @Query('is_read') is_read?: string,
+    @Query() query: FindAllContactsQueryDto,
   ): Promise<ContactsListResponseDto> {
-    const pageNumber = parseInt(page, 10) || 1;
-    const perPage = parseInt(per_page, 10) || 10;
-    const isRead = is_read === undefined ? undefined : is_read === 'true';
-
-    return this.contactsService.findAll({
-      page: pageNumber,
-      per_page: perPage,
-      search,
-      isRead: isRead,
+    const result = await this.contactsService.findAll({
+      page: query.page || 1,
+      per_page: query.per_page || 10,
+      search: query.search,
+      isRead: query.is_read,
     });
+
+    // Transform entities to DTOs
+    const contactDtos = result.items.map((contact) =>
+      ContactResponseDto.fromEntity(contact),
+    );
+
+    // Return standardized response
+    return ContactsListResponseDto.fromEntities(
+      contactDtos,
+      result.page,
+      result.per_page,
+      result.total,
+    );
   }
 
   @Get(':id')
@@ -125,30 +95,17 @@ export class ContactsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get a contact by ID (Admin only)' })
   @ApiParam({ name: 'id', type: Number, description: 'Contact ID' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'The found contact',
-    type: SingleContactResponseDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Contact not found',
-    type: ErrorResponseDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED,
-    description: 'Unauthorized',
-    type: ErrorResponseDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    description: 'Internal server error',
-    type: ErrorResponseDto,
-  })
+  @ApiGetSingleResource(
+    200,
+    'The found contact',
+    SingleContactResponseDto,
+    ContactResponseDto,
+  )
   async findOne(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<SingleContactResponseDto> {
-    return this.contactsService.findOne(id);
+    const contact = await this.contactsService.findOne(id);
+    return SingleContactResponseDto.fromEntity(contact);
   }
 
   @Patch(':id/read')
@@ -156,30 +113,16 @@ export class ContactsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Mark a contact as read (Admin only)' })
   @ApiParam({ name: 'id', type: Number, description: 'Contact ID' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'The contact has been successfully marked as read.',
-    type: SingleContactResponseDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Contact not found',
-    type: ErrorResponseDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED,
-    description: 'Unauthorized',
-    type: ErrorResponseDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    description: 'Internal server error',
-    type: ErrorResponseDto,
-  })
+  @ApiUpdateResource(
+    'The contact has been successfully marked as read',
+    SingleContactResponseDto,
+    ContactResponseDto,
+  )
   async markAsRead(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<SingleContactResponseDto> {
-    return this.contactsService.markAsRead(id);
+    const contact = await this.contactsService.markAsRead(id);
+    return SingleContactResponseDto.fromEntity(contact);
   }
 
   @Delete(':id')
@@ -187,26 +130,10 @@ export class ContactsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a contact by ID (Admin only)' })
   @ApiParam({ name: 'id', type: Number, description: 'Contact ID' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'The contact has been successfully deleted.',
-    type: DeleteResponseDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Contact not found',
-    type: ErrorResponseDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED,
-    description: 'Unauthorized',
-    type: ErrorResponseDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    description: 'Internal server error',
-    type: ErrorResponseDto,
-  })
+  @ApiDeleteResource(
+    'The contact has been successfully deleted',
+    DeleteResponseDto,
+  )
   async remove(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<DeleteResponseDto> {

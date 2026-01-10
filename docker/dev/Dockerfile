@@ -42,5 +42,5 @@ COPY --chown=node:node . .
 # Expose the development port
 EXPOSE 3001
 
-# Run Nuxt in development mode
+# Run NestJS in development mode
 CMD ["yarn", "run", "start:debug", "--host"]
