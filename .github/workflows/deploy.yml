@@ -5,13 +5,12 @@ on:
     branches: [main]
   pull_request:
     types: [closed]
-    branches: [main]
 
 jobs:
-  build:
+  if_merged:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     environment: prod  # Add this line to reference the "prod" environment
-    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -96,6 +95,16 @@ jobs:
             
             # Stop and remove old containers (but keep volumes)
             docker compose -f compose.prod.yml down || true
+
+            # Print Environment Variables for Debugging
+            echo "=== Environment Variables ==="
+            echo "DB_USERNAME: $DB_USERNAME"
+            echo "DB_NAME: $DB_NAME"
+            echo "DB_PASSWORD: $DB_PASSWORD"
+            echo "MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD"
+            echo "JWT_SECRET: $JWT_SECRET
+            echo "JWT_EXPIRES_IN: $JWT_EXPIRES_IN"
+            echo "CORS_ORIGINS: $CORS_ORIGINS"
             
             # Start new containers
             docker compose -f compose.prod.yml up -d
