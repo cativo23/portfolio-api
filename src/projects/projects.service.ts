@@ -4,6 +4,7 @@ import { Project } from './entities/project.entity';
 import { CreateProjectDto, UpdateProjectDto, DeleteResponseDto } from './dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { NotFoundException } from '@core/exceptions/not-found.exception';
+import { PaginationUtil } from '@core/utils/pagination.util';
 
 /**
  * Interface defining options for finding projects with pagination, search, and filtering
@@ -31,7 +32,7 @@ export class ProjectsService {
   constructor(
     @InjectRepository(Project)
     private projectsRepository: Repository<Project>,
-  ) {}
+  ) { }
 
   /**
    * Creates a new project
@@ -59,40 +60,21 @@ export class ProjectsService {
     per_page: number;
   }> {
     const { page, per_page, search, isFeatured } = options;
-    const query = this.projectsRepository.createQueryBuilder('projects');
 
-    // Filtering by search
-    if (search) {
-      query.andWhere(
-        'projects.title LIKE :search OR projects.description LIKE :search',
-        {
-          search: `%${search}%`,
-        },
-      );
-    }
-
-    // Filtering by isFeatured
-    if (typeof isFeatured !== 'undefined') {
-      query.andWhere('projects.isFeatured = :isFeatured', { isFeatured });
-    }
-
-    // Add ordering
-    query.orderBy('projects.createdAt', 'DESC');
-
-    // Pagination
-    query.skip((page - 1) * per_page).take(per_page);
-
-    // Execute the query and get [data, total count]
-    const [items, total] = await query.getManyAndCount();
-
-    this.logger.log(`Found ${total} projects`);
-
-    return {
-      items,
-      total,
+    const result = await PaginationUtil.paginate(this.projectsRepository, {
       page,
       per_page,
-    };
+      search,
+      searchFields: ['title', 'description'],
+      filters: {
+        isFeatured: typeof isFeatured !== 'undefined' ? isFeatured : undefined,
+      },
+      alias: 'projects',
+    });
+
+    this.logger.log(`Found ${result.total} projects`);
+
+    return result;
   }
 
   /**

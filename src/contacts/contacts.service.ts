@@ -5,6 +5,7 @@ import { CreateContactDto } from './dto';
 import { DeleteResponseDto } from '@projects/dto/delete-response.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { NotFoundException } from '@core/exceptions/not-found.exception';
+import { PaginationUtil } from '@core/utils/pagination.util';
 
 /**
  * Interface defining options for finding contacts with pagination, search, and filtering
@@ -60,40 +61,21 @@ export class ContactsService {
     per_page: number;
   }> {
     const { page, per_page, search, isRead } = options;
-    const query = this.contactsRepository.createQueryBuilder('contacts');
 
-    // Filtering by search
-    if (search) {
-      query.andWhere(
-        'contacts.name LIKE :search OR contacts.email LIKE :search OR contacts.message LIKE :search',
-        {
-          search: `%${search}%`,
-        },
-      );
-    }
-
-    // Filtering by isRead
-    if (typeof isRead !== 'undefined') {
-      query.andWhere('contacts.isRead = :isRead', { isRead });
-    }
-
-    // Add ordering (newest first)
-    query.orderBy('contacts.createdAt', 'DESC');
-
-    // Pagination
-    query.skip((page - 1) * per_page).take(per_page);
-
-    // Execute the query and get [data, total count]
-    const [items, total] = await query.getManyAndCount();
-
-    this.logger.log(`Found ${total} contacts`);
-
-    return {
-      items,
-      total,
+    const result = await PaginationUtil.paginate(this.contactsRepository, {
       page,
       per_page,
-    };
+      search,
+      searchFields: ['name', 'email', 'message'],
+      filters: {
+        isRead: typeof isRead !== 'undefined' ? isRead : undefined,
+      },
+      alias: 'contacts',
+    });
+
+    this.logger.log(`Found ${result.total} contacts`);
+
+    return result;
   }
 
   /**

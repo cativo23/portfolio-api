@@ -12,3 +12,5 @@ export * from './context/request-context.service';
 export * from './context/request-context.decorator';
 export * from './context/request-context.module';
 export * from './decorators';
+export * from './utils/pagination.util';
+export * from './utils/pagination.util';

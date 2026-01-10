@@ -38,11 +38,13 @@ This comprehensive code review identifies code duplication, architectural issues
 
 ## 1. Code Duplication Issues
 
-### 1.1 Pagination Logic Duplication ⚠️ CRITICAL
+### 1.1 Pagination Logic Duplication ✅ FIXED
 
 **Location**: `src/projects/projects.service.ts` and `src/contacts/contacts.service.ts`
 
-**Issue**: The `findAll` method contains nearly identical pagination, filtering, and query building logic in both services.
+**Status**: ✅ **RESOLVED** - Pagination logic has been extracted to a reusable utility class, eliminating duplication across services.
+
+**Issue**: The `findAll` method contained nearly identical pagination, filtering, and query building logic in both services.
 
 **Current Implementation** (duplicated in both services):
 ```typescript
@@ -167,55 +169,57 @@ export class ProjectsService extends BaseCrudService<Project, CreateProjectDto, 
 }
 ```
 
-**Alternative (Lighter) Solution**: Create a pagination utility:
+**Alternative (Lighter) Solution**: Create a pagination utility (applied):
 ```typescript
 // src/core/utils/pagination.util.ts
 export class PaginationUtil {
-  static async paginate<TEntity, TDto>(
+  static async paginate<TEntity>(
     repository: Repository<TEntity>,
-    options: {
-      page: number;
-      per_page: number;
-      search?: string;
-      searchFields?: string[];
-      filters?: Record<string, any>;
-      orderBy?: { field: string; direction: 'ASC' | 'DESC' };
-      alias?: string;
-    },
-    mapper: (entity: TEntity) => TDto,
-  ): Promise<{ items: TDto[]; total: number }> {
-    const { page, per_page, search, searchFields = [], filters, orderBy, alias = 'entity' } = options;
-    const query = repository.createQueryBuilder(alias);
-
-    // Search
-    if (search && searchFields.length > 0) {
-      const conditions = searchFields.map(field => `${alias}.${field} LIKE :search`).join(' OR ');
-      query.andWhere(`(${conditions})`, { search: `%${search}%` });
-    }
-
-    // Filters
-    if (filters) {
-      Object.entries(filters).forEach(([key, value]) => {
-        if (typeof value !== 'undefined') {
-          query.andWhere(`${alias}.${key} = :${key}`, { [key]: value });
-        }
-      });
-    }
-
-    // Ordering
-    query.orderBy(
-      orderBy ? `${alias}.${orderBy.field}` : `${alias}.createdAt`,
-      orderBy?.direction || 'DESC',
-    );
-
-    // Pagination
-    query.skip((page - 1) * per_page).take(per_page);
-
-    const [items, total] = await query.getManyAndCount();
-    return { items: items.map(mapper), total };
+    options: PaginationOptions,
+  ): Promise<PaginationResult<TEntity>> {
+    // Handles search, filtering, ordering, and pagination
+    // Returns entities with pagination metadata
   }
 }
 ```
+
+**Solution Applied** (using PaginationUtil utility):
+```typescript
+// src/projects/projects.service.ts
+async findAll(options: FindAllOptions): Promise<...> {
+  const result = await PaginationUtil.paginate(this.projectsRepository, {
+    page,
+    per_page,
+    search,
+    searchFields: ['title', 'description'],
+    filters: { isFeatured: typeof isFeatured !== 'undefined' ? isFeatured : undefined },
+    alias: 'projects',
+  });
+  return result;
+}
+
+// src/contacts/contacts.service.ts
+async findAll(options: FindAllOptions): Promise<...> {
+  const result = await PaginationUtil.paginate(this.contactsRepository, {
+    page,
+    per_page,
+    search,
+    searchFields: ['name', 'email', 'message'],
+    filters: { isRead: typeof isRead !== 'undefined' ? isRead : undefined },
+    alias: 'contacts',
+  });
+  return result;
+}
+```
+
+**Changes Made**:
+- ✅ Created `PaginationUtil` utility class in `src/core/utils/pagination.util.ts`
+- ✅ Extracted common pagination logic (search, filtering, ordering, pagination)
+- ✅ Refactored `ProjectsService.findAll()` to use `PaginationUtil`
+- ✅ Refactored `ContactsService.findAll()` to use `PaginationUtil`
+- ✅ Exported `PaginationUtil` from `@core` module
+- ✅ Eliminated code duplication while maintaining flexibility for service-specific configurations
+- ✅ Preserved existing behavior - services still return entities with pagination metadata
 
 ---
 
@@ -1224,12 +1228,13 @@ this.cls.set('requestContext', context);
    - Risk: Low - Adds validation, doesn't break existing functionality
    - **Status**: Query parameter DTOs created with proper validation. Controllers updated to use DTOs.
 
-### High Priority
-
-4. **Extract pagination logic to utility/base service** (Section 1.1)
+4. **Extract pagination logic to utility/base service** (Section 1.1) ✅ **COMPLETED**
    - Impact: High - Reduces duplication
    - Effort: Medium - Refactoring required
    - Risk: Medium - Must test thoroughly
+   - **Status**: Pagination logic extracted to `PaginationUtil` utility class. Both `ProjectsService` and `ContactsService` refactored to use the utility, eliminating code duplication.
+
+### High Priority
 
 5. **Create base paginated response DTO** (Section 1.2)
    - Impact: Medium - Reduces duplication
@@ -1293,7 +1298,8 @@ The Portfolio API demonstrates good understanding of response standardization an
 - ✅ Request ID tracking implementation
 
 **Key Areas for Improvement:**
-- ⚠️ Code duplication (pagination, query building)
+- ✅ Code duplication - pagination logic (Section 1.1 - Fixed)
+- ⚠️ Code duplication - query building (other areas)
 - ⚠️ Type safety issues
 - ✅ Error handling patterns (Sections 1.4, 3.3 - Fixed)
 - ✅ Inefficient database operations (Section 2.1 - Fixed)
@@ -1308,10 +1314,11 @@ All recommendations maintain the existing API response schema as required.
 
 ---
 
-**Document Version**: 1.3  
+**Document Version**: 1.4  
 **Last Updated**: 2026-01-08
 
 **Updates:**
+- ✅ Section 1.1 (Pagination Logic Duplication) - Fixed
 - ✅ Section 1.4 (Error Handling Pattern Duplication) - Fixed
 - ✅ Section 3.3 (Error Context Loss in Services) - Fixed
 - ✅ Section 2.1 (Inefficient Update Operations) - Fixed
