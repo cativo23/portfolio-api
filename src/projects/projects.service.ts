@@ -31,7 +31,7 @@ export class ProjectsService {
   constructor(
     @InjectRepository(Project)
     private projectsRepository: Repository<Project>,
-  ) { }
+  ) {}
 
   /**
    * Creates a new project

@@ -13,7 +13,6 @@ import {
 import {
   ApiOperation,
   ApiParam,
-  ApiQuery,
   ApiTags,
   ApiBody,
   ApiBearerAuth,
@@ -26,6 +25,7 @@ import {
   SingleProjectResponseDto,
   DeleteResponseDto,
   ProjectResponseDto,
+  FindAllProjectsQueryDto,
 } from './dto';
 import { ProjectsService } from './projects.service';
 import { AuthGuard } from '@auth/auth.guard';
@@ -42,52 +42,25 @@ import {
 @ApiTags('Projects')
 @Controller('projects')
 export class ProjectsController {
-  constructor(private readonly projectsService: ProjectsService) { }
+  constructor(private readonly projectsService: ProjectsService) {}
 
   @Get()
   @UseGuards(JwtOrApiKeyGuard)
   @ApiBearerAuth()
   @ApiSecurity('x-api-key')
   @ApiOperation({ summary: 'Get all projects' })
-  @ApiQuery({
-    name: 'page',
-    required: false,
-    description: 'Page number',
-    example: 1,
-  })
-  @ApiQuery({
-    name: 'per_page',
-    required: false,
-    description: 'Number of items per page',
-    example: 10,
-  })
-  @ApiQuery({ name: 'search', required: false, description: 'Search term' })
-  @ApiQuery({
-    name: 'is_featured',
-    required: false,
-    description: 'Filter by featured projects',
-    type: Boolean,
-  })
   @ApiGetPaginatedList(
     'Returns a paginated list of projects',
     ProjectsListResponseDto,
   )
   async findAll(
-    @Query('page') page?: string,
-    @Query('per_page') per_page?: string,
-    @Query('search') search?: string,
-    @Query('is_featured') is_featured?: string,
+    @Query() query: FindAllProjectsQueryDto,
   ): Promise<ProjectsListResponseDto> {
-    const pageNumber = parseInt(page, 10) || 1;
-    const perPage = parseInt(per_page, 10) || 10;
-    const isFeatured =
-      is_featured === undefined ? undefined : is_featured === 'true';
-
     const result = await this.projectsService.findAll({
-      page: pageNumber,
-      per_page: perPage,
-      search,
-      isFeatured: isFeatured,
+      page: query.page || 1,
+      per_page: query.per_page || 10,
+      search: query.search,
+      isFeatured: query.is_featured,
     });
 
     // Transform entities to DTOs

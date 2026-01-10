@@ -14,7 +14,6 @@ import {
 import {
   ApiOperation,
   ApiParam,
-  ApiQuery,
   ApiTags,
   ApiBody,
   ApiBearerAuth,
@@ -24,6 +23,7 @@ import {
   ContactsListResponseDto,
   SingleContactResponseDto,
   ContactResponseDto,
+  FindAllContactsQueryDto,
 } from './dto';
 import { ContactsService } from './contacts.service';
 import { AuthGuard } from '@auth/auth.guard';
@@ -41,7 +41,7 @@ import {
 @ApiTags('Contacts')
 @Controller('contacts')
 export class ContactsController {
-  constructor(private readonly contactsService: ContactsService) { }
+  constructor(private readonly contactsService: ContactsService) {}
 
   @Post()
   @Public()
@@ -65,44 +65,18 @@ export class ContactsController {
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get all contacts (Admin only)' })
-  @ApiQuery({
-    name: 'page',
-    required: false,
-    description: 'Page number',
-    example: 1,
-  })
-  @ApiQuery({
-    name: 'per_page',
-    required: false,
-    description: 'Number of items per page',
-    example: 10,
-  })
-  @ApiQuery({ name: 'search', required: false, description: 'Search term' })
-  @ApiQuery({
-    name: 'is_read',
-    required: false,
-    description: 'Filter by read status (true/false)',
-    type: Boolean,
-  })
   @ApiGetPaginatedList(
     'Returns a paginated list of contacts',
     ContactsListResponseDto,
   )
   async findAll(
-    @Query('page') page?: string,
-    @Query('per_page') per_page?: string,
-    @Query('search') search?: string,
-    @Query('is_read') is_read?: string,
+    @Query() query: FindAllContactsQueryDto,
   ): Promise<ContactsListResponseDto> {
-    const pageNumber = parseInt(page, 10) || 1;
-    const perPage = parseInt(per_page, 10) || 10;
-    const isRead = is_read === undefined ? undefined : is_read === 'true';
-
     const result = await this.contactsService.findAll({
-      page: pageNumber,
-      per_page: perPage,
-      search,
-      isRead: isRead,
+      page: query.page || 1,
+      per_page: query.per_page || 10,
+      search: query.search,
+      isRead: query.is_read,
     });
 
     // Transform entities to DTOs

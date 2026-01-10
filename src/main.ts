@@ -97,7 +97,7 @@ Paginated endpoints include \`meta.pagination\` with:
 - \`total_pages\`: Total number of pages`,
     )
     .setVersion('1.0')
-    .addServer('http://localhost:3000', 'Development')
+    .addServer('http://localhost:3001', 'Development')
     .addBearerAuth(
       {
         type: 'http',

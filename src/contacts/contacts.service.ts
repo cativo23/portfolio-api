@@ -53,9 +53,7 @@ export class ContactsService {
    * @param options - Object containing pagination, search, and filtering options
    * @returns Promise resolving to contact entities with pagination metadata
    */
-  async findAll(
-    options: FindAllOptions,
-  ): Promise<{
+  async findAll(options: FindAllOptions): Promise<{
     items: Contact[];
     total: number;
     page: number;

@@ -309,11 +309,13 @@ export class ProjectsListResponseDto extends PaginatedResponseDto<ProjectRespons
 
 ---
 
-### 1.3 Query Parameter Parsing Duplication ⚠️ MEDIUM
+### 1.3 Query Parameter Parsing Duplication ✅ FIXED
 
 **Location**:
-- `src/projects/projects.controller.ts:75-84`
-- `src/contacts/contacts.controller.ts:90-105`
+- `src/projects/projects.controller.ts:47-67`
+- `src/contacts/contacts.controller.ts:63-79`
+
+**Status**: ✅ **RESOLVED** - Query parameter parsing logic has been extracted to reusable DTOs with proper validation.
 
 **Issue**: Query parameter parsing and validation logic is duplicated across controllers.
 
@@ -392,10 +394,32 @@ async findAll(
 }
 ```
 
-**Better Solution** (using Transform decorator):
+**Solution Applied** (using Transform decorator):
 ```typescript
-import { Transform } from 'class-transformer';
+// src/core/dto/pagination-query.dto.ts
+export class PaginationQueryDto {
+  @ApiPropertyOptional({ description: 'Page number', example: 1, minimum: 1, default: 1 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page?: number = 1;
 
+  @ApiPropertyOptional({ description: 'Items per page', example: 10, minimum: 1, maximum: 100, default: 10 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  per_page?: number = 10;
+
+  @ApiPropertyOptional({ description: 'Search term' })
+  @IsOptional()
+  @IsString()
+  search?: string;
+}
+
+// src/projects/dto/find-all-projects-query.dto.ts
 export class FindAllProjectsQueryDto extends PaginationQueryDto {
   @ApiPropertyOptional({ description: 'Filter by featured status', type: Boolean })
   @IsOptional()
@@ -406,13 +430,49 @@ export class FindAllProjectsQueryDto extends PaginationQueryDto {
   })
   is_featured?: boolean;
 }
+
+// src/contacts/dto/find-all-contacts-query.dto.ts
+export class FindAllContactsQueryDto extends PaginationQueryDto {
+  @ApiPropertyOptional({ description: 'Filter by read status', type: Boolean })
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return undefined;
+  })
+  is_read?: boolean;
+}
+
+// Controller usage
+@Get()
+async findAll(@Query() query: FindAllProjectsQueryDto): Promise<ProjectsListResponseDto> {
+  return this.projectsService.findAll({
+    page: query.page || 1,
+    per_page: query.per_page || 10,
+    search: query.search,
+    isFeatured: query.is_featured,
+  });
+}
 ```
+
+**Changes Made**:
+- ✅ Created `PaginationQueryDto` base class with validation (page, per_page, search)
+- ✅ Created `FindAllProjectsQueryDto` extending PaginationQueryDto with `is_featured` filter
+- ✅ Created `FindAllContactsQueryDto` extending PaginationQueryDto with `is_read` filter
+- ✅ Updated `ProjectsController.findAll()` to use `FindAllProjectsQueryDto`
+- ✅ Updated `ContactsController.findAll()` to use `FindAllContactsQueryDto`
+- ✅ Removed manual query parameter parsing logic
+- ✅ Added proper validation with `@Min`, `@Max`, `@IsInt` for pagination
+- ✅ Added `@Transform` decorator for boolean conversion
+- ✅ Removed redundant `@ApiQuery` decorators (now handled by DTO)
 
 ---
 
-### 1.4 Error Handling Pattern Duplication ⚠️ HIGH
+### 1.4 Error Handling Pattern Duplication ✅ FIXED
 
 **Location**: All service methods in `projects.service.ts` and `contacts.service.ts`
+
+**Status**: ✅ **RESOLVED** - Try-catch blocks have been removed from all service methods. Errors now bubble up naturally to the global exception filter.
 
 **Issue**: Every service method wraps operations in try-catch blocks and converts all errors to `InternalServerException`, losing the original exception context.
 
@@ -500,15 +560,17 @@ async create(dto: CreateDto): Promise<ResponseDto> {
 
 ## 2. Architecture & Design Patterns
 
-### 2.1 Inefficient Update Operations ⚠️ HIGH
+### 2.1 Inefficient Update Operations ✅ FIXED
 
 **Location**: 
-- `src/projects/projects.service.ts:160-192`
-- `src/contacts/contacts.service.ts:158-195`
+- `src/projects/projects.service.ts:127-150`
+- `src/contacts/contacts.service.ts:129-149`
 
-**Issue**: Update methods perform three database queries instead of one: `findOne` → `update` → `findOne`.
+**Status**: ✅ **RESOLVED** - Update methods now use `merge` + `save` pattern, reducing from three queries to two (findOne for validation + save).
 
-**Current Implementation**:
+**Issue**: Update methods were performing three database queries instead of two: `findOne` → `update` → `findOne`.
+
+**Previous Implementation** (before fix - 3 queries):
 ```typescript
 async update(id: number, updateDto: UpdateDto): Promise<ResponseDto> {
   // Query 1: Check existence
@@ -527,6 +589,30 @@ async update(id: number, updateDto: UpdateDto): Promise<ResponseDto> {
 }
 ```
 
+**Current Implementation** (after fix - 2 queries, optimal for MySQL):
+```typescript
+// src/projects/projects.service.ts
+async update(id: number, updateProjectDto: UpdateProjectDto): Promise<Project> {
+  // Query 1: Check existence
+  const existingProject = await this.projectsRepository.findOne({
+    where: { id },
+  });
+
+  if (!existingProject) {
+    throw new NotFoundException(`Project with ID ${id} not found`);
+  }
+
+  // Query 2: Merge and save (update + fetch in one operation)
+  const updatedProject = this.projectsRepository.merge(
+    existingProject,
+    updateProjectDto,
+  );
+  const savedProject = await this.projectsRepository.save(updatedProject);
+  
+  return savedProject; // ✅ Only 2 queries (findOne + save)
+}
+```
+
 **Why This Is Bad:**
 1. **Performance**: Three database round-trips instead of one
 2. **Race Conditions**: Entity could be modified between update and fetch
@@ -534,25 +620,20 @@ async update(id: number, updateDto: UpdateDto): Promise<ResponseDto> {
 
 **Recommendation**: Use TypeORM's `save` method or `update` with `returning` clause (if supported).
 
-**Suggested Solution** (Option 1 - Use save):
-```typescript
-async update(id: number, updateDto: UpdateDto): Promise<ResponseDto> {
-  const existing = await this.repository.findOne({ where: { id } });
-  
-  if (!existing) {
-    throw new NotFoundException(`Entity with ID ${id} not found`);
-  }
+**Solution Applied** (Option 1 - Use merge + save, optimal for MySQL):
 
-  // Merge and save in one operation
-  const updated = this.repository.merge(existing, updateDto);
-  const saved = await this.repository.save(updated);
-  
-  return ResponseDto.fromEntity(saved); // Single query
-}
-```
+**Changes Made**:
+- ✅ `ProjectsService.update()` - Uses `merge` + `save` instead of `update` + `findOne`
+- ✅ `ContactsService.markAsRead()` - Uses `merge` + `save` instead of `update` + `findOne`
+- **Reduced from 3 queries to 2 queries** (findOne for validation + save with merged data)
+- **Eliminates race condition** - No gap between update and fetch operations
+- **Better performance** - Fewer database round-trips
+- **MySQL optimized** - Since MySQL doesn't support RETURNING clause, this is the optimal pattern
 
-**Suggested Solution** (Option 2 - PostgreSQL RETURNING):
+**Alternative Solution** (Option 2 - PostgreSQL RETURNING, not applicable for MySQL):
 ```typescript
+// Note: This approach only works with PostgreSQL
+// The current codebase uses MySQL, so merge + save is the optimal solution
 async update(id: number, updateDto: UpdateDto): Promise<ResponseDto> {
   const result = await this.repository
     .createQueryBuilder()
@@ -566,7 +647,7 @@ async update(id: number, updateDto: UpdateDto): Promise<ResponseDto> {
     throw new NotFoundException(`Entity with ID ${id} not found`);
   }
 
-  return ResponseDto.fromEntity(result.raw[0]); // Single query with returning
+  return ResponseDto.fromEntity(result.raw[0]); // Single query with returning (PostgreSQL only)
 }
 ```
 
@@ -715,11 +796,20 @@ async canActivate(context: ExecutionContext): Promise<boolean> {
 
 ---
 
-### 3.3 Error Context Loss in Services ⚠️ HIGH
+### 3.3 Error Context Loss in Services ✅ FIXED
+
+**Status**: ✅ **RESOLVED** - All try-catch blocks that converted errors to `InternalServerException` have been removed. Error context is now preserved and handled by the global exception filter.
 
 **Issue**: As mentioned in section 1.4, services catch all errors and convert them to `InternalServerException`, losing important context.
 
 **Recommendation**: Remove unnecessary try-catch blocks (see section 1.4).
+
+**Solution Applied**:
+- Removed all try-catch blocks from `ProjectsService` methods (`create`, `findAll`, `findOne`, `update`, `remove`)
+- Removed all try-catch blocks from `ContactsService` methods (`create`, `findAll`, `findOne`, `markAsRead`, `remove`)
+- Removed `InternalServerException` imports from both services
+- Errors now bubble up naturally to the global exception filter, preserving original error context
+- Updated tests to reflect the new error handling behavior
 
 ---
 
@@ -831,13 +921,24 @@ return new SuccessResponseDto(items, {
 
 ## 5. Validation & Input Handling
 
-### 5.1 Missing Query Parameter Validation ⚠️ HIGH
+### 5.1 Missing Query Parameter Validation ✅ FIXED
+
+**Status**: ✅ **RESOLVED** - Query parameter validation has been implemented using DTOs with class-validator decorators.
 
 **Location**: Controllers parsing query parameters manually
 
-**Issue**: As mentioned in section 1.3, query parameters are parsed without validation.
+**Issue**: As mentioned in section 1.3, query parameters were parsed without validation.
 
 **Recommendation**: Create query DTOs with class-validator decorators (see section 1.3).
+
+**Solution Applied**:
+- ✅ Created `PaginationQueryDto` with validation for common pagination parameters
+- ✅ Created resource-specific query DTOs (`FindAllProjectsQueryDto`, `FindAllContactsQueryDto`)
+- ✅ Added validation decorators: `@IsInt()`, `@Min()`, `@Max()`, `@IsString()`
+- ✅ Added `@Type()` transformer for proper type conversion
+- ✅ Added `@Transform()` decorator for boolean query parameters
+- ✅ Controllers now use DTOs instead of manual parsing
+- ✅ Validation errors are automatically handled by global ValidationPipe
 
 ---
 
@@ -899,9 +1000,9 @@ async findOne(@Param('id', ParseIntPipe) id: number): Promise<...> {
 
 ## 6. Database & Performance
 
-### 6.1 Update Operations Inefficiency ⚠️ HIGH
+### 6.1 Update Operations Inefficiency ✅ FIXED
 
-**Issue**: Already covered in section 2.2.
+**Status**: ✅ **RESOLVED** - Already covered in section 2.1. Update operations now use efficient `merge` + `save` pattern.
 
 ---
 
@@ -1105,20 +1206,23 @@ this.cls.set('requestContext', context);
 
 ### Critical Priority (Do First)
 
-1. **Remove try-catch blocks from services** (Section 1.4, 3.3)
+1. **Remove try-catch blocks from services** (Section 1.4, 3.3) ✅ **COMPLETED**
    - Impact: High - Improves error handling and debugging
    - Effort: Low - Simple refactoring
    - Risk: Low - Global exception filter already handles errors
+   - **Status**: All try-catch blocks removed from services. Errors now bubble up naturally.
 
-2. **Fix inefficient update operations** (Section 2.2)
+2. **Fix inefficient update operations** (Section 2.1) ✅ **COMPLETED**
    - Impact: High - Performance improvement
    - Effort: Low - Use `save` instead of `update` + `findOne`
    - Risk: Low - Well-tested TypeORM pattern
+   - **Status**: All update methods now use `merge` + `save` pattern, reducing queries from 3 to 2
 
-3. **Create query parameter DTOs** (Section 1.3, 5.1)
+3. **Create query parameter DTOs** (Section 1.3, 5.1) ✅ **COMPLETED**
    - Impact: High - Input validation and consistency
    - Effort: Medium - Create DTOs for all endpoints
    - Risk: Low - Adds validation, doesn't break existing functionality
+   - **Status**: Query parameter DTOs created with proper validation. Controllers updated to use DTOs.
 
 ### High Priority
 
@@ -1153,11 +1257,6 @@ this.cls.set('requestContext', context);
    - Impact: Low - Consistency
    - Effort: Low - Add ParseIntPipe where missing
    - Risk: Low - Should validate better
-
-10. **Consider service layer returning entities** (Section 2.1)
-    - Impact: Medium - Better architecture
-    - Effort: High - Requires refactoring controllers
-    - Risk: Medium - Significant change, but more aligned with NestJS best practices
 
 ### Low Priority
 
@@ -1194,11 +1293,11 @@ The Portfolio API demonstrates good understanding of response standardization an
 - ✅ Request ID tracking implementation
 
 **Key Areas for Improvement:**
-- ⚠️ Code duplication (pagination, error handling, query building)
-- ⚠️ Missing input validation for query parameters
-- ⚠️ Inefficient database operations
+- ⚠️ Code duplication (pagination, query building)
 - ⚠️ Type safety issues
-- ⚠️ Inconsistent error handling patterns
+- ✅ Error handling patterns (Sections 1.4, 3.3 - Fixed)
+- ✅ Inefficient database operations (Section 2.1 - Fixed)
+- ✅ Missing input validation for query parameters (Sections 1.3, 5.1 - Fixed)
 
 **Recommended Approach:**
 1. Start with critical priority items (error handling, update operations, query validation)
@@ -1209,5 +1308,12 @@ All recommendations maintain the existing API response schema as required.
 
 ---
 
-**Document Version**: 1.0  
+**Document Version**: 1.3  
 **Last Updated**: 2026-01-08
+
+**Updates:**
+- ✅ Section 1.4 (Error Handling Pattern Duplication) - Fixed
+- ✅ Section 3.3 (Error Context Loss in Services) - Fixed
+- ✅ Section 2.1 (Inefficient Update Operations) - Fixed
+- ✅ Section 1.3 (Query Parameter Parsing Duplication) - Fixed
+- ✅ Section 5.1 (Missing Query Parameter Validation) - Fixed
