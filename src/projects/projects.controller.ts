@@ -30,7 +30,6 @@ import {
 import { ProjectsService } from '@projects/projects.service';
 import { AuthGuard } from '@auth/auth.guard';
 import { JwtOrApiKeyGuard } from '@core/jwt-or-api-key.guard';
-import { ValidationPipe } from '@core/pipes';
 import {
   ApiGetSingleResource,
   ApiGetPaginatedList,

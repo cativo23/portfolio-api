@@ -13,15 +13,11 @@ describe('ProjectsService', () => {
   let repository: Repository<Project>;
   // Logger spy variables
   let logSpy: jest.SpyInstance;
-  let errorSpy: jest.SpyInstance;
   let warnSpy: jest.SpyInstance;
 
   beforeEach(async () => {
     // Mock Logger methods
     logSpy = jest.spyOn(Logger.prototype, 'log').mockImplementation(jest.fn());
-    errorSpy = jest
-      .spyOn(Logger.prototype, 'error')
-      .mockImplementation(jest.fn());
     warnSpy = jest
       .spyOn(Logger.prototype, 'warn')
       .mockImplementation(jest.fn());

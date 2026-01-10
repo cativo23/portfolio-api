@@ -4,7 +4,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Contact } from './entities/contact.entity';
 import { CreateContactDto } from './dto/create-contact.dto';
-import { NotFoundException, Logger } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 
 describe('ContactsService', () => {
   let service: ContactsService;
