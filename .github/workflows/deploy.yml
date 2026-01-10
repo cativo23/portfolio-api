@@ -59,7 +59,7 @@ jobs:
           host: 186.32.90.71
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
+          port: 52222
           source: "compose.prod.yml"
           target: "/home/cativo23/deploy/portfolio-api-deploy"
           debug: true
@@ -74,7 +74,7 @@ jobs:
           host: 186.32.90.71
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
+          port: 52222
           envs: DOCKER_USERNAME,DB_USERNAME,DB_PASSWORD,DB_NAME,MYSQL_ROOT_PASSWORD
           script: |
             export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
