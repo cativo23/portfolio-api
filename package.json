@@ -1,6 +1,6 @@
 {
   "name": "portfolio-api",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "",
   "author": "",
   "private": true,
@@ -38,6 +38,7 @@
     "@nestjs/schedule": "^6.0.0",
     "@nestjs/swagger": "^11.2.0",
     "@nestjs/terminus": "^11.0.0",
+    "@nestjs/throttler": "^6.5.0",
     "@nestjs/typeorm": "^11.0.0",
     "@types/passport-jwt": "^4.0.1",
     "axios": "^1.10.x",

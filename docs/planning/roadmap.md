@@ -106,8 +106,8 @@ This document outlines the improvement plan and task checklist for the Portfolio
 
 #### Security Enhancements
 
-- [ ] Implement rate limiting
-- [ ] Add CORS configuration
+- [x] Implement rate limiting
+- [x] Add CORS configuration
 - [ ] Set up security headers (Helmet)
 - [ ] Add password strength validation
 - [ ] Implement account lockout after failed attempts

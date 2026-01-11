@@ -16,6 +16,7 @@ Key features:
 - Contact management for administrators
 - Pagination, filtering, and search functionality
 - Health checks for monitoring
+- Rate limiting (configurable per endpoint type)
 - Standardized API responses
 - Comprehensive error handling
 
@@ -100,6 +101,10 @@ The following environment variables are required for the application to run:
 - `CORS_ORIGINS` - (Optional) Comma-separated list of allowed CORS origins. Defaults to `http://localhost:3000,http://localhost:5173,http://localhost:5174` in development
 - `PORT` - (Optional) Server port. Defaults to 3000
 - `NODE_ENV` - (Optional) Environment (development/production). In development, CORS is more permissive
+- `THROTTLE_TTL` - (Optional) Rate limit time window in milliseconds. Defaults to `60000` (1 minute)
+- `THROTTLE_LIMIT` - (Optional) Default rate limit (requests per window). Defaults to `100`
+- `THROTTLE_PUBLIC_LIMIT` - (Optional) Rate limit for public endpoints. Defaults to `10`
+- `THROTTLE_STRICT_LIMIT` - (Optional) Rate limit for auth endpoints (login/register). Defaults to `5`
 
 ## Project Setup
 

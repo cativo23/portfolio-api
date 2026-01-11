@@ -94,6 +94,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         case HttpStatus.CONFLICT:
           code = ErrorCode.CONFLICT_ERROR;
           break;
+        case HttpStatus.TOO_MANY_REQUESTS:
+          code = ErrorCode.RATE_LIMIT_ERROR;
+          break;
         default:
           code = ErrorCode.INTERNAL_SERVER_ERROR;
       }

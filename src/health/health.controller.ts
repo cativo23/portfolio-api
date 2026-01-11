@@ -1,4 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
+import { SkipThrottle } from '@nestjs/throttler';
 import {
   HealthCheckService,
   HttpHealthIndicator,
@@ -28,6 +29,7 @@ export class HealthController {
    * @returns Health check results for each component
    */
   @Get()
+  @SkipThrottle() // Health checks should not be rate limited (used for monitoring)
   @HealthCheck()
   check() {
     return this.health.check([
