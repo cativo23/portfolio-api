@@ -1,11 +1,18 @@
 name: Deploy
 
 # This workflow deploys to production when:
-# 1. A PR from release/* branch to main is merged (triggers push to main)
-# 2. A release tag (v*) is pushed to main
+# A release tag (v*) is pushed (e.g., v1.0.3)
+# 
+# Deployment process:
+# 1. Create release branch from develop
+# 2. Prepare release (version bump, tests, docs)
+# 3. Create and push release tag (v*.*.*)
+# 4. Create PR from release branch to main
+# 5. Merge PR to main (tag will be on main after merge)
+# 6. Push tag explicitly (if not already on main): git push origin v*.*.*
+# 7. Workflow triggers automatically on tag push and deploys
 on:
   push:
-    branches: [main]
     tags:
       - 'v*'
 
@@ -13,12 +20,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     environment: prod
-    # Only deploy if:
-    # - Push to main branch (which happens when PR from release/* is merged)
-    # - Or a release tag is pushed
-    if: |
-      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
-      (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v'))
+    # Only deploy on release tag pushes
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -38,10 +41,9 @@ jobs:
         with:
           images: ${{ secrets.DOCKER_USERNAME }}/portfolio-api
           tags: |
-            type=ref,event=branch
             type=ref,event=tag
-            type=sha,prefix={{branch}}-
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha
+            type=raw,value=latest
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
