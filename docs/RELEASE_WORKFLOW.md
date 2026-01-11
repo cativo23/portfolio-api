@@ -40,6 +40,8 @@ git merge origin/develop --no-ff -m "chore: merge latest from develop into relea
 
 #### 2.2 Fix Lint Issues
 
+Since the API is dockerized, use docker compose to run commands:
+
 ```bash
 docker compose exec api yarn lint
 # Fix any lint errors
@@ -54,6 +56,8 @@ docker compose exec api yarn test
 docker compose exec api yarn test:cov
 # Verify coverage is above 80%
 ```
+
+**Note**: All yarn commands should be executed inside the Docker container using `docker compose exec api yarn {command}`.
 
 #### 2.4 Update Version
 
