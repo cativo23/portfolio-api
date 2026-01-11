@@ -1,30 +1,21 @@
 name: Deploy
 
 # This workflow deploys to production when:
-# A release tag (v*) is pushed (e.g., v1.0.3)
-# 
-# Deployment process:
-# 1. Create release branch from develop
-# 2. Prepare release (version bump, tests, docs)
-# 3. Create and push release tag (v*.*.*)
-# 4. Create PR from release branch to main
-# 5. Merge PR to main (tag will be on main after merge)
-# 6. Push tag explicitly (if not already on main): git push origin v*.*.*
-# 7. Workflow triggers automatically on tag push and deploys
+# A GitHub Release is published (created via GitHub UI or gh cli)
+# This ensures deployment only happens after code is merged to main and properly tagged
 on:
-  push:
-    tags:
-      - 'v*'
+  release:
+    types: [published]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     environment: prod
-    # Only deploy on release tag pushes
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -41,9 +32,9 @@ jobs:
         with:
           images: ${{ secrets.DOCKER_USERNAME }}/portfolio-api
           tags: |
-            type=ref,event=tag
-            type=sha
+            type=raw,value=${{ github.event.release.tag_name }}
             type=raw,value=latest
+            type=sha
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
@@ -62,7 +53,10 @@ jobs:
     runs-on: ubuntu-latest
     environment: prod
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
       - name: Copy compose file to server
         uses: appleboy/scp-action@v1
         with:
