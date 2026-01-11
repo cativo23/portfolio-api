@@ -26,32 +26,32 @@ import { APP_GUARD } from '@nestjs/core';
  */
 @Global()
 @Module({
-    imports: [
-        ThrottlerModule.forRoot([
-            {
-                name: 'default',
-                ttl: parseInt(process.env.THROTTLE_TTL || '60000', 10), // 1 minute in milliseconds
-                limit: parseInt(process.env.THROTTLE_LIMIT || '100', 10), // 100 requests per minute
-            },
-            {
-                name: 'public',
-                ttl: parseInt(process.env.THROTTLE_PUBLIC_TTL || '60000', 10), // 1 minute
-                limit: parseInt(process.env.THROTTLE_PUBLIC_LIMIT || '10', 10), // 10 requests per minute
-            },
-            {
-                name: 'strict',
-                ttl: parseInt(process.env.THROTTLE_STRICT_TTL || '60000', 10), // 1 minute
-                limit: parseInt(process.env.THROTTLE_STRICT_LIMIT || '5', 10), // 5 requests per minute
-            },
-        ]),
-    ],
-    providers: [
-        // Register ThrottlerGuard globally to protect all routes by default
-        {
-            provide: APP_GUARD,
-            useClass: ThrottlerGuard,
-        },
-    ],
-    exports: [ThrottlerModule],
+  imports: [
+    ThrottlerModule.forRoot([
+      {
+        name: 'default',
+        ttl: parseInt(process.env.THROTTLE_TTL || '60000', 10), // 1 minute in milliseconds
+        limit: parseInt(process.env.THROTTLE_LIMIT || '100', 10), // 100 requests per minute
+      },
+      {
+        name: 'public',
+        ttl: parseInt(process.env.THROTTLE_PUBLIC_TTL || '60000', 10), // 1 minute
+        limit: parseInt(process.env.THROTTLE_PUBLIC_LIMIT || '10', 10), // 10 requests per minute
+      },
+      {
+        name: 'strict',
+        ttl: parseInt(process.env.THROTTLE_STRICT_TTL || '60000', 10), // 1 minute
+        limit: parseInt(process.env.THROTTLE_STRICT_LIMIT || '5', 10), // 5 requests per minute
+      },
+    ]),
+  ],
+  providers: [
+    // Register ThrottlerGuard globally to protect all routes by default
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
+  exports: [ThrottlerModule],
 })
-export class AppThrottlerModule { }
+export class AppThrottlerModule {}

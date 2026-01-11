@@ -32,7 +32,7 @@ import { RequestContextService } from '@core/context/request-context.service';
 export class GlobalExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(GlobalExceptionFilter.name);
 
-  constructor(private readonly requestContext: RequestContextService) { }
+  constructor(private readonly requestContext: RequestContextService) {}
 
   /**
    * Catch method that handles exceptions
@@ -52,7 +52,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     // Log the exception with request ID for correlation
     this.logger.error(
       `[${requestId}] Exception occurred: ${exception instanceof Error ? exception.message : 'Unknown error'} | ` +
-      `Request: ${request.method} ${request.url} | IP: ${request.ip}`,
+        `Request: ${request.method} ${request.url} | IP: ${request.ip}`,
       exception instanceof Error ? exception.stack : undefined,
     );
 
@@ -71,8 +71,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       const exceptionResponse = exception.getResponse();
       const message =
         typeof exceptionResponse === 'object' &&
-          'message' in exceptionResponse &&
-          typeof exceptionResponse.message === 'string'
+        'message' in exceptionResponse &&
+        typeof exceptionResponse.message === 'string'
           ? exceptionResponse.message
           : exception.message;
 
@@ -106,8 +106,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         message,
         details:
           typeof exceptionResponse === 'object' &&
-            'message' in exceptionResponse &&
-            Array.isArray(exceptionResponse.message)
+          'message' in exceptionResponse &&
+          Array.isArray(exceptionResponse.message)
             ? { errors: exceptionResponse.message }
             : undefined,
         path,
