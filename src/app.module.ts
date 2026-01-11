@@ -14,11 +14,13 @@ import { RequestContextModule } from '@core/context/request-context.module';
 import { RequestIdMiddleware } from '@core/middleware/request-id.middleware';
 import { ResponseTransformInterceptor } from '@core/interceptors/response-transform.interceptor';
 import { GlobalExceptionFilter } from '@core/exceptions/global-exception.filter';
+import { AppThrottlerModule } from '@core/throttler/throttler.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     RequestContextModule, // Must be imported before other modules that use it
+    AppThrottlerModule, // Rate limiting - must be imported early for global guard
     HealthModule,
     DatabaseModule,
     ProjectsModule,

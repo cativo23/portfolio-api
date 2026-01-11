@@ -10,6 +10,7 @@ import {
   Patch,
   ParseIntPipe,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import {
   ApiOperation,
   ApiParam,
@@ -39,10 +40,11 @@ import {
 @ApiTags('Contacts')
 @Controller('contacts')
 export class ContactsController {
-  constructor(private readonly contactsService: ContactsService) {}
+  constructor(private readonly contactsService: ContactsService) { }
 
   @Post()
   @Public()
+  @Throttle({ default: { limit: 10, ttl: 60000 } }) // 10 requests per minute for public contact form
   @ApiOperation({ summary: 'Submit a contact form' })
   @ApiBody({ type: CreateContactDto })
   @ApiCreateResource(

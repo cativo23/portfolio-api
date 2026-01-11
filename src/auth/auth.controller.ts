@@ -8,6 +8,7 @@ import {
   HttpStatus,
   Get,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { ErrorCode, ErrorResponseDto, SuccessResponseDto } from '@core/dto';
 import { AuthService } from '@auth/auth.service';
 import {
@@ -30,7 +31,7 @@ import { AuthenticatedRequest } from '@core/types/authenticated-request.interfac
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
   /**
    * Handles user login by validating credentials and returning an authentication token.
@@ -40,6 +41,7 @@ export class AuthController {
    */
   @HttpCode(HttpStatus.OK)
   @Post('login')
+  @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 requests per minute for login (prevent brute force)
   @ApiOperation({ summary: 'User Login' })
   @ApiCustomResponses(
     ApiResponse({
@@ -75,6 +77,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('register')
+  @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 requests per minute for registration (prevent abuse)
   @ApiOperation({ summary: 'User Registration' })
   @ApiCustomResponses(
     ApiResponse({
