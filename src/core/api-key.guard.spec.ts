@@ -19,6 +19,15 @@ describe('ApiKeyGuard', () => {
     await expect(guard.canActivate(context)).rejects.toThrow();
   });
 
+  it('should not accept API key from query params', async () => {
+    const context: any = {
+      switchToHttp: () => ({
+        getRequest: () => ({ headers: {}, query: { api_key: 'from-query' } }),
+      }),
+    };
+    await expect(guard.canActivate(context)).rejects.toThrow();
+  });
+
   it('should throw if key is invalid', async () => {
     (apiKeyService.validate as jest.Mock).mockResolvedValue(false);
     const context: any = {
