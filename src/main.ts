@@ -12,7 +12,7 @@ async function bootstrap() {
 
   // Mount CLS middleware first - before any other middleware that depends on it
   // This ensures CLS context is available for RequestIdMiddleware and others
-  app.use(new ClsMiddleware({ global: true }).use);
+  app.use(new ClsMiddleware({}).use);
 
   const appConfig = loadAppConfig();
 
