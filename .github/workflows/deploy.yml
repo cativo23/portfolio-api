@@ -123,7 +123,12 @@ jobs:
             echo "THROTTLE_LIMIT=${THROTTLE_LIMIT}" >> .env
             echo "THROTTLE_PUBLIC_LIMIT=${THROTTLE_PUBLIC_LIMIT}" >> .env
             echo "THROTTLE_STRICT_LIMIT=${THROTTLE_STRICT_LIMIT}" >> .env
-            
+
+            # Verify .env file was created
+            echo "=== .env file contents ==="
+            cat .env
+            echo "=========================="
+
             # Login to Docker Hub on server
             echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
             
@@ -132,9 +137,9 @@ jobs:
             
             # Stop and remove old containers (but keep volumes)
             docker compose -f compose.prod.yml down || true
-            
-            # Start new containers
-            docker compose -f compose.prod.yml up -d
+
+            # Start new containers (explicitly load .env file)
+            docker compose --env-file .env -f compose.prod.yml up -d
             
             # Wait for services to be healthy
             sleep 10
