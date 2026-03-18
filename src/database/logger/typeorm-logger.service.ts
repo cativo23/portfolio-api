@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Logger as TypeOrmLogger } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
+import type { DatabaseConfig } from '@config/configuration.types';
 
 /**
  * Custom TypeORM logger that integrates with NestJS logger
@@ -12,12 +13,8 @@ export class TypeOrmLoggerService implements TypeOrmLogger {
   private readonly logLevels: string[];
 
   constructor(private readonly configService: ConfigService) {
-    // Get log levels from environment variables or use default
-    this.logLevels = (
-      this.configService.get<string>('DB_LOG_LEVELS') || 'error,warn,schema'
-    )
-      .split(',')
-      .map((level) => level.trim());
+    const db = this.configService.getOrThrow<DatabaseConfig>('database');
+    this.logLevels = db.logLevels.map((l) => String(l));
   }
 
   /**

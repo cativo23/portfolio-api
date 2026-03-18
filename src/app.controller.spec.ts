@@ -8,10 +8,15 @@ describe('AppController', () => {
 
   beforeEach(async () => {
     const mockConfigService = {
-      get: jest.fn((key: string) => {
-        if (key === 'NODE_ENV') return 'test';
-        if (key === 'PORT') return '3001';
-        return undefined;
+      getOrThrow: jest.fn((key: string) => {
+        if (key === 'app') {
+          return {
+            nodeEnv: 'test',
+            port: 3001,
+            corsOrigins: [],
+          };
+        }
+        throw new Error(key);
       }),
     };
 
