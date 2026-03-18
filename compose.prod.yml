@@ -7,27 +7,15 @@ services:
     restart: unless-stopped
     ports:
       - '${PORT:-3000}:3000'
+    env_file:
+      - .env
     environment:
       - NODE_ENV=production
       - PORT=3000
       - DB_HOST=mysql
       - DB_PORT=3306
-      - DB_USERNAME=${DB_USERNAME}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME}
-      - JWT_SECRET=${JWT_SECRET}
-      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN}
-      - CORS_ORIGINS=${CORS_ORIGINS}
-      - API_KEY_SECRET=${API_KEY_SECRET}
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
-      - REDIS_TTL=${REDIS_TTL:-300}
-      # Rate limiting
-      - THROTTLE_TTL=${THROTTLE_TTL:-60}
-      - THROTTLE_LIMIT=${THROTTLE_LIMIT:-10}
-      - THROTTLE_PUBLIC_LIMIT=${THROTTLE_PUBLIC_LIMIT:-20}
-      - THROTTLE_STRICT_LIMIT=${THROTTLE_STRICT_LIMIT:-5}
     depends_on:
       mysql:
         condition: service_healthy
