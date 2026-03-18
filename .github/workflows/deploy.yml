@@ -81,6 +81,7 @@ jobs:
           port: 52222
           envs: DOCKER_USERNAME,DB_USERNAME,DB_PASSWORD,DB_NAME,MYSQL_ROOT_PASSWORD,JWT_SECRET,JWT_EXPIRES_IN,CORS_ORIGINS,API_KEY_SECRET,REDIS_PASSWORD,REDIS_TTL,THROTTLE_TTL,THROTTLE_LIMIT,THROTTLE_PUBLIC_LIMIT,THROTTLE_STRICT_LIMIT
           script: |
+            # Docker and database credentials
             export DOCKER_USERNAME="${{ secrets.DOCKER_USERNAME }}"
             export DB_USERNAME="${{ secrets.DB_USERNAME }}"
             export DB_PASSWORD="${{ secrets.DB_PASSWORD }}"
@@ -91,6 +92,9 @@ jobs:
             export CORS_ORIGINS="${{ secrets.CORS_ORIGINS }}"
             export API_KEY_SECRET="${{ secrets.API_KEY_SECRET }}"
             export REDIS_PASSWORD="${{ secrets.REDIS_PASSWORD }}"
+            # Internal Docker network hosts (not secrets)
+            export DB_HOST="mysql"
+            export REDIS_HOST="redis"
             # Configuration variables (use GitHub vars or defaults)
             export REDIS_TTL="${{ vars.REDIS_TTL || 300 }}"
             export THROTTLE_TTL="${{ vars.THROTTLE_TTL || 60 }}"
