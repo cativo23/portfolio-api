@@ -8,10 +8,13 @@ services:
     ports:
       - '3001:3001'
     volumes:
-      - .:/home/node/app 
+      - .:/home/node/app
     environment:
       - NODE_ENV=development
     user: 'node'
+    depends_on:
+      redis:
+        condition: service_healthy
     networks:
       - portfolio
   
@@ -29,9 +32,25 @@ services:
     networks:
       - portfolio
 
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+    volumes:
+      - 'redis-data:/data'
+    networks:
+      - portfolio
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
 networks:
   portfolio:
     driver: bridge
 volumes:
   mysql-data:
+    driver: local
+  redis-data:
     driver: local
