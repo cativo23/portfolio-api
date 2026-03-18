@@ -35,6 +35,12 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
+      - name: Check formatting
+        run: yarn format:check
+
+      - name: Run linter
+        run: yarn lint
+
       - name: Run tests
         env:
           NODE_ENV: test
@@ -49,22 +55,19 @@ jobs:
           DB_NAME: portfolio_test
         run: yarn test
 
-      - name: Run code formatter
-        run: yarn format
-
-      - name: Set up git for pushing
+      # Auto-format and push only on develop (not on PRs)
+      - name: Apply formatting and push (develop only)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
         run: |
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-
-      - name: Commit formatted code if needed
-        run: |
+          yarn format
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${REPO}"
           if [[ -n $(git status --porcelain) ]]; then
             git add .
             git commit -m "chore: apply code formatting [ci skip]"
             git push
           fi
-
-      - name: Run linter
-        run: yarn lint
