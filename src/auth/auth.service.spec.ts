@@ -8,7 +8,6 @@ import { RegisterDto } from './dto/register.dto';
 import { User } from '@users/entities/user.entity';
 import {
   ConflictException,
-  NotFoundException,
   AuthenticationException,
 } from '@core/exceptions';
 
