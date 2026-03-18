@@ -38,6 +38,13 @@ services:
         reservations:
           cpus: '0.25'
           memory: 128M
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portfolio-api.rule=Host(`api.cativo.dev`)"
+      - "traefik.http.routers.portfolio-api.entrypoints=websecure"
+      - "traefik.http.routers.portfolio-api.tls.certresolver=letsencryptresolver"
+      - "traefik.http.services.portfolio-api.loadbalancer.server.port=3000"
+      - "traefik.docker.network=space-server_web"
 
   mysql:
     image: mariadb:10.11
