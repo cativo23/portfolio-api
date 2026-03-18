@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.2] - 2026-03-18
+
+### Fixed
+- **Redis authentication**: Fixed `requirepass` configuration error in `compose.prod.yml` that caused Redis to fail on startup
+- **Throttler configuration**: Changed from multiple named throttles to single global throttle to prevent all limits applying simultaneously (was causing 429 errors after 5 requests on `/projects` endpoints)
+- **Deploy workflow**: Use GitHub `vars.*` instead of `secrets.*` for non-sensitive configuration (REDIS_TTL, THROTTLE_*)
+
+### Changed
+- **Redis command**: Use array syntax for proper argument parsing in Docker Compose
+- **Deploy script**: Configuration variables now use `${{ vars.* }}` with fallback defaults
+
+---
+
 ## [2.0.1] - 2026-03-18
 
 ### Fixed
