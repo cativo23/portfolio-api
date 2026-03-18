@@ -16,13 +16,12 @@ describe('ApiKeyController (unit)', () => {
 
   it('should create an API key', async () => {
     (service.create as jest.Mock).mockResolvedValue({
-      id: 1,
-      key: 'abc',
-      description: 'desc',
+      apiKey: { id: 1, hashedKey: 'hashed', description: 'desc' },
+      plainKey: 'plain-key-abc',
     });
     const result = await controller.create('desc');
     expect(result.status).toBe('success');
-    expect(result.data.key).toBe('abc');
+    expect(result.data.key).toBe('plain-key-abc');
     expect(result.data.description).toBe('desc');
   });
 

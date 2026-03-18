@@ -59,10 +59,10 @@ export class ApiKeyController {
   ): Promise<
     SuccessResponseDto<{ id: number; key: string; description?: string }>
   > {
-    const apiKey = await this.apiKeyService.create(description);
+    const { apiKey, plainKey } = await this.apiKeyService.create(description);
     return new SuccessResponseDto({
       id: apiKey.id,
-      key: apiKey.key, // Only return key at creation
+      key: plainKey, // Plain key shown only once
       description: apiKey.description,
     });
   }

@@ -36,6 +36,8 @@ jobs:
         run: yarn install --immutable
 
       - name: Run tests
+        env:
+          API_KEY_SECRET: ci-test-api-key-secret
         run: yarn test
 
       - name: Run code formatter
