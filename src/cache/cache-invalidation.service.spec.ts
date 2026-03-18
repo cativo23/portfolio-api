@@ -66,9 +66,7 @@ describe('CacheInvalidationService', () => {
     });
 
     it('should not call del when no keys match', async () => {
-      mockRedisClient.scanIterator.mockReturnValue(
-        (async function* () {})(),
-      );
+      mockRedisClient.scanIterator.mockReturnValue((async function* () {})());
 
       await service.invalidateByPrefix('projects');
 

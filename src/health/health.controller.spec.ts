@@ -86,13 +86,11 @@ describe('HealthController', () => {
       .mockReturnValue(
         Promise.resolve({ storage: { status: 'up' } } as HealthIndicatorResult),
       );
-    jest
-      .spyOn(typeOrmHealthIndicator, 'pingCheck')
-      .mockReturnValue(
-        Promise.resolve({
-          database: { status: 'up' },
-        } as HealthIndicatorResult),
-      );
+    jest.spyOn(typeOrmHealthIndicator, 'pingCheck').mockReturnValue(
+      Promise.resolve({
+        database: { status: 'up' },
+      } as HealthIndicatorResult),
+    );
     jest
       .spyOn(healthCheckService, 'check')
       .mockReturnValue(Promise.resolve(healthCheckResult));

@@ -1,7 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Project } from '@projects/entities/project.entity';
-import { CreateProjectDto, UpdateProjectDto, DeleteResponseDto } from '@projects/dto';
+import {
+  CreateProjectDto,
+  UpdateProjectDto,
+  DeleteResponseDto,
+} from '@projects/dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationUtil } from '@core/utils/pagination.util';
 import { BaseCrudService } from '@core/services/base-crud.service';

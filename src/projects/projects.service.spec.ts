@@ -42,7 +42,9 @@ describe('ProjectsService', () => {
 
     service = module.get<ProjectsService>(ProjectsService);
     repository = module.get<Repository<Project>>(getRepositoryToken(Project));
-    cacheInvalidationService = module.get<CacheInvalidationService>(CacheInvalidationService);
+    cacheInvalidationService = module.get<CacheInvalidationService>(
+      CacheInvalidationService,
+    );
   });
 
   afterEach(() => {
@@ -94,7 +96,9 @@ describe('ProjectsService', () => {
 
       await service.create(createProjectDto);
 
-      expect(cacheInvalidationService.invalidateByPrefix).toHaveBeenCalledWith('projects');
+      expect(cacheInvalidationService.invalidateByPrefix).toHaveBeenCalledWith(
+        'projects',
+      );
     });
 
     it('should let errors bubble up when repository.save throws an error', async () => {
@@ -333,16 +337,24 @@ describe('ProjectsService', () => {
         title: 'Updated Project',
         description: 'Updated Description',
       };
-      const existingProject = { id: 1, title: 'Original', description: 'Original' };
+      const existingProject = {
+        id: 1,
+        title: 'Original',
+        description: 'Original',
+      };
       const updatedProject = { id: 1, ...updateProjectDto };
 
-      jest.spyOn(repository, 'findOne').mockResolvedValueOnce(existingProject as any);
+      jest
+        .spyOn(repository, 'findOne')
+        .mockResolvedValueOnce(existingProject as any);
       jest.spyOn(repository, 'merge').mockReturnValue(updatedProject as any);
       jest.spyOn(repository, 'save').mockResolvedValue(updatedProject as any);
 
       await service.update(1, updateProjectDto);
 
-      expect(cacheInvalidationService.invalidateByPrefix).toHaveBeenCalledWith('projects');
+      expect(cacheInvalidationService.invalidateByPrefix).toHaveBeenCalledWith(
+        'projects',
+      );
     });
 
     it('should throw NotFoundException if project not found during initial check', async () => {
@@ -425,12 +437,18 @@ describe('ProjectsService', () => {
     it('should invalidate cache after removing a project', async () => {
       const existingProject = { id: 1, title: 'Test', description: 'Test' };
 
-      jest.spyOn(repository, 'findOne').mockResolvedValue(existingProject as any);
-      jest.spyOn(repository, 'delete').mockResolvedValue({ affected: 1 } as any);
+      jest
+        .spyOn(repository, 'findOne')
+        .mockResolvedValue(existingProject as any);
+      jest
+        .spyOn(repository, 'delete')
+        .mockResolvedValue({ affected: 1 } as any);
 
       await service.remove(1);
 
-      expect(cacheInvalidationService.invalidateByPrefix).toHaveBeenCalledWith('projects');
+      expect(cacheInvalidationService.invalidateByPrefix).toHaveBeenCalledWith(
+        'projects',
+      );
     });
 
     it('should throw NotFoundException if project not found during initial check', async () => {
