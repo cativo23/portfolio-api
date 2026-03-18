@@ -1,6 +1,11 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 import * as crypto from 'crypto';
 
+/**
+ * Hashes existing API keys with HMAC-SHA256 and renames column `key` → `hashedKey`.
+ * Requires API_KEY_SECRET in the environment. MySQL preserves the unique index on
+ * the column when renaming. Irreversible: down() throws.
+ */
 export class HashApiKeys1774000000000 implements MigrationInterface {
   name = 'HashApiKeys1774000000000';
 
@@ -28,12 +33,13 @@ export class HashApiKeys1774000000000 implements MigrationInterface {
       );
     }
 
-    // Rename column key -> hashedKey
+    // Rename column key -> hashedKey (MySQL preserves unique index on the column)
     await queryRunner.query(
       'ALTER TABLE api_keys CHANGE `key` `hashedKey` varchar(255) NOT NULL',
     );
   }
 
+  /** Irreversible: hashed keys cannot be restored to plain text. */
   public async down(): Promise<void> {
     throw new Error(
       'This migration is irreversible. Hashed API keys cannot be restored to plain text.',

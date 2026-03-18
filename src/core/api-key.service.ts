@@ -30,6 +30,7 @@ export class ApiKeyService {
   async create(
     description?: string,
   ): Promise<{ apiKey: ApiKey; plainKey: string }> {
+    // 32 bytes → 64 hex chars, 256 bits entropy
     const plainKey = crypto.randomBytes(32).toString('hex');
     const hashedKey = this.hashKey(plainKey);
     const apiKey = this.apiKeyRepository.create({ hashedKey, description });
