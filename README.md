@@ -168,6 +168,8 @@ yarn migration:run
 yarn migration:revert
 ```
 
+Si ves errores del tipo **Table already exists** al correr migraciones, revisa [docs/database/migrations.md](./docs/database/migrations.md).
+
 ## Testing
 
 ```bash
