@@ -44,8 +44,12 @@ describe('Helmet Security Headers (e2e)', () => {
   it('should include Content-Security-Policy header', async () => {
     const res = await request(app).get('/test');
     expect(res.headers['content-security-policy']).toBeDefined();
-    expect(res.headers['content-security-policy']).toContain("default-src 'self'");
-    expect(res.headers['content-security-policy']).toContain("style-src 'self' 'unsafe-inline'");
+    expect(res.headers['content-security-policy']).toContain(
+      "default-src 'self'",
+    );
+    expect(res.headers['content-security-policy']).toContain(
+      "style-src 'self' 'unsafe-inline'",
+    );
   });
 
   it('should not include X-Powered-By header', async () => {
