@@ -2,7 +2,7 @@ import AppDataSource from '@config/typeorm.config';
 import { User } from '@users/entities/user.entity';
 import { Project } from '@projects/entities/project.entity';
 import { Contact } from '@contacts/entities/contact.entity';
-import * as bcryptjs from 'bcryptjs';
+import * as bcrypt from 'bcrypt';
 
 async function seed() {
   try {
@@ -18,7 +18,7 @@ async function seed() {
     await userRepo.clear();
 
     // Users
-    const password = await bcryptjs.hash('password123', 10);
+    const password = await bcrypt.hash('password123', 10);
     const users = [
       userRepo.create({
         username: 'testuser',

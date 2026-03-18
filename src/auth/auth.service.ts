@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import * as bcryptjs from 'bcryptjs';
+import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '@users/users.service';
 import { RegisterDto } from '@auth/dto/register.dto';
@@ -37,7 +37,7 @@ export class AuthService {
     if (existingUser) {
       throw new ConflictException('Email already exists');
     }
-    const hashedPassword = await bcryptjs.hash(payload.password, 10);
+    const hashedPassword = await bcrypt.hash(payload.password, 10);
 
     return await this.usersService.create({
       username: payload.username,
@@ -97,7 +97,7 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    const isMatch: boolean = await bcryptjs.compare(password, user.password);
+    const isMatch: boolean = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       throw new AuthenticationException('Invalid credentials');
     }
