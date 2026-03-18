@@ -3,30 +3,21 @@ import { AppModule } from '@src/app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Logger } from '@nestjs/common';
 import { ValidationPipe } from '@core';
+import { loadAppConfig } from '@config/configuration.loaders';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
-  // Set up CORS
-  const allowedOrigins = process.env.CORS_ORIGINS
-    ? process.env.CORS_ORIGINS.split(',')
-    : [
-        'http://localhost:3000',
-        'http://localhost:5173',
-        'http://localhost:5174',
-      ];
+  const appConfig = loadAppConfig();
 
   app.enableCors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps, Postman, curl)
       if (!origin) {
         return callback(null, true);
       }
 
-      // Check if origin is in allowed list
       if (
-        allowedOrigins.includes(origin) ||
-        process.env.NODE_ENV === 'development'
+        appConfig.corsOrigins.includes(origin) ||
+        appConfig.nodeEnv === 'development'
       ) {
         callback(null, true);
       } else {
@@ -97,7 +88,7 @@ Paginated endpoints include \`meta.pagination\` with:
 - \`total_pages\`: Total number of pages`,
     )
     .setVersion('1.0')
-    .addServer('http://localhost:3001', 'Development')
+    .addServer(`http://localhost:${appConfig.port}`, 'Development')
     .addServer('https://api.cativo.dev', 'Production')
     .addBearerAuth(
       {
@@ -137,8 +128,7 @@ Paginated endpoints include \`meta.pagination\` with:
     customSiteTitle: 'Portfolio API Documentation',
   });
 
-  // Set up port
-  const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
+  const port = appConfig.port;
   Logger.log(`Starting server on port ${port}`, 'Bootstrap');
   await app.listen(port);
 }

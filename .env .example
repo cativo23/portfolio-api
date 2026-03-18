@@ -20,3 +20,6 @@ REDIS_HOST=localhost
 REDIS_PORT=6379
 REDIS_PASSWORD=
 REDIS_TTL=300
+
+# API Key Hashing
+API_KEY_SECRET=your-api-key-secret-change-in-production

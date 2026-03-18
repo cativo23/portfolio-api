@@ -6,6 +6,7 @@ import { TransactionService } from './transaction/transaction.service';
 import { ConnectionRetryService } from './connection/connection-retry.service';
 import { TypeOrmLoggerService } from './logger/typeorm-logger.service';
 import { createTypeOrmOptions } from '@config/typeorm-common.config';
+import type { DatabaseConfig } from '@config/configuration.types';
 
 @Global()
 @Module({
@@ -19,9 +20,9 @@ import { createTypeOrmOptions } from '@config/typeorm-common.config';
         configService: ConfigService,
         loggerService: TypeOrmLoggerService,
       ): Promise<TypeOrmModuleOptions> => {
-        // Use common TypeORM configuration
+        const db = configService.getOrThrow<DatabaseConfig>('database');
         const config: TypeOrmModuleOptions = {
-          ...createTypeOrmOptions(configService, loggerService),
+          ...createTypeOrmOptions(db, loggerService),
           // Add application-specific options
           autoLoadEntities: true,
         };

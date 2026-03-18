@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
+import type { DatabaseConfig } from '@config/configuration.types';
 
 /**
  * Service for handling database connection retries
@@ -15,8 +16,9 @@ export class ConnectionRetryService {
     private readonly dataSource: DataSource,
     private readonly configService: ConfigService,
   ) {
-    this.maxRetries = this.configService.get<number>('DB_MAX_RETRIES') || 5;
-    this.retryDelay = this.configService.get<number>('DB_RETRY_DELAY') || 5000;
+    const db = this.configService.getOrThrow<DatabaseConfig>('database');
+    this.maxRetries = db.maxRetries;
+    this.retryDelay = db.retryDelay;
   }
 
   /**
