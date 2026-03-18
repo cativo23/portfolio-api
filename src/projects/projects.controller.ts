@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UsePipes,
+  UseInterceptors,
   Query,
   UseGuards,
   HttpStatus,
@@ -31,6 +32,7 @@ import { ProjectsService } from './projects.service';
 import { AuthGuard } from '@auth/auth.guard';
 import { ErrorResponseDto } from '@core/dto';
 import { ValidationPipe } from '@core/pipes';
+import { ProjectsCacheInterceptor } from './interceptors/projects-cache.interceptor';
 
 @ApiTags('Projects')
 @Controller('projects')
@@ -40,6 +42,7 @@ export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
   @Get()
+  @UseInterceptors(ProjectsCacheInterceptor)
   @ApiOperation({ summary: 'Get all projects' })
   @ApiQuery({
     name: 'page',
@@ -90,6 +93,7 @@ export class ProjectsController {
   }
 
   @Get(':id')
+  @UseInterceptors(ProjectsCacheInterceptor)
   @ApiOperation({ summary: 'Get a project by ID' })
   @ApiParam({ name: 'id', type: String, description: 'Project ID' })
   @ApiResponse({
