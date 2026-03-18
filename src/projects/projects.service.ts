@@ -1,10 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Project } from '@projects/entities/project.entity';
-import { CreateProjectDto, UpdateProjectDto } from '@projects/dto';
+import { CreateProjectDto, UpdateProjectDto, DeleteResponseDto } from '@projects/dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationUtil } from '@core/utils/pagination.util';
 import { BaseCrudService } from '@core/services/base-crud.service';
+import { CacheInvalidationService } from '@src/cache/cache-invalidation.service';
 
 /**
  * Interface defining options for finding projects with pagination, search, and filtering
@@ -37,6 +38,7 @@ export class ProjectsService extends BaseCrudService<
   constructor(
     @InjectRepository(Project)
     protected readonly projectsRepository: Repository<Project>,
+    private readonly cacheInvalidationService: CacheInvalidationService,
   ) {
     super();
   }
@@ -79,5 +81,36 @@ export class ProjectsService extends BaseCrudService<
     return result;
   }
 
-  // create, findOne, update, and remove methods are inherited from BaseCrudService
+  /**
+   * Creates a new project and invalidates cache
+   */
+  async create(createProjectDto: CreateProjectDto): Promise<Project> {
+    const result = await super.create(createProjectDto);
+    // Safe: invalidateByPrefix never throws (has internal try/catch)
+    await this.cacheInvalidationService.invalidateByPrefix('projects');
+    return result;
+  }
+
+  /**
+   * Updates a project and invalidates cache
+   */
+  async update(
+    id: number,
+    updateProjectDto: UpdateProjectDto,
+  ): Promise<Project> {
+    const result = await super.update(id, updateProjectDto);
+    // Safe: invalidateByPrefix never throws (has internal try/catch)
+    await this.cacheInvalidationService.invalidateByPrefix('projects');
+    return result;
+  }
+
+  /**
+   * Removes a project and invalidates cache
+   */
+  async remove(id: number): Promise<DeleteResponseDto> {
+    const result = await super.remove(id);
+    // Safe: invalidateByPrefix never throws (has internal try/catch)
+    await this.cacheInvalidationService.invalidateByPrefix('projects');
+    return result;
+  }
 }

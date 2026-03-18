@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  UseInterceptors,
   Query,
   UseGuards,
   ParseIntPipe,
@@ -37,6 +38,7 @@ import {
   ApiUpdateResource,
   ApiDeleteResource,
 } from '@core/decorators';
+import { ProjectsCacheInterceptor } from './interceptors/projects-cache.interceptor';
 
 @ApiTags('Projects')
 @Controller('projects')
@@ -44,6 +46,7 @@ export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
   @Get()
+  @UseInterceptors(ProjectsCacheInterceptor)
   @UseGuards(JwtOrApiKeyGuard)
   @ApiBearerAuth()
   @ApiSecurity('x-api-key')
@@ -77,6 +80,7 @@ export class ProjectsController {
   }
 
   @Get(':id')
+  @UseInterceptors(ProjectsCacheInterceptor)
   @UseGuards(JwtOrApiKeyGuard)
   @ApiBearerAuth()
   @ApiSecurity('x-api-key')

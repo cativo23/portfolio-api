@@ -5,9 +5,10 @@ import { Entity, Column, Index } from 'typeorm';
 @Index(['createdAt'])
 export class Project extends BaseEntity {
   @Column()
+  @Index()
   title: string;
 
-  @Column()
+  @Column({ type: 'text' })
   description: string;
 
   @Column()
