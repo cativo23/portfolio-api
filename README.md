@@ -98,6 +98,7 @@ The following environment variables are required for the application to run:
 - `DB_NAME` - Database name
 - `JWT_SECRET` - Secret key for JWT token generation
 - `JWT_EXPIRES_IN` - Token expiration time in seconds
+- `API_KEY_SECRET` - Secret used to hash API keys with HMAC-SHA256 before storage (required; app fails to start if missing). **Rotating this value invalidates all existing API keys**—clients must create new keys after a secret change.
 - `CORS_ORIGINS` - (Optional) Comma-separated list of allowed CORS origins. Defaults to `http://localhost:3000,http://localhost:5173,http://localhost:5174` in development
 - `PORT` - (Optional) Server port. Defaults to 3000
 - `NODE_ENV` - (Optional) Environment (development/production). In development, CORS is more permissive
@@ -129,6 +130,7 @@ The following environment variables are required for the application to run:
    DB_NAME=portfolio
    JWT_SECRET=your-secret-key
    JWT_EXPIRES_IN=3600
+   API_KEY_SECRET=your-api-key-hmac-secret
    ```
 
 4. **Run database migrations**:
@@ -165,6 +167,8 @@ yarn migration:run
 # Revert the last migration
 yarn migration:revert
 ```
+
+Si ves errores del tipo **Table already exists** al correr migraciones, revisa [docs/database/migrations.md](./docs/database/migrations.md).
 
 ## Testing
 

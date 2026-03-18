@@ -2,6 +2,8 @@ import type { Config } from 'jest';
 import { compilerOptions } from '../tsconfig.json';
 import { pathsToModuleNameMapper } from 'ts-jest';
 
+process.env.NODE_ENV = 'test';
+
 const config: Config = {
   rootDir: '..',
   testEnvironment: 'node',

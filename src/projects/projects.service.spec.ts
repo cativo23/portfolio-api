@@ -7,11 +7,13 @@ import { CreateProjectDto } from '@projects/dto';
 import { UpdateProjectDto } from '@projects/dto';
 import { NotFoundException, Logger } from '@nestjs/common';
 import { SuccessResponseDto } from '@core/dto';
+import { CacheInvalidationService } from '@src/cache/cache-invalidation.service';
 
 describe('ProjectsService', () => {
   let service: ProjectsService;
   let repository: Repository<Project>;
   // Logger spy variables
+  let cacheInvalidationService: CacheInvalidationService;
   let logSpy: jest.SpyInstance;
   let warnSpy: jest.SpyInstance;
 
@@ -29,11 +31,24 @@ describe('ProjectsService', () => {
           provide: getRepositoryToken(Project),
           useClass: Repository,
         },
+        {
+          provide: CacheInvalidationService,
+          useValue: {
+            invalidateByPrefix: jest.fn().mockResolvedValue(undefined),
+          },
+        },
       ],
     }).compile();
 
     service = module.get<ProjectsService>(ProjectsService);
     repository = module.get<Repository<Project>>(getRepositoryToken(Project));
+    cacheInvalidationService = module.get<CacheInvalidationService>(
+      CacheInvalidationService,
+    );
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   it('should be defined', () => {
@@ -64,6 +79,25 @@ describe('ProjectsService', () => {
       );
       expect(logSpy).toHaveBeenCalledWith(
         `Project created with ID ${project.id}`,
+      );
+    });
+
+    it('should invalidate cache after creating a project', async () => {
+      const createProjectDto: CreateProjectDto = {
+        title: 'Test Project',
+        description: 'Test Description',
+        shortDescription: 'Short Description',
+        repoUrl: 'url',
+      };
+      const project = { id: 1, ...createProjectDto };
+
+      jest.spyOn(repository, 'create').mockReturnValue(project as any);
+      jest.spyOn(repository, 'save').mockResolvedValue(project as any);
+
+      await service.create(createProjectDto);
+
+      expect(cacheInvalidationService.invalidateByPrefix).toHaveBeenCalledWith(
+        'projects',
       );
     });
 
@@ -298,6 +332,31 @@ describe('ProjectsService', () => {
       expect(logSpy).toHaveBeenCalledWith(`Updated project with ID 1`);
     });
 
+    it('should invalidate cache after updating a project', async () => {
+      const updateProjectDto: UpdateProjectDto = {
+        title: 'Updated Project',
+        description: 'Updated Description',
+      };
+      const existingProject = {
+        id: 1,
+        title: 'Original',
+        description: 'Original',
+      };
+      const updatedProject = { id: 1, ...updateProjectDto };
+
+      jest
+        .spyOn(repository, 'findOne')
+        .mockResolvedValueOnce(existingProject as any);
+      jest.spyOn(repository, 'merge').mockReturnValue(updatedProject as any);
+      jest.spyOn(repository, 'save').mockResolvedValue(updatedProject as any);
+
+      await service.update(1, updateProjectDto);
+
+      expect(cacheInvalidationService.invalidateByPrefix).toHaveBeenCalledWith(
+        'projects',
+      );
+    });
+
     it('should throw NotFoundException if project not found during initial check', async () => {
       const updateProjectDto: UpdateProjectDto = {
         title: 'Updated Title',
@@ -373,6 +432,23 @@ describe('ProjectsService', () => {
       expect(result).toBeInstanceOf(SuccessResponseDto);
       expect(result.data.message).toBe('Project successfully deleted');
       expect(logSpy).toHaveBeenCalledWith(`Deleted project with ID 1`);
+    });
+
+    it('should invalidate cache after removing a project', async () => {
+      const existingProject = { id: 1, title: 'Test', description: 'Test' };
+
+      jest
+        .spyOn(repository, 'findOne')
+        .mockResolvedValue(existingProject as any);
+      jest
+        .spyOn(repository, 'delete')
+        .mockResolvedValue({ affected: 1 } as any);
+
+      await service.remove(1);
+
+      expect(cacheInvalidationService.invalidateByPrefix).toHaveBeenCalledWith(
+        'projects',
+      );
     });
 
     it('should throw NotFoundException if project not found during initial check', async () => {

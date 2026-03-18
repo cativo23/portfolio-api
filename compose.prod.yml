@@ -1,7 +1,12 @@
 services:
   api:
     image: ${DOCKER_USERNAME:-cativo23}/portfolio-api:latest
+    build:
+      context: .
+      dockerfile: docker/prod/Dockerfile
     restart: unless-stopped
+    ports:
+      - '${PORT:-3000}:3000'
     environment:
       - NODE_ENV=production
       - PORT=3000
@@ -13,19 +18,38 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - JWT_EXPIRES_IN=${JWT_EXPIRES_IN}
       - CORS_ORIGINS=${CORS_ORIGINS}
+      - API_KEY_SECRET=${API_KEY_SECRET}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+      - REDIS_TTL=${REDIS_TTL:-300}
+      # Rate limiting
+      - THROTTLE_TTL=${THROTTLE_TTL:-60}
+      - THROTTLE_LIMIT=${THROTTLE_LIMIT:-10}
+      - THROTTLE_PUBLIC_LIMIT=${THROTTLE_PUBLIC_LIMIT:-20}
+      - THROTTLE_STRICT_LIMIT=${THROTTLE_STRICT_LIMIT:-5}
     depends_on:
       mysql:
         condition: service_healthy
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.portfolio-api.rule=Host(`api.cativo.dev`)"
-      - "traefik.http.routers.portfolio-api.entrypoints=websecure"
-      - "traefik.http.routers.portfolio-api.tls.certresolver=letsencryptresolver"
-      - "traefik.http.services.portfolio-api.loadbalancer.server.port=3000"
-      - "traefik.docker.network=space-server_web"
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
     networks:
-      - space-server_web
       - portfolio-internal
+    # Resource limits for production
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
 
   mysql:
     image: mariadb:10.11
@@ -45,16 +69,51 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
-    # Don't expose MySQL port publicly in production
+    # No exponer MySQL públicamente en producción
     # ports:
     #   - '3306:3306'
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PASSWORD:-}
+    volumes:
+      - redis-data:/data
+    networks:
+      - portfolio-internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    # No exponer Redis públicamente en producción
+    # ports:
+    #   - '6379:6379'
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 128M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
 
 networks:
-  space-server_web:
-    external: true
   portfolio-internal:
     driver: bridge
+    internal: true
 
 volumes:
   mysql-data:
+    driver: local
+  redis-data:
     driver: local

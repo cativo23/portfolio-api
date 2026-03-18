@@ -36,6 +36,17 @@ jobs:
         run: yarn install --immutable
 
       - name: Run tests
+        env:
+          NODE_ENV: test
+          API_KEY_SECRET: ci-test-api-key-secret
+          JWT_SECRET: test-jwt-secret
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+          DB_HOST: localhost
+          DB_PORT: 3306
+          DB_USERNAME: root
+          DB_PASSWORD: root
+          DB_NAME: portfolio_test
         run: yarn test
 
       - name: Run code formatter
