@@ -53,7 +53,7 @@ async function bootstrap() {
 
   // Global API prefix for versioning
   app.setGlobalPrefix('api/v1', {
-    exclude: ['health', 'docs'],
+    exclude: ['health', 'docs', '/'],
   });
 
   // Set up global pipes
