@@ -5,7 +5,7 @@ import { Entity, Column, Index } from 'typeorm';
 export class ApiKey extends BaseEntity {
   @Index({ unique: true })
   @Column({ length: 255, nullable: false })
-  key: string;
+  hashedKey: string;
 
   @Column({ default: true })
   isActive: boolean;
