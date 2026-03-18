@@ -16,6 +16,7 @@ import { InternalServerException } from '@core/exceptions/internal-server.except
 import { NotFoundException } from '@core/exceptions/not-found.exception';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 describe('ProjectsController', () => {
   let controller: ProjectsController;
@@ -75,6 +76,15 @@ describe('ProjectsController', () => {
           provide: ConfigService,
           useValue: {
             get: jest.fn((key: string) => ({ JWT_SECRET: 'test-secret' })[key]),
+          },
+        },
+        {
+          provide: CACHE_MANAGER,
+          useValue: {
+            get: jest.fn(),
+            set: jest.fn(),
+            del: jest.fn(),
+            stores: [],
           },
         },
       ],
