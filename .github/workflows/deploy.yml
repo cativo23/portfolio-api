@@ -91,12 +91,12 @@ jobs:
             export CORS_ORIGINS="${{ secrets.CORS_ORIGINS }}"
             export API_KEY_SECRET="${{ secrets.API_KEY_SECRET }}"
             export REDIS_PASSWORD="${{ secrets.REDIS_PASSWORD }}"
-            # Configuration variables (not secrets) - use env vars or defaults
-            export REDIS_TTL="${REDIS_TTL:-300}"
-            export THROTTLE_TTL="${THROTTLE_TTL:-60}"
-            export THROTTLE_LIMIT="${THROTTLE_LIMIT:-10}"
-            export THROTTLE_PUBLIC_LIMIT="${THROTTLE_PUBLIC_LIMIT:-20}"
-            export THROTTLE_STRICT_LIMIT="${THROTTLE_STRICT_LIMIT:-5}"
+            # Configuration variables (use GitHub vars or defaults)
+            export REDIS_TTL="${{ vars.REDIS_TTL || 300 }}"
+            export THROTTLE_TTL="${{ vars.THROTTLE_TTL || 60 }}"
+            export THROTTLE_LIMIT="${{ vars.THROTTLE_LIMIT || 10 }}"
+            export THROTTLE_PUBLIC_LIMIT="${{ vars.THROTTLE_PUBLIC_LIMIT || 20 }}"
+            export THROTTLE_STRICT_LIMIT="${{ vars.THROTTLE_STRICT_LIMIT || 5 }}"
             
             cd /home/cativo23/deploy/portfolio-api-deploy
             
