@@ -256,7 +256,7 @@ import { SomeService } from '@users/some.service';
 For detailed API documentation, you can access the Swagger UI when the application is running:
 
 ```
-http://localhost:3000/docs
+http://localhost:3001/docs
 ```
 
 This provides an interactive interface to explore and test all API endpoints.
@@ -270,13 +270,13 @@ This provides an interactive interface to explore and test all API endpoints.
 
 ## Authentication Flow
 
-1. **Registration**: Create a new user account using the `/auth/register` endpoint
-2. **Login**: Authenticate with email and password using the `/auth/login` endpoint
+1. **Registration**: Create a new user account using the `/api/v1/auth/register` endpoint
+2. **Login**: Authenticate with email and password using the `/api/v1/auth/login` endpoint
 3. **Using the token**: Include the JWT token in the Authorization header for protected endpoints:
    ```
    Authorization: Bearer <your-token>
    ```
-4. **Profile**: Access your user profile using the `/auth/profile` endpoint
+4. **Profile**: Access your user profile using the `/api/v1/auth/profile` endpoint
 
 ## Contributing
 
