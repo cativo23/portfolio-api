@@ -1,9 +1,5 @@
 import { LogLevel } from 'typeorm';
-import {
-  parseEnvBoolean,
-  parseEnvInt,
-  trimEnvQuotes,
-} from '@config/env.utils';
+import { parseEnvBoolean, parseEnvInt, trimEnvQuotes } from '@config/env.utils';
 import type {
   AppConfig,
   DatabaseConfig,
