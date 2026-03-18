@@ -1,16 +1,14 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
-import { ConfigService } from '@nestjs/config';
-import { createTypeOrmOptions } from './typeorm-common.config';
 import { config } from 'dotenv';
+import { createTypeOrmOptions } from './typeorm-common.config';
+import { loadDatabaseConfig } from './configuration.loaders';
 
-// Load environment variables from .env file
 config();
 
-const configService = new ConfigService();
+const db = loadDatabaseConfig();
 
-// Use common TypeORM configuration with migration-specific options
 const AppDataSource = new DataSource({
-  ...(createTypeOrmOptions(configService) as DataSourceOptions),
+  ...(createTypeOrmOptions(db) as DataSourceOptions),
   migrations: ['src/database/migrations/*.ts'],
   migrationsRun: false,
 });

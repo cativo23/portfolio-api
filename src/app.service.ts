@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import type { AppConfig } from '@config/configuration.types';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { ApiInfoResponseDto } from '@src/app/dto/api-info-response.dto';
@@ -28,9 +29,9 @@ export class AppService {
   }
 
   getApiInfo(): ApiInfoResponseDto {
-    const environment =
-      this.configService.get<string>('NODE_ENV') || 'development';
-    const port = this.configService.get<string>('PORT') || '3001';
+    const app = this.configService.getOrThrow<AppConfig>('app');
+    const environment = app.nodeEnv;
+    const port = String(app.port);
 
     // Determine base URL based on environment
     const baseUrl =

@@ -3,6 +3,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { redisStore } from 'cache-manager-redis-yet';
 import { CacheInvalidationService } from './cache-invalidation.service';
+import type { RedisConfig } from '@config/configuration.types';
 
 @Global()
 @Module({
@@ -12,16 +13,17 @@ import { CacheInvalidationService } from './cache-invalidation.service';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => {
+        const redis = configService.getOrThrow<RedisConfig>('redis');
         const store = await redisStore({
           socket: {
-            host: configService.get<string>('REDIS_HOST') || 'localhost',
-            port: configService.get<number>('REDIS_PORT') || 6379,
+            host: redis.host,
+            port: redis.port,
           },
-          password: configService.get<string>('REDIS_PASSWORD') || undefined,
+          password: redis.password,
         });
         return {
           store,
-          ttl: (configService.get<number>('REDIS_TTL') || 300) * 1000,
+          ttl: redis.ttlSeconds * 1000,
         };
       },
     }),
