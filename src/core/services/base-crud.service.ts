@@ -110,14 +110,13 @@ export abstract class BaseCrudService<
   }
 
   /**
-   * Deletes an entity by its ID
+   * Soft-deletes an entity by its ID (sets deletedAt timestamp)
    *
    * @param id - The ID of the entity to delete
    * @returns Promise resolving to a standardized response with a success message
    * @throws NotFoundException if the entity doesn't exist
    */
   async remove(id: number): Promise<DeleteResponseDto> {
-    // Check if the entity exists
     const existingEntity = await this.repository.findOne({
       where: { id } as FindOptionsWhere<TEntity>,
     });
@@ -129,24 +128,40 @@ export abstract class BaseCrudService<
       );
     }
 
-    // Delete entity
-    const result = await this.repository.delete(id);
+    await this.repository.softRemove(existingEntity);
+
+    this.logger.log(
+      `Soft-deleted ${this.getEntityName().toLowerCase()} with ID ${id}`,
+    );
+    return DeleteResponseDto.withMessage(
+      `${this.getEntityName()} successfully deleted`,
+    );
+  }
+
+  /**
+   * Restores a soft-deleted entity by its ID
+   *
+   * @param id - The ID of the entity to restore
+   * @returns Promise resolving to the restored entity
+   * @throws NotFoundException if the entity doesn't exist
+   */
+  async restore(id: number): Promise<TEntity> {
+    const result = await this.repository.restore(id);
 
     if (result.affected === 0) {
-      // This should rarely happen if findOne succeeded, but handle it just in case
-      this.logger.warn(
-        `Failed to delete ${this.getEntityName().toLowerCase()} with ID ${id} - no rows affected`,
-      );
+      this.logger.warn(`${this.getEntityName()} with ID ${id} not found`);
       throw new NotFoundException(
         `${this.getEntityName()} with ID ${id} not found`,
       );
     }
 
+    const entity = await this.repository.findOne({
+      where: { id } as FindOptionsWhere<TEntity>,
+    });
+
     this.logger.log(
-      `Deleted ${this.getEntityName().toLowerCase()} with ID ${id}`,
+      `Restored ${this.getEntityName().toLowerCase()} with ID ${id}`,
     );
-    return DeleteResponseDto.withMessage(
-      `${this.getEntityName()} successfully deleted`,
-    );
+    return entity;
   }
 }

@@ -424,14 +424,14 @@ describe('ProjectsService', () => {
         .spyOn(repository, 'findOne')
         .mockResolvedValue(existingProject as any);
       jest
-        .spyOn(repository, 'delete')
-        .mockResolvedValue({ affected: 1 } as any);
+        .spyOn(repository, 'softRemove')
+        .mockResolvedValue(existingProject as any);
 
       const result = await service.remove(1);
 
       expect(result).toBeInstanceOf(SuccessResponseDto);
       expect(result.data.message).toBe('Project successfully deleted');
-      expect(logSpy).toHaveBeenCalledWith(`Deleted project with ID 1`);
+      expect(logSpy).toHaveBeenCalledWith(`Soft-deleted project with ID 1`);
     });
 
     it('should invalidate cache after removing a project', async () => {
@@ -441,8 +441,8 @@ describe('ProjectsService', () => {
         .spyOn(repository, 'findOne')
         .mockResolvedValue(existingProject as any);
       jest
-        .spyOn(repository, 'delete')
-        .mockResolvedValue({ affected: 1 } as any);
+        .spyOn(repository, 'softRemove')
+        .mockResolvedValue(existingProject as any);
 
       await service.remove(1);
 
@@ -453,39 +453,16 @@ describe('ProjectsService', () => {
 
     it('should throw NotFoundException if project not found during initial check', async () => {
       jest.spyOn(repository, 'findOne').mockResolvedValue(undefined);
-      const deleteSpy = jest.spyOn(repository, 'delete');
+      const softRemoveSpy = jest.spyOn(repository, 'softRemove');
 
       await expect(service.remove(1)).rejects.toThrow(
         `Project with ID 1 not found`,
       );
       expect(warnSpy).toHaveBeenCalledWith(`Project with ID 1 not found`);
-      expect(deleteSpy).not.toHaveBeenCalled();
+      expect(softRemoveSpy).not.toHaveBeenCalled();
     });
 
-    it('should throw NotFoundException if delete operation fails (no rows affected)', async () => {
-      const existingProject = {
-        id: 1,
-        title: 'Test Project',
-        description: 'Test Description',
-      };
-
-      jest
-        .spyOn(repository, 'findOne')
-        .mockResolvedValue(existingProject as any);
-      jest
-        .spyOn(repository, 'delete')
-        .mockResolvedValue({ affected: 0 } as any);
-
-      // If no rows affected, treat as not found
-      await expect(service.remove(1)).rejects.toThrow(
-        'Project with ID 1 not found',
-      );
-      expect(warnSpy).toHaveBeenCalledWith(
-        `Failed to delete project with ID 1 - no rows affected`,
-      );
-    });
-
-    it('should let errors bubble up when repository.delete throws an error', async () => {
+    it('should let errors bubble up when repository.softRemove throws an error', async () => {
       const existingProject = {
         id: 1,
         title: 'Test Project',
@@ -497,7 +474,7 @@ describe('ProjectsService', () => {
       jest
         .spyOn(repository, 'findOne')
         .mockResolvedValue(existingProject as any);
-      jest.spyOn(repository, 'delete').mockRejectedValue(error);
+      jest.spyOn(repository, 'softRemove').mockRejectedValue(error);
 
       // Errors should bubble up naturally - let global exception filter handle them
       await expect(service.remove(1)).rejects.toThrow(error);
