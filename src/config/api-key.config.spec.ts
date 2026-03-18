@@ -27,9 +27,7 @@ describe('apiKeyConfig', () => {
   it('exposes secret when API_KEY_SECRET is set', async () => {
     process.env.API_KEY_SECRET = 'unit-test-api-key-secret-value';
     const moduleRef = await Test.createTestingModule({
-      imports: [
-        ConfigModule.forRoot({ isGlobal: true, load: [apiKeyConfig] }),
-      ],
+      imports: [ConfigModule.forRoot({ isGlobal: true, load: [apiKeyConfig] })],
     }).compile();
     const config = moduleRef.get(ConfigService);
     expect(config.get('apiKey')).toEqual({

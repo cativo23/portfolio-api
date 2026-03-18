@@ -104,12 +104,9 @@ describe('ApiKeyService', () => {
 
   describe('revokeById', () => {
     it('should deactivate an API key by id', async () => {
-      const updateSpy = jest
-        .spyOn(repo, 'update')
-        .mockResolvedValue({} as any);
+      const updateSpy = jest.spyOn(repo, 'update').mockResolvedValue({} as any);
       await service.revokeById(1);
       expect(updateSpy).toHaveBeenCalledWith({ id: 1 }, { isActive: false });
     });
   });
-
 });

@@ -27,10 +27,10 @@ export class HashApiKeys1774000000000 implements MigrationInterface {
         .createHmac('sha256', secret)
         .update(row.key)
         .digest('hex');
-      await queryRunner.query(
-        'UPDATE api_keys SET `key` = ? WHERE id = ?',
-        [hashedKey, row.id],
-      );
+      await queryRunner.query('UPDATE api_keys SET `key` = ? WHERE id = ?', [
+        hashedKey,
+        row.id,
+      ]);
     }
 
     // Rename column key -> hashedKey (MySQL preserves unique index on the column)
