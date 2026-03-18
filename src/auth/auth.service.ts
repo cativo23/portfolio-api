@@ -5,10 +5,7 @@ import { UsersService } from '@users/users.service';
 import { RegisterDto } from '@auth/dto/register.dto';
 import { ConfigService } from '@nestjs/config';
 import { User } from '@users/entities/user.entity';
-import {
-  ConflictException,
-  AuthenticationException,
-} from '@core/exceptions';
+import { ConflictException, AuthenticationException } from '@core/exceptions';
 
 /**
  * Service responsible for authentication-related operations

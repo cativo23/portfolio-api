@@ -6,10 +6,7 @@ import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { RegisterDto } from './dto/register.dto';
 import { User } from '@users/entities/user.entity';
-import {
-  ConflictException,
-  AuthenticationException,
-} from '@core/exceptions';
+import { ConflictException, AuthenticationException } from '@core/exceptions';
 
 describe('AuthService', () => {
   let service: AuthService;
