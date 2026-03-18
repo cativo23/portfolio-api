@@ -23,7 +23,11 @@ export class TypeOrmLoggerService implements TypeOrmLogger {
   /**
    * Log query and parameters
    */
-  logQuery(query: string, parameters?: any[], _queryRunner?: QueryRunner): void {
+  logQuery(
+    query: string,
+    parameters?: any[],
+    _queryRunner?: QueryRunner,
+  ): void {
     if (this.shouldLog('query')) {
       const sql = this.buildSqlString(query, parameters);
       this.logger.log(`Query: ${sql}`);
