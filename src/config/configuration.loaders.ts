@@ -37,6 +37,9 @@ function parseDbLogLevels(raw: string | undefined): LogLevel[] {
 }
 
 export function loadDatabaseConfig(): DatabaseConfig {
+  console.log('[DB Config Loader] process.env.DB_HOST:', process.env.DB_HOST);
+  console.log('[DB Config Loader] process.env.DB_USERNAME:', process.env.DB_USERNAME);
+  console.log('[DB Config Loader] process.env.DB_NAME:', process.env.DB_NAME);
   return {
     host: trimEnvQuotes(process.env.DB_HOST) || 'localhost',
     port: parseEnvInt(process.env.DB_PORT, 3306),
@@ -64,6 +67,7 @@ export function loadDatabaseConfig(): DatabaseConfig {
 }
 
 export function loadRedisConfig(): RedisConfig {
+  console.log('[Redis Config Loader] process.env.REDIS_HOST:', process.env.REDIS_HOST);
   const password = trimEnvQuotes(process.env.REDIS_PASSWORD);
   return {
     host: trimEnvQuotes(process.env.REDIS_HOST) || 'localhost',
@@ -74,8 +78,10 @@ export function loadRedisConfig(): RedisConfig {
 }
 
 export function loadJwtConfig(): JwtConfig {
+  console.log('[JWT Config Loader] process.env.JWT_SECRET:', process.env.JWT_SECRET);
   const nodeEnv = trimEnvQuotes(process.env.NODE_ENV) || 'development';
   let secret = trimEnvQuotes(process.env.JWT_SECRET) ?? '';
+  console.log('[JWT Config Loader] loaded secret:', secret ? '***' + secret.slice(-4) : '(empty)');
   if (!secret.length && nodeEnv === 'test') {
     secret = 'test-jwt-secret';
   }
