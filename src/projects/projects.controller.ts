@@ -11,7 +11,6 @@ import {
   UseGuards,
   ParseIntPipe,
 } from '@nestjs/common';
-import { Throttle, seconds } from '@nestjs/throttler';
 import {
   ApiOperation,
   ApiParam,
@@ -47,7 +46,6 @@ export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
   @Get()
-  @Throttle({ default: { limit: 100, ttl: seconds(60) } })
   @UseInterceptors(ProjectsCacheInterceptor)
   @UseGuards(JwtOrApiKeyGuard)
   @ApiBearerAuth()
@@ -82,7 +80,6 @@ export class ProjectsController {
   }
 
   @Get(':id')
-  @Throttle({ default: { limit: 100, ttl: seconds(60) } })
   @UseInterceptors(ProjectsCacheInterceptor)
   @UseGuards(JwtOrApiKeyGuard)
   @ApiBearerAuth()
@@ -103,7 +100,6 @@ export class ProjectsController {
   }
 
   @Post()
-  @Throttle({ default: { limit: 100, ttl: seconds(60) } })
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new project' })
@@ -122,7 +118,6 @@ export class ProjectsController {
   }
 
   @Patch(':id')
-  @Throttle({ default: { limit: 100, ttl: seconds(60) } })
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a project by ID' })
@@ -142,7 +137,6 @@ export class ProjectsController {
   }
 
   @Delete(':id')
-  @Throttle({ default: { limit: 100, ttl: seconds(60) } })
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a project by ID' })
