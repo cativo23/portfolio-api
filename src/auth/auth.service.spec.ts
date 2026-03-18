@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { UsersService } from '@users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import * as bcryptjs from 'bcryptjs';
+import * as bcrypt from 'bcrypt';
 import { RegisterDto } from './dto/register.dto';
 import { User } from '@users/entities/user.entity';
 import {
@@ -22,7 +22,7 @@ describe('AuthService', () => {
   let hashedPassword: string;
 
   beforeAll(async () => {
-    hashedPassword = await bcryptjs.hash(password, 10);
+    hashedPassword = await bcrypt.hash(password, 10);
   });
 
   beforeEach(async () => {
