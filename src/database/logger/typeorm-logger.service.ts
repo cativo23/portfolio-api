@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { QueryRunner, Logger as TypeOrmLogger } from 'typeorm';
+import { Logger as TypeOrmLogger } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 
 /**
@@ -23,11 +23,7 @@ export class TypeOrmLoggerService implements TypeOrmLogger {
   /**
    * Log query and parameters
    */
-  logQuery(
-    query: string,
-    parameters?: any[],
-    _queryRunner?: QueryRunner,
-  ): void {
+  logQuery(query: string, parameters?: any[]): void {
     if (this.shouldLog('query')) {
       const sql = this.buildSqlString(query, parameters);
       this.logger.log(`Query: ${sql}`);
@@ -41,7 +37,6 @@ export class TypeOrmLoggerService implements TypeOrmLogger {
     error: string | Error,
     query: string,
     parameters?: any[],
-    _queryRunner?: QueryRunner,
   ): void {
     if (this.shouldLog('error')) {
       const sql = this.buildSqlString(query, parameters);
@@ -62,7 +57,6 @@ export class TypeOrmLoggerService implements TypeOrmLogger {
     time: number,
     query: string,
     parameters?: any[],
-    _queryRunner?: QueryRunner,
   ): void {
     if (this.shouldLog('warn')) {
       const sql = this.buildSqlString(query, parameters);
@@ -73,7 +67,7 @@ export class TypeOrmLoggerService implements TypeOrmLogger {
   /**
    * Log schema build messages
    */
-  logSchemaBuild(message: string, _queryRunner?: QueryRunner): void {
+  logSchemaBuild(message: string): void {
     if (this.shouldLog('schema')) {
       this.logger.log(`Schema: ${message}`);
     }
@@ -82,7 +76,7 @@ export class TypeOrmLoggerService implements TypeOrmLogger {
   /**
    * Log migration messages
    */
-  logMigration(message: string, _queryRunner?: QueryRunner): void {
+  logMigration(message: string): void {
     if (this.shouldLog('migration')) {
       this.logger.log(`Migration: ${message}`);
     }
@@ -94,7 +88,6 @@ export class TypeOrmLoggerService implements TypeOrmLogger {
   log(
     level: 'log' | 'info' | 'warn' | 'error',
     message: any,
-    _queryRunner?: QueryRunner,
   ): void {
     switch (level) {
       case 'log':
@@ -151,7 +144,7 @@ export class TypeOrmLoggerService implements TypeOrmLogger {
           });
         }
       }
-    } catch (error) {
+    } catch {
       // If parameter replacement fails, return original query with parameters
       return `${query} -- Parameters: ${JSON.stringify(parameters)}`;
     }

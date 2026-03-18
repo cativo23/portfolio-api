@@ -73,7 +73,7 @@ async function runSeeders(): Promise<void> {
   try {
     await seedRunner.run();
     process.exit(0);
-  } catch (error) {
+  } catch {
     process.exit(1);
   }
 }
