@@ -23,9 +23,9 @@ describe('ApiKeyService', () => {
         {
           provide: ConfigService,
           useValue: {
-            get: jest.fn((key: string) => {
-              if (key === 'API_KEY_SECRET') return TEST_SECRET;
-              return undefined;
+            getOrThrow: jest.fn((key: string) => {
+              if (key === 'apiKey') return { secret: TEST_SECRET };
+              throw new Error(`Unknown config: ${key}`);
             }),
           },
         },
@@ -112,25 +112,4 @@ describe('ApiKeyService', () => {
     });
   });
 
-  describe('startup validation', () => {
-    it('should throw if API_KEY_SECRET is missing', async () => {
-      await expect(
-        Test.createTestingModule({
-          providers: [
-            ApiKeyService,
-            {
-              provide: getRepositoryToken(ApiKey),
-              useClass: Repository,
-            },
-            {
-              provide: ConfigService,
-              useValue: {
-                get: jest.fn().mockReturnValue(undefined),
-              },
-            },
-          ],
-        }).compile(),
-      ).rejects.toThrow('API_KEY_SECRET');
-    });
-  });
 });

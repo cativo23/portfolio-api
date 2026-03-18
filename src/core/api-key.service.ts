@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
+import type { ApiKeyConfig } from '@src/config/api-key.config';
 import { ApiKey } from '@core/entities/api-key.entity';
 import { ApiKeyListItem } from '@core/types/api-key-list-item.interface';
 import * as crypto from 'crypto';
@@ -15,13 +16,8 @@ export class ApiKeyService {
     private readonly apiKeyRepository: Repository<ApiKey>,
     private readonly configService: ConfigService,
   ) {
-    const secret = this.configService.get<string>('API_KEY_SECRET');
-    if (!secret) {
-      throw new Error(
-        'API_KEY_SECRET environment variable is required but not set',
-      );
-    }
-    this.apiKeySecret = secret;
+    this.apiKeySecret =
+      this.configService.getOrThrow<ApiKeyConfig>('apiKey').secret;
   }
 
   private hashKey(plainKey: string): string {

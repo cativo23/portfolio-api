@@ -3,6 +3,7 @@ import { APP_INTERCEPTOR, APP_FILTER } from '@nestjs/core';
 import { AppController } from '@src/app.controller';
 import { AppService } from '@src/app.service';
 import { ConfigModule } from '@nestjs/config';
+import apiKeyConfig from '@src/config/api-key.config';
 import { RedisCacheModule } from '@src/cache/redis-cache.module';
 import { HealthModule } from '@health/health.module';
 import { DatabaseModule } from '@database/database.module';
@@ -19,7 +20,10 @@ import { AppThrottlerModule } from '@core/throttler/throttler.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [apiKeyConfig],
+    }),
     RedisCacheModule,
     RequestContextModule, // Must be imported before other modules that use it
     AppThrottlerModule, // Rate limiting - must be imported early for global guard
