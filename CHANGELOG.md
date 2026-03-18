@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-03-18
+
+### Added
+- **Traefik labels**: Production Docker Compose configured for Traefik reverse proxy
+
+### Fixed
+- **CLS middleware**: Mount in `main.ts` for proper ordering before `RequestIdMiddleware`
+- **Config fallback**: Use `process.env` as fallback when config namespaces are not available
+- **Deploy workflow**: Proper `.env` file creation and variable passing to containers
+- **Redis authentication**: Fixed `requirepass` config in `compose.prod.yml`
+- **Throttler**: Single global throttle instead of multiple named (fixes 429 errors)
+- Removed debug `console.log` statements from config loaders
+
+### Changed
+- **Deploy script**: Uses `vars.*` for non-sensitive config with fallback defaults
+- **Redis command**: Array syntax for proper argument parsing in Docker Compose
+- **Production compose**: Uses `env_file` for environment variables
+
+---
+
+## [2.0.1] - 2026-03-18
+
+### Fixed
+- **Redis authentication**: Fixed `requirepass` configuration error in `compose.prod.yml` that caused Redis to fail on startup
+- **Throttler configuration**: Changed from multiple named throttles to single global throttle to prevent all limits applying simultaneously (was causing 429 errors after 5 requests on `/projects` endpoints)
+- **Deploy workflow**: Use GitHub `vars.*` instead of `secrets.*` for non-sensitive configuration (REDIS_TTL, THROTTLE_*)
+
+### Changed
+- **Redis command**: Use array syntax for proper argument parsing in Docker Compose
+- **Deploy script**: Configuration variables now use `${{ vars.* }}` with fallback defaults
+
+---
+
 ## [2.0.1] - 2026-03-18
 
 ### Fixed
@@ -120,7 +153,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Automated CI/CD with GitHub Actions
 - Auto-release workflow for release branches
 
-[Unreleased]: https://github.com/cativo23/portfolio-api/compare/v2.0.1...HEAD
+[Unreleased]: https://github.com/cativo23/portfolio-api/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/cativo23/portfolio-api/compare/v2.0.1...v2.1.0
 [2.0.1]: https://github.com/cativo23/portfolio-api/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/cativo23/portfolio-api/compare/v1.1.0...v2.0.0
 [1.1.0]: https://github.com/cativo23/portfolio-api/compare/v0.1.0...v1.1.0

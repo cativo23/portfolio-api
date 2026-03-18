@@ -51,10 +51,8 @@ import { AppThrottlerModule } from '@core/throttler/throttler.module';
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     // Apply RequestIdMiddleware to all routes
-    // This ensures every request gets a unique ID and context is set
-    // Note: CLS middleware is applied first by RequestContextModule
-    // RequestIdMiddleware runs after CLS middleware and populates the context
-    // NestJS will resolve RequestIdMiddleware from DI (provided by RequestContextModule)
+    // Note: CLS middleware is mounted in main.ts before bootstrap()
+    // so RequestIdMiddleware can safely use ClsService.set()
     consumer.apply(RequestIdMiddleware).forRoutes('*');
   }
 }
