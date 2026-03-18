@@ -1,21 +1,18 @@
 import { ConfigService } from '@nestjs/config';
+import type { JwtConfig } from '@config/configuration.types';
 
 /**
- * Factory function that creates JWT configuration options
- *
- * This function is used by the JwtModule to configure JWT token generation.
- * It reads the JWT_SECRET and JWT_EXPIRES_IN environment variables to set
- * the secret key and token expiration time.
- *
- * @param configService - The NestJS ConfigService for accessing environment variables
- * @returns JWT module configuration object with secret and sign options
- * @throws Error if required environment variables are missing
+ * Opciones para JwtModule (secreto y expiración).
  */
 export async function jwtConfigFactory(configService: ConfigService) {
+  const jwt = configService.getOrThrow<JwtConfig>('jwt');
+  if (!jwt.secret?.length) {
+    throw new Error('JWT_SECRET is not set');
+  }
   return {
-    secret: configService.get<string>('JWT_SECRET'),
+    secret: jwt.secret,
     signOptions: {
-      expiresIn: configService.getOrThrow<string>('JWT_EXPIRES_IN') + 's',
+      expiresIn: `${jwt.expiresInSeconds}s`,
     },
   };
 }

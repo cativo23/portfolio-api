@@ -23,7 +23,10 @@ describe('AuthGuard', () => {
         {
           provide: ConfigService,
           useValue: {
-            get: jest.fn(),
+            getOrThrow: jest.fn().mockReturnValue({
+              secret: 'jwt_secret',
+              expiresInSeconds: 3600,
+            }),
           },
         },
       ],
@@ -79,7 +82,6 @@ describe('AuthGuard', () => {
 
     it('should throw AuthenticationException when token verification fails', async () => {
       mockRequest.headers.authorization = 'Bearer validToken';
-      configService.get.mockReturnValue('jwt_secret');
       jwtService.verifyAsync.mockRejectedValue(new Error('Invalid token'));
 
       await expect(guard.canActivate(mockContext)).rejects.toThrow(
@@ -93,7 +95,6 @@ describe('AuthGuard', () => {
     it('should return true and set user in request when token is valid', async () => {
       const mockPayload = { sub: 1, username: 'testuser' };
       mockRequest.headers.authorization = 'Bearer validToken';
-      configService.get.mockReturnValue('jwt_secret');
       jwtService.verifyAsync.mockResolvedValue(mockPayload);
 
       const result = await guard.canActivate(mockContext);
@@ -103,7 +104,7 @@ describe('AuthGuard', () => {
       expect(jwtService.verifyAsync).toHaveBeenCalledWith('validToken', {
         secret: 'jwt_secret',
       });
-      expect(configService.get).toHaveBeenCalledWith('JWT_SECRET');
+      expect(configService.getOrThrow).toHaveBeenCalledWith('jwt');
     });
   });
 });

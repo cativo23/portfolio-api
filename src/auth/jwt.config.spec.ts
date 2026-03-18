@@ -1,26 +1,22 @@
 import { ConfigService } from '@nestjs/config';
 import { jwtConfigFactory } from './jwt.config';
+import type { JwtConfig } from '@config/configuration.types';
 
 describe('jwtConfigFactory', () => {
   let mockConfigService: jest.Mocked<ConfigService>;
 
   beforeEach(() => {
     mockConfigService = {
-      get: jest.fn(),
       getOrThrow: jest.fn(),
     } as unknown as jest.Mocked<ConfigService>;
   });
 
   it('should return correct JWT config', async () => {
-    // Mock successful responses
-    mockConfigService.get.mockImplementation((key: string) => {
-      if (key === 'JWT_SECRET') return 'my-secret';
-      return null;
-    });
-    mockConfigService.getOrThrow.mockImplementation((key: string) => {
-      if (key === 'JWT_EXPIRES_IN') return '3600';
-      throw new Error('Key not found');
-    });
+    const jwt: JwtConfig = {
+      secret: 'my-secret',
+      expiresInSeconds: 3600,
+    };
+    mockConfigService.getOrThrow.mockReturnValue(jwt);
 
     const config = await jwtConfigFactory(mockConfigService);
 
@@ -29,30 +25,27 @@ describe('jwtConfigFactory', () => {
       signOptions: { expiresIn: '3600s' },
     });
 
-    expect(mockConfigService.get).toHaveBeenCalledWith('JWT_SECRET');
-    expect(mockConfigService.getOrThrow).toHaveBeenCalledWith('JWT_EXPIRES_IN');
+    expect(mockConfigService.getOrThrow).toHaveBeenCalledWith('jwt');
   });
 
-  it('should use undefined as secret when JWT_SECRET is not defined', async () => {
-    // Mock missing JWT_SECRET
-    mockConfigService.get.mockReturnValue(undefined);
-    mockConfigService.getOrThrow.mockReturnValue('3600');
-
-    const config = await jwtConfigFactory(mockConfigService);
-
-    expect(config.secret).toBeUndefined();
-    expect(config.signOptions.expiresIn).toBe('3600s');
-  });
-
-  it('should throw error when JWT_EXPIRES_IN is not defined', async () => {
-    // Mock successful JWT_SECRET but missing JWT_EXPIRES_IN
-    mockConfigService.get.mockReturnValue('my-secret');
-    mockConfigService.getOrThrow.mockImplementation(() => {
-      throw new Error('Config key "JWT_EXPIRES_IN" is not defined');
+  it('should throw when JWT secret is empty', async () => {
+    mockConfigService.getOrThrow.mockReturnValue({
+      secret: '',
+      expiresInSeconds: 3600,
     });
 
     await expect(jwtConfigFactory(mockConfigService)).rejects.toThrow(
-      'Config key "JWT_EXPIRES_IN" is not defined',
+      'JWT_SECRET is not set',
+    );
+  });
+
+  it('should throw when jwt namespace is missing', async () => {
+    mockConfigService.getOrThrow.mockImplementation(() => {
+      throw new Error('Config key "jwt" is not defined');
+    });
+
+    await expect(jwtConfigFactory(mockConfigService)).rejects.toThrow(
+      'Config key "jwt" is not defined',
     );
   });
 });

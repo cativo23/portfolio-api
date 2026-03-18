@@ -43,11 +43,14 @@ describe('AuthService', () => {
         {
           provide: ConfigService,
           useValue: {
-            get: jest.fn().mockImplementation((key: string) => {
-              const config = {
-                JWT_SECRET: 'test-secret',
-              };
-              return config[key];
+            getOrThrow: jest.fn((key: string) => {
+              if (key === 'jwt') {
+                return {
+                  secret: 'test-secret',
+                  expiresInSeconds: 3600,
+                };
+              }
+              throw new Error(`unknown ${key}`);
             }),
           },
         },
@@ -168,7 +171,10 @@ describe('AuthService', () => {
 
       usersService.findOneByEmail.mockResolvedValue(user);
       jwtService.signAsync.mockResolvedValue('fake-jwt-token');
-      configService.get.mockReturnValue(3600); // 1 hour
+      configService.getOrThrow.mockReturnValue({
+        secret: 'test-secret',
+        expiresInSeconds: 3600,
+      });
 
       const result = await service.login(user.email, password);
 

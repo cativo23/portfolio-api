@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '@users/users.service';
 import { RegisterDto } from '@auth/dto/register.dto';
 import { ConfigService } from '@nestjs/config';
+import type { JwtConfig } from '@config/configuration.types';
 import { User } from '@users/entities/user.entity';
 import {
   ConflictException,
@@ -73,7 +74,9 @@ export class AuthService {
     return {
       access_token: access_token,
       expires_at: new Date(
-        Date.now() + this.configService.get<number>('JWT_EXPIRES_IN') * 1000,
+        Date.now() +
+          this.configService.getOrThrow<JwtConfig>('jwt').expiresInSeconds *
+            1000,
       ),
       user: {
         id: user.id,
