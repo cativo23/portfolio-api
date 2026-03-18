@@ -13,10 +13,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Redis authentication**: Fixed `requirepass` configuration error in `compose.prod.yml` that caused Redis to fail on startup
 - **Throttler configuration**: Changed from multiple named throttles to single global throttle to prevent all limits applying simultaneously (was causing 429 errors after 5 requests on `/projects` endpoints)
 - **Deploy workflow**: Use GitHub `vars.*` instead of `secrets.*` for non-sensitive configuration (REDIS_TTL, THROTTLE_*)
+- **CLS middleware**: Mount in `main.ts` for proper ordering before `RequestIdMiddleware`
+- **Config fallback**: Use `process.env` as fallback when config namespaces are not available
+
+### Added
+- **Traefik labels**: Production Docker Compose configured for Traefik reverse proxy
 
 ### Changed
 - **Redis command**: Use array syntax for proper argument parsing in Docker Compose
 - **Deploy script**: Configuration variables now use `${{ vars.* }}` with fallback defaults
+- **Deploy workflow**: `.env` file creation with proper variable passing to containers
 
 ---
 
