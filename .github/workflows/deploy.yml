@@ -79,16 +79,23 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 52222
-          envs: DOCKER_USERNAME,DB_USERNAME,DB_PASSWORD,DB_NAME,MYSQL_ROOT_PASSWORD
+          envs: DOCKER_USERNAME,DB_USERNAME,DB_PASSWORD,DB_NAME,MYSQL_ROOT_PASSWORD,JWT_SECRET,JWT_EXPIRES_IN,CORS_ORIGINS,API_KEY_SECRET,REDIS_PASSWORD,REDIS_TTL,THROTTLE_TTL,THROTTLE_LIMIT,THROTTLE_PUBLIC_LIMIT,THROTTLE_STRICT_LIMIT
           script: |
-            export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
-            export DB_USERNAME=${{ secrets.DB_USERNAME }}
-            export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-            export DB_NAME=${{ secrets.DB_NAME }}
-            export MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
-            export JWT_SECRET=${{ secrets.JWT_SECRET }}
-            export JWT_EXPIRES_IN=${{ secrets.JWT_EXPIRES_IN }}
-            export CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
+            export DOCKER_USERNAME="${{ secrets.DOCKER_USERNAME }}"
+            export DB_USERNAME="${{ secrets.DB_USERNAME }}"
+            export DB_PASSWORD="${{ secrets.DB_PASSWORD }}"
+            export DB_NAME="${{ secrets.DB_NAME }}"
+            export MYSQL_ROOT_PASSWORD="${{ secrets.MYSQL_ROOT_PASSWORD }}"
+            export JWT_SECRET="${{ secrets.JWT_SECRET }}"
+            export JWT_EXPIRES_IN="${{ secrets.JWT_EXPIRES_IN }}"
+            export CORS_ORIGINS="${{ secrets.CORS_ORIGINS }}"
+            export API_KEY_SECRET="${{ secrets.API_KEY_SECRET }}"
+            export REDIS_PASSWORD="${{ secrets.REDIS_PASSWORD }}"
+            export REDIS_TTL="${{ secrets.REDIS_TTL }}"
+            export THROTTLE_TTL="${{ secrets.THROTTLE_TTL }}"
+            export THROTTLE_LIMIT="${{ secrets.THROTTLE_LIMIT }}"
+            export THROTTLE_PUBLIC_LIMIT="${{ secrets.THROTTLE_PUBLIC_LIMIT }}"
+            export THROTTLE_STRICT_LIMIT="${{ secrets.THROTTLE_STRICT_LIMIT }}"
             
             cd /home/cativo23/deploy/portfolio-api-deploy
             
