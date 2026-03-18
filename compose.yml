@@ -6,11 +6,16 @@ services:
       context: .
       dockerfile: docker/dev/Dockerfile
     ports:
-      - '3001:3001'
+      - '${PORT}:${PORT}'
     volumes:
       - .:/home/node/app
     environment:
-      - NODE_ENV=development
+      NODE_ENV: development
+      # Host del servicio en la red Docker (override si usas otro .env en el host)
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      REDIS_TTL: ${REDIS_TTL:-300}
     user: 'node'
     depends_on:
       redis:
