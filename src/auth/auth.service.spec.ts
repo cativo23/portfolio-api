@@ -125,12 +125,12 @@ describe('AuthService', () => {
       expect(result).toEqual(user);
     });
 
-    it('should throw if user not found', async () => {
+    it('should throw AuthenticationException if user not found (prevents enumeration)', async () => {
       usersService.findOneByEmail.mockResolvedValue(undefined);
 
       await expect(
         service.validateUser('notfound@mail.com', password),
-      ).rejects.toThrow(NotFoundException);
+      ).rejects.toThrow(AuthenticationException);
     });
 
     it('should throw if password does not match', async () => {
