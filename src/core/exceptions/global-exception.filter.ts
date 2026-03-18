@@ -73,8 +73,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
           code = ErrorCode.INTERNAL_SERVER_ERROR;
       }
 
-      console.log('Exception response:', exceptionResponse);
-
       const errorResponse = new ErrorResponseDto({
         code,
         message,

@@ -60,17 +60,19 @@ describe('HealthController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should return health check results', async () => {
+  it('should return health check results with summary, checks, and checkedAt', async () => {
     const healthCheckResult: HealthCheckResult = {
       status: 'ok',
       info: {
         'nestjs-docs': { status: 'up' },
         storage: { status: 'up' },
+        database: { status: 'up' },
       },
       error: {},
       details: {
         'nestjs-docs': { status: 'up' },
         storage: { status: 'up' },
+        database: { status: 'up' },
       },
     };
 
@@ -85,18 +87,24 @@ describe('HealthController', () => {
         Promise.resolve({ storage: { status: 'up' } } as HealthIndicatorResult),
       );
     jest
-      .spyOn(healthCheckService, 'check')
-      .mockReturnValue(Promise.resolve(healthCheckResult));
-
-    jest
       .spyOn(typeOrmHealthIndicator, 'pingCheck')
       .mockReturnValue(
         Promise.resolve({
           database: { status: 'up' },
         } as HealthIndicatorResult),
       );
+    jest
+      .spyOn(healthCheckService, 'check')
+      .mockReturnValue(Promise.resolve(healthCheckResult));
 
     const result = await controller.check();
-    expect(result).toEqual(healthCheckResult);
+
+    expect(result).toHaveProperty('summary');
+    expect(result).toHaveProperty('checks');
+    expect(result).toHaveProperty('checkedAt');
+    expect(result.summary).toContain('nestjs-docs: up');
+    expect(result.summary).toContain('storage: up');
+    expect(result.summary).toContain('database: up');
+    expect(result.checks).toEqual(healthCheckResult.info);
   });
 });

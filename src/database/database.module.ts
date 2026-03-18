@@ -14,6 +14,7 @@ import { createTypeOrmOptions } from '@config/typeorm-common.config';
     ScheduleModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
+      extraProviders: [TypeOrmLoggerService],
       useFactory: async (
         configService: ConfigService,
         loggerService: TypeOrmLoggerService,
@@ -25,7 +26,7 @@ import { createTypeOrmOptions } from '@config/typeorm-common.config';
           autoLoadEntities: true,
         };
 
-        Logger.log('Database configuration loadd', 'DatabaseModule');
+        Logger.log('Database configuration loaded', 'DatabaseModule');
         return config;
       },
       inject: [ConfigService, TypeOrmLoggerService],
