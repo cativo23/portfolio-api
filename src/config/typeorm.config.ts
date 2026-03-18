@@ -11,7 +11,7 @@ const configService = new ConfigService();
 // Use common TypeORM configuration with migration-specific options
 const AppDataSource = new DataSource({
   ...(createTypeOrmOptions(configService) as DataSourceOptions),
-  migrations: ['src/database/migrations/*-migration.ts'],
+  migrations: ['src/database/migrations/*.ts'],
   migrationsRun: false,
 });
 
