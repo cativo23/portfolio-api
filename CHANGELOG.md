@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.2] - 2026-03-18
+
+### Fixed
+- Network `space-server_web` declared as external in production Docker Compose
+
+---
+
 ## [2.1.1] - 2026-03-18
 
 ### Fixed
@@ -160,7 +167,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Automated CI/CD with GitHub Actions
 - Auto-release workflow for release branches
 
-[Unreleased]: https://github.com/cativo23/portfolio-api/compare/v2.1.1...HEAD
+[Unreleased]: https://github.com/cativo23/portfolio-api/compare/v2.1.2...HEAD
+[2.1.2]: https://github.com/cativo23/portfolio-api/compare/v2.1.1...v2.1.2
 [2.1.1]: https://github.com/cativo23/portfolio-api/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/cativo23/portfolio-api/compare/v2.0.1...v2.1.0
 [2.0.1]: https://github.com/cativo23/portfolio-api/compare/v2.0.0...v2.0.1

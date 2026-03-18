@@ -104,6 +104,8 @@ services:
           memory: 64M
 
 networks:
+  space-server_web:
+    external: true
   portfolio-internal:
     driver: bridge
     internal: true
