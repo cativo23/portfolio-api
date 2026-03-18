@@ -1,6 +1,6 @@
 # Portfolio API
 
-[![Coverage Status](https://coveralls.io/repos/github/cativo23/portfolio-api/badge.svg?branch=main)](https://coveralls.io/github/cativo23/portfolio-api?branch=main)
+[![Coverage](https://img.shields.io/badge/coverage-90.1%25-brightgreen)](https://github.com/cativo23/portfolio-api)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Node Version](https://img.shields.io/badge/node-%3E%3D23.0.0-brightgreen.svg)](https://nodejs.org/)
 [![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](https://hub.docker.com/)
@@ -12,8 +12,11 @@ Portfolio API is a RESTful API built with NestJS for managing portfolio projects
 Key features:
 - User authentication with JWT
 - Project management (CRUD operations)
+- Contact form submission (public endpoint)
+- Contact management for administrators
 - Pagination, filtering, and search functionality
 - Health checks for monitoring
+- Rate limiting (configurable per endpoint type)
 - Standardized API responses
 - Comprehensive error handling
 
@@ -56,6 +59,29 @@ Key features:
 - `DELETE /projects/:id` - Delete a project by ID (requires authentication)
   - Response: Deletion confirmation
 
+### Contacts
+
+- `POST /contacts` - Submit a contact form (public endpoint, no authentication required)
+  - Request body: `{ "name": "John Doe", "email": "john@example.com", "message": "Hello...", "subject": "Optional subject" }`
+  - Response: Created contact information
+
+- `GET /contacts` - Get all contacts (requires authentication, admin only)
+  - Query parameters:
+    - `page` - Page number (default: 1)
+    - `per_page` - Items per page (default: 10)
+    - `search` - Search term (searches in name, email, message)
+    - `is_read` - Filter by read status (true/false)
+  - Response: List of contacts with pagination
+
+- `GET /contacts/:id` - Get a contact by ID (requires authentication, admin only)
+  - Response: Contact details
+
+- `PATCH /contacts/:id/read` - Mark a contact as read (requires authentication, admin only)
+  - Response: Updated contact information
+
+- `DELETE /contacts/:id` - Delete a contact by ID (requires authentication, admin only)
+  - Response: Deletion confirmation
+
 ### Health Check
 
 - `GET /health` - Check API health
@@ -72,6 +98,13 @@ The following environment variables are required for the application to run:
 - `DB_NAME` - Database name
 - `JWT_SECRET` - Secret key for JWT token generation
 - `JWT_EXPIRES_IN` - Token expiration time in seconds
+- `CORS_ORIGINS` - (Optional) Comma-separated list of allowed CORS origins. Defaults to `http://localhost:3000,http://localhost:5173,http://localhost:5174` in development
+- `PORT` - (Optional) Server port. Defaults to 3000
+- `NODE_ENV` - (Optional) Environment (development/production). In development, CORS is more permissive
+- `THROTTLE_TTL` - (Optional) Rate limit time window in milliseconds. Defaults to `60000` (1 minute)
+- `THROTTLE_LIMIT` - (Optional) Default rate limit (requests per window). Defaults to `100`
+- `THROTTLE_PUBLIC_LIMIT` - (Optional) Rate limit for public endpoints. Defaults to `10`
+- `THROTTLE_STRICT_LIMIT` - (Optional) Rate limit for auth endpoints (login/register). Defaults to `5`
 
 ## Project Setup
 
@@ -223,6 +256,13 @@ http://localhost:3000/docs
 ```
 
 This provides an interactive interface to explore and test all API endpoints.
+
+### Additional Documentation
+
+- **[Release Workflow](./docs/RELEASE_WORKFLOW.md)**: Professional release workflow guide with GitFlow pattern
+- **[API Documentation](./docs/api/endpoints.md)**: Detailed endpoint documentation with request/response examples
+- **[Code Review](./docs/code-review.md)**: Comprehensive code review and recommendations
+- **[API Standards](./docs/standardization/api-standards.md)**: API design standards and conventions
 
 ## Authentication Flow
 

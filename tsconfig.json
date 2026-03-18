@@ -18,10 +18,12 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
+      "@core": ["src/core/index"],
       "@core/*": ["src/core/*"],
       "@auth/*": ["src/auth/*"],
       "@users/*": ["src/users/*"],
       "@projects/*": ["src/projects/*"],
+      "@contacts/*": ["src/contacts/*"],
       "@config/*": ["src/config/*"],
       "@database/*": ["src/database/*"],
       "@health/*": ["src/health/*"],

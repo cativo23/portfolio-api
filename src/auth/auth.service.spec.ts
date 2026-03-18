@@ -4,9 +4,13 @@ import { UsersService } from '@users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcryptjs from 'bcryptjs';
-import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
 import { User } from '@users/entities/user.entity';
+import {
+  ConflictException,
+  NotFoundException,
+  AuthenticationException,
+} from '@core/exceptions';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -69,7 +73,7 @@ describe('AuthService', () => {
       };
       const expectedUser: User = { id: 1, ...payload } as User;
 
-      usersService.findOneByEmail.mockResolvedValue(null);
+      usersService.findOneByEmail.mockResolvedValue(undefined);
       usersService.create.mockResolvedValue(expectedUser);
 
       const result = await service.register(payload);
@@ -103,7 +107,7 @@ describe('AuthService', () => {
           email: 'test@mail.com',
           password,
         }),
-      ).rejects.toThrow(BadRequestException);
+      ).rejects.toThrow(ConflictException);
     });
   });
 
@@ -122,11 +126,11 @@ describe('AuthService', () => {
     });
 
     it('should throw if user not found', async () => {
-      usersService.findOneByEmail.mockResolvedValue(null);
+      usersService.findOneByEmail.mockResolvedValue(undefined);
 
       await expect(
         service.validateUser('notfound@mail.com', password),
-      ).rejects.toThrow(BadRequestException);
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should throw if password does not match', async () => {
@@ -139,7 +143,7 @@ describe('AuthService', () => {
 
       await expect(
         service.validateUser(user.email, 'wrongpass'),
-      ).rejects.toThrow(UnauthorizedException);
+      ).rejects.toThrow(AuthenticationException);
     });
   });
 
@@ -189,7 +193,7 @@ describe('AuthService', () => {
       usersService.findOneByEmail.mockResolvedValue(user);
 
       await expect(service.login(user.email, 'wrong-password')).rejects.toThrow(
-        UnauthorizedException,
+        AuthenticationException,
       );
     });
   });

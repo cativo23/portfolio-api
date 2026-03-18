@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
-import { NotFoundException, Logger } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -83,13 +83,12 @@ describe('UsersService', () => {
       expect(loggerSpy).toHaveBeenCalledWith(`User with email ${email} found.`);
     });
 
-    it('should throw NotFoundException and log when user is not found', async () => {
+    it('should return undefined and log when user is not found', async () => {
       const email = 'notfound@email.com';
       jest.spyOn(repository, 'findOneBy').mockResolvedValue(undefined);
 
-      await expect(service.findOneByEmail(email)).rejects.toThrow(
-        NotFoundException,
-      );
+      const result = await service.findOneByEmail(email);
+      expect(result).toBeUndefined();
       expect(repository.findOneBy).toHaveBeenCalledWith({ email });
       expect(loggerSpy).toHaveBeenCalledWith(
         `User with email ${email} not found.`,

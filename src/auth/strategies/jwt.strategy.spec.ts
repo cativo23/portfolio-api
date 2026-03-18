@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './jwt.strategy';
-import { AccessTokenPayload } from '../types/AccessTokenPayload';
+import { AccessTokenPayload } from '@auth/types/AccessTokenPayload';
 
 describe('JwtStrategy', () => {
   let strategy: JwtStrategy;

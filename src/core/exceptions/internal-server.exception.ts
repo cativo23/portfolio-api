@@ -1,6 +1,6 @@
 import { HttpStatus } from '@nestjs/common';
 import { BaseException } from '@core/exceptions';
-import { ErrorCode } from '../dto';
+import { ErrorCode } from '@core/dto';
 
 /**
  * Exception for internal server errors

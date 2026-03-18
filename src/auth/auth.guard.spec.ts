@@ -1,8 +1,9 @@
-import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import { ExecutionContext } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthGuard } from './auth.guard';
+import { AuthenticationException } from '@core/exceptions';
 
 describe('AuthGuard', () => {
   let guard: AuthGuard;
@@ -52,37 +53,37 @@ describe('AuthGuard', () => {
       } as unknown as ExecutionContext;
     });
 
-    it('should throw UnauthorizedException when no token is provided', async () => {
+    it('should throw AuthenticationException when no token is provided', async () => {
       mockRequest.headers.authorization = undefined;
 
       await expect(guard.canActivate(mockContext)).rejects.toThrow(
-        UnauthorizedException,
+        AuthenticationException,
       );
     });
 
-    it('should throw UnauthorizedException when authorization header has invalid format', async () => {
+    it('should throw AuthenticationException when authorization header has invalid format', async () => {
       mockRequest.headers.authorization = 'InvalidFormat';
 
       await expect(guard.canActivate(mockContext)).rejects.toThrow(
-        UnauthorizedException,
+        AuthenticationException,
       );
     });
 
-    it('should throw UnauthorizedException when token type is not Bearer', async () => {
+    it('should throw AuthenticationException when token type is not Bearer', async () => {
       mockRequest.headers.authorization = 'Basic token123';
 
       await expect(guard.canActivate(mockContext)).rejects.toThrow(
-        UnauthorizedException,
+        AuthenticationException,
       );
     });
 
-    it('should throw UnauthorizedException when token verification fails', async () => {
+    it('should throw AuthenticationException when token verification fails', async () => {
       mockRequest.headers.authorization = 'Bearer validToken';
       configService.get.mockReturnValue('jwt_secret');
       jwtService.verifyAsync.mockRejectedValue(new Error('Invalid token'));
 
       await expect(guard.canActivate(mockContext)).rejects.toThrow(
-        UnauthorizedException,
+        AuthenticationException,
       );
       expect(jwtService.verifyAsync).toHaveBeenCalledWith('validToken', {
         secret: 'jwt_secret',
