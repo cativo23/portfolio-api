@@ -38,7 +38,7 @@ jobs:
       - name: Run tests
         run: yarn test
 
-      - name: Run code formatter
+      - name: Apply code formatting (Prettier)
         run: yarn format
 
       - name: Set up git for pushing
