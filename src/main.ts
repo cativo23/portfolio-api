@@ -45,6 +45,11 @@ async function bootstrap() {
     exposedHeaders: ['Content-Range', 'X-Content-Range'],
   });
 
+  // Global API prefix for versioning
+  app.setGlobalPrefix('api/v1', {
+    exclude: ['health', 'docs'],
+  });
+
   // Set up global pipes
   // Note: Interceptors and filters are registered in AppModule using APP_INTERCEPTOR
   // and APP_FILTER tokens for proper DI support
