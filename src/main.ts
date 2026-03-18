@@ -4,10 +4,25 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Logger } from '@nestjs/common';
 import { ValidationPipe } from '@core';
 import { loadAppConfig } from '@config/configuration.loaders';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const appConfig = loadAppConfig();
+
+  // Security headers — CSP configured to allow Swagger UI
+  app.use(
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: [`'self'`],
+          styleSrc: [`'self'`, `'unsafe-inline'`],
+          imgSrc: [`'self'`, 'data:', 'validator.swagger.io'],
+          scriptSrc: [`'self'`, `https: 'unsafe-inline'`],
+        },
+      },
+    }),
+  );
 
   app.enableCors({
     origin: (origin, callback) => {
@@ -28,6 +43,11 @@ async function bootstrap() {
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
     exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  });
+
+  // Global API prefix for versioning
+  app.setGlobalPrefix('api/v1', {
+    exclude: ['health', 'docs'],
   });
 
   // Set up global pipes

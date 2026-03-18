@@ -1,15 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import * as bcryptjs from 'bcryptjs';
+import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '@users/users.service';
 import { RegisterDto } from '@auth/dto/register.dto';
 import { ConfigService } from '@nestjs/config';
 import { User } from '@users/entities/user.entity';
-import {
-  ConflictException,
-  NotFoundException,
-  AuthenticationException,
-} from '@core/exceptions';
+import { ConflictException, AuthenticationException } from '@core/exceptions';
 
 /**
  * Service responsible for authentication-related operations
@@ -37,7 +33,7 @@ export class AuthService {
     if (existingUser) {
       throw new ConflictException('Email already exists');
     }
-    const hashedPassword = await bcryptjs.hash(payload.password, 10);
+    const hashedPassword = await bcrypt.hash(payload.password, 10);
 
     return await this.usersService.create({
       username: payload.username,
@@ -95,11 +91,12 @@ export class AuthService {
   async validateUser(email: string, password: string): Promise<User> {
     const user: User = await this.usersService.findOneByEmail(email);
     if (!user) {
-      throw new NotFoundException('User not found');
+      // Same error message as invalid password to prevent user enumeration
+      throw new AuthenticationException('Invalid email or password');
     }
-    const isMatch: boolean = await bcryptjs.compare(password, user.password);
+    const isMatch: boolean = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      throw new AuthenticationException('Invalid credentials');
+      throw new AuthenticationException('Invalid email or password');
     }
     return user;
   }

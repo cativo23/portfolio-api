@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-03-18
+
+### ⚠️ Breaking Changes
+- **Global API prefix**: All endpoints now require `/api/v1/` prefix (#43)
+  - `/projects` → `/api/v1/projects`
+  - `/auth/login` → `/api/v1/auth/login`
+  - `/contacts` → `/api/v1/contacts`
+  - `/api-keys` → `/api/v1/api-keys`
+  - `/health` and `/docs` remain unchanged (excluded from prefix)
+- **Soft delete**: `DELETE` endpoints now soft-delete (set `deletedAt`) instead of permanently removing records (#53)
+- **Password requirements**: Registration now requires min 8 chars with uppercase, lowercase, and number (#50)
+- **API key query params removed**: `?api_key=xxx` no longer accepted, use `x-api-key` header only (#44)
+
+### Added
+- **Helmet security headers**: XSS protection, HSTS, X-Frame-Options, CSP configured for Swagger (#41)
+- **Password strength validation**: `@IsStrongPassword()` on `RegisterDto` with clear error messages (#50)
+- **Soft delete with restore**: `BaseCrudService.remove()` uses `softRemove()`, new `restore()` method (#53)
+- **Expanded startup validation**: All required env vars checked — production throws, development warns (#64)
+- **E2E tests for Helmet**: Verify security headers in responses
+- **Test for query param rejection**: Verify API keys from URL params are rejected
+
+### Changed
+- **DeleteResponseDto moved to @core/dto**: Breaks circular dependency `@core` → `@projects` (#54)
+- **Unified bcrypt**: Removed `bcryptjs`, all hashing uses native `bcrypt` (#47)
+- **Auth error messages unified**: "Invalid email or password" for both wrong email and wrong password (#42)
+
+### Security
+- Helmet middleware with CSP directives allowing Swagger UI (#41)
+- API keys no longer accepted via query parameters — prevents leaking in URLs, logs, browser history (#44)
+- User enumeration prevented — identical error messages for invalid email and password (#42)
+
+### Removed
+- `bcryptjs` dependency (replaced by native `bcrypt`) (#47)
+
+---
+
 ## [1.1.0] - 2026-03-18
 
 ### Added
@@ -76,6 +112,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Automated CI/CD with GitHub Actions
 - Auto-release workflow for release branches
 
-[Unreleased]: https://github.com/cativo23/portfolio-api/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/cativo23/portfolio-api/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/cativo23/portfolio-api/compare/v1.1.0...v2.0.0
 [1.1.0]: https://github.com/cativo23/portfolio-api/compare/v0.1.0...v1.1.0
 [0.1.0]: https://github.com/cativo23/portfolio-api/releases/tag/v0.1.0

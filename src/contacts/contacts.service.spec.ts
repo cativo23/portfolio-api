@@ -274,13 +274,13 @@ describe('ContactsService', () => {
         .spyOn(repository, 'findOne')
         .mockResolvedValue(existingContact as any);
       jest
-        .spyOn(repository, 'delete')
-        .mockResolvedValue({ affected: 1 } as any);
+        .spyOn(repository, 'softRemove')
+        .mockResolvedValue(existingContact as any);
 
       const result = await service.remove(1);
 
       expect(result.data.message).toBe('Contact successfully deleted');
-      expect(logSpy).toHaveBeenCalledWith(`Deleted contact with ID 1`);
+      expect(logSpy).toHaveBeenCalledWith(`Soft-deleted contact with ID 1`);
     });
 
     it('should throw NotFoundException if contact not found', async () => {
