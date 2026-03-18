@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-03-18
+
+### Fixed
+- Auto-release workflow now uses `RELEASE_PAT` to trigger deploy workflow (GitHub Actions limitation: `GITHUB_TOKEN` cannot trigger other workflows)
+- CI workflow: auto-format only on develop push, use `format:check` on PRs to main (fixes detached HEAD failure)
+
+---
+
 ## [2.0.0] - 2026-03-18
 
 ### ⚠️ Breaking Changes
@@ -112,7 +120,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Automated CI/CD with GitHub Actions
 - Auto-release workflow for release branches
 
-[Unreleased]: https://github.com/cativo23/portfolio-api/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/cativo23/portfolio-api/compare/v2.0.1...HEAD
+[2.0.1]: https://github.com/cativo23/portfolio-api/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/cativo23/portfolio-api/compare/v1.1.0...v2.0.0
 [1.1.0]: https://github.com/cativo23/portfolio-api/compare/v0.1.0...v1.1.0
 [0.1.0]: https://github.com/cativo23/portfolio-api/releases/tag/v0.1.0
