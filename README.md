@@ -24,20 +24,20 @@ Key features:
 
 ### Authentication
 
-- `POST /auth/login` - User login
+- `POST /api/v1/auth/login` - User login
   - Request body: `{ "email": "user@example.com", "password": "password" }`
   - Response: JWT token and user information
 
-- `POST /auth/register` - User registration
+- `POST /api/v1/auth/register` - User registration
   - Request body: `{ "username": "user", "email": "user@example.com", "password": "password" }`
   - Response: Created user information
 
-- `GET /auth/profile` - Get user profile (requires authentication)
+- `GET /api/v1/auth/profile` - Get user profile (requires authentication)
   - Response: User profile information
 
 ### Projects
 
-- `GET /projects` - Get all projects (requires authentication)
+- `GET /api/v1/projects` - Get all projects (requires authentication)
   - Query parameters:
     - `page` - Page number (default: 1)
     - `per_page` - Items per page (default: 10)
@@ -45,27 +45,27 @@ Key features:
     - `is_featured` - Filter by featured projects (true/false)
   - Response: List of projects with pagination
 
-- `GET /projects/:id` - Get a project by ID (requires authentication)
+- `GET /api/v1/projects/:id` - Get a project by ID (requires authentication)
   - Response: Project details
 
-- `POST /projects` - Create a new project (requires authentication)
+- `POST /api/v1/projects` - Create a new project (requires authentication)
   - Request body: Project details
   - Response: Created project information
 
-- `PATCH /projects/:id` - Update a project by ID (requires authentication)
+- `PATCH /api/v1/projects/:id` - Update a project by ID (requires authentication)
   - Request body: Project details to update
   - Response: Updated project information
 
-- `DELETE /projects/:id` - Delete a project by ID (requires authentication)
+- `DELETE /api/v1/projects/:id` - Delete a project by ID (requires authentication)
   - Response: Deletion confirmation
 
 ### Contacts
 
-- `POST /contacts` - Submit a contact form (public endpoint, no authentication required)
+- `POST /api/v1/contacts` - Submit a contact form (public endpoint, no authentication required)
   - Request body: `{ "name": "John Doe", "email": "john@example.com", "message": "Hello...", "subject": "Optional subject" }`
   - Response: Created contact information
 
-- `GET /contacts` - Get all contacts (requires authentication, admin only)
+- `GET /api/v1/contacts` - Get all contacts (requires authentication, admin only)
   - Query parameters:
     - `page` - Page number (default: 1)
     - `per_page` - Items per page (default: 10)
@@ -73,13 +73,13 @@ Key features:
     - `is_read` - Filter by read status (true/false)
   - Response: List of contacts with pagination
 
-- `GET /contacts/:id` - Get a contact by ID (requires authentication, admin only)
+- `GET /api/v1/contacts/:id` - Get a contact by ID (requires authentication, admin only)
   - Response: Contact details
 
-- `PATCH /contacts/:id/read` - Mark a contact as read (requires authentication, admin only)
+- `PATCH /api/v1/contacts/:id/read` - Mark a contact as read (requires authentication, admin only)
   - Response: Updated contact information
 
-- `DELETE /contacts/:id` - Delete a contact by ID (requires authentication, admin only)
+- `DELETE /api/v1/contacts/:id` - Delete a contact by ID (requires authentication, admin only)
   - Response: Deletion confirmation
 
 ### Health Check
@@ -256,7 +256,7 @@ import { SomeService } from '@users/some.service';
 For detailed API documentation, you can access the Swagger UI when the application is running:
 
 ```
-http://localhost:3000/docs
+http://localhost:3001/docs
 ```
 
 This provides an interactive interface to explore and test all API endpoints.
@@ -270,13 +270,13 @@ This provides an interactive interface to explore and test all API endpoints.
 
 ## Authentication Flow
 
-1. **Registration**: Create a new user account using the `/auth/register` endpoint
-2. **Login**: Authenticate with email and password using the `/auth/login` endpoint
+1. **Registration**: Create a new user account using the `/api/v1/auth/register` endpoint
+2. **Login**: Authenticate with email and password using the `/api/v1/auth/login` endpoint
 3. **Using the token**: Include the JWT token in the Authorization header for protected endpoints:
    ```
    Authorization: Bearer <your-token>
    ```
-4. **Profile**: Access your user profile using the `/auth/profile` endpoint
+4. **Profile**: Access your user profile using the `/api/v1/auth/profile` endpoint
 
 ## Contributing
 

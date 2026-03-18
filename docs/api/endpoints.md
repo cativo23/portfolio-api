@@ -29,7 +29,7 @@ This document provides detailed information about the Portfolio API endpoints, i
 
 Authenticates a user and returns a JWT token.
 
-**URL**: `/auth/login`
+**URL**: `/api/v1/auth/login`
 
 **Method**: `POST`
 
@@ -92,7 +92,7 @@ OR
 
 Register a new user.
 
-**URL**: `/auth/register`
+**URL**: `/api/v1/auth/register`
 
 **Method**: `POST`
 
@@ -140,7 +140,7 @@ Register a new user.
 
 Returns the authenticated user's profile.
 
-**URL**: `/auth/profile`
+**URL**: `/api/v1/auth/profile`
 
 **Method**: `GET`
 
@@ -183,7 +183,7 @@ Returns the authenticated user's profile.
 
 Returns a paginated list of projects.
 
-**URL**: `/projects`
+**URL**: `/api/v1/projects`
 
 **Method**: `GET`
 
@@ -247,7 +247,7 @@ Returns a paginated list of projects.
 
 Returns a specific project by ID.
 
-**URL**: `/projects/:id`
+**URL**: `/api/v1/projects/:id`
 
 **Method**: `GET`
 
@@ -290,7 +290,7 @@ Returns a specific project by ID.
 
 Create a new project.
 
-**URL**: `/projects`
+**URL**: `/api/v1/projects`
 
 **Method**: `POST`
 
@@ -342,7 +342,7 @@ Create a new project.
 
 Updates an existing project.
 
-**URL**: `/projects/:id`
+**URL**: `/api/v1/projects/:id`
 
 **Method**: `PATCH`
 
@@ -393,7 +393,7 @@ Updates an existing project.
 
 Delete a project.
 
-**URL**: `/projects/:id`
+**URL**: `/api/v1/projects/:id`
 
 **Method**: `DELETE`
 
@@ -435,7 +435,7 @@ The Contacts API allows users to submit contact forms and administrators to mana
 
 Submit a new contact form. This endpoint is public and does not require authentication.
 
-**URL**: `/contacts`
+**URL**: `/api/v1/contacts`
 
 **Method**: `POST`
 
@@ -499,7 +499,7 @@ Submit a new contact form. This endpoint is public and does not require authenti
 
 Returns a paginated list of all contact submissions. This endpoint requires authentication and is intended for administrators.
 
-**URL**: `/contacts`
+**URL**: `/api/v1/contacts`
 
 **Method**: `GET`
 
@@ -569,7 +569,7 @@ Returns a paginated list of all contact submissions. This endpoint requires auth
 
 Returns a specific contact submission by ID. This endpoint requires authentication and is intended for administrators.
 
-**URL**: `/contacts/:id`
+**URL**: `/api/v1/contacts/:id`
 
 **Method**: `GET`
 
@@ -630,7 +630,7 @@ OR
 
 Marks a contact submission as read. This endpoint requires authentication and is intended for administrators.
 
-**URL**: `/contacts/:id/read`
+**URL**: `/api/v1/contacts/:id/read`
 
 **Method**: `PATCH`
 
@@ -691,7 +691,7 @@ OR
 
 Deletes a contact submission. This endpoint requires authentication and is intended for administrators.
 
-**URL**: `/contacts/:id`
+**URL**: `/api/v1/contacts/:id`
 
 **Method**: `DELETE`
 
