@@ -53,11 +53,7 @@ export class TypeOrmLoggerService implements TypeOrmLogger {
   /**
    * Log query that is slow
    */
-  logQuerySlow(
-    time: number,
-    query: string,
-    parameters?: any[],
-  ): void {
+  logQuerySlow(time: number, query: string, parameters?: any[]): void {
     if (this.shouldLog('warn')) {
       const sql = this.buildSqlString(query, parameters);
       this.logger.warn(`Slow Query (${time}ms): ${sql}`);
@@ -85,10 +81,7 @@ export class TypeOrmLoggerService implements TypeOrmLogger {
   /**
    * Log general messages
    */
-  log(
-    level: 'log' | 'info' | 'warn' | 'error',
-    message: any,
-  ): void {
+  log(level: 'log' | 'info' | 'warn' | 'error', message: any): void {
     switch (level) {
       case 'log':
       case 'info':
