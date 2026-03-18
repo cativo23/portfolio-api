@@ -8,9 +8,9 @@ export class ApiKeyGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    // Accept API key from header `x-api-key`, Authorization header as `ApiKey <key>`,
-    // or query param `api_key` for flexibility when calling from curl or browsers.
-    let apiKey = request.headers['x-api-key'] || request.query?.api_key;
+    // Accept API key from header `x-api-key` or Authorization header as `ApiKey <key>`.
+    // Query param removed to prevent keys leaking in URLs, logs, and browser history.
+    let apiKey = request.headers['x-api-key'];
     if (!apiKey) {
       const authHeader =
         request.headers['authorization'] || request.headers['Authorization'];
