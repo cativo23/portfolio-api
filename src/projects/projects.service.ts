@@ -12,6 +12,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { InternalServerException } from '@core/exceptions/internal-server.exception';
 import { NotFoundException } from '@core/exceptions/not-found.exception';
+import { CacheInvalidationService } from '@src/cache/cache-invalidation.service';
 
 /**
  * Interface defining options for finding projects with pagination, search, and filtering
@@ -39,6 +40,7 @@ export class ProjectsService {
   constructor(
     @InjectRepository(Project)
     private projectsRepository: Repository<Project>,
+    private readonly cacheInvalidationService: CacheInvalidationService,
   ) {}
 
   /**
@@ -55,6 +57,8 @@ export class ProjectsService {
       const project = this.projectsRepository.create(createProjectDto);
       const savedProject = await this.projectsRepository.save(project);
       this.logger.log(`Project created with ID ${savedProject.id}`);
+      // Safe: invalidateByPrefix never throws (has internal try/catch)
+      await this.cacheInvalidationService.invalidateByPrefix('projects');
       return SingleProjectResponseDto.fromEntity(savedProject);
     } catch (error) {
       this.logger.error('Error creating project', error.stack);
@@ -175,6 +179,8 @@ export class ProjectsService {
       // Update project
       await this.projectsRepository.update(id, updateProjectDto);
       this.logger.log(`Updated project with ID ${id}`);
+      // Safe: invalidateByPrefix never throws (has internal try/catch)
+      await this.cacheInvalidationService.invalidateByPrefix('projects');
 
       // Get the updated project
       const updatedProject = await this.projectsRepository.findOne({
@@ -222,6 +228,8 @@ export class ProjectsService {
       }
 
       this.logger.log(`Deleted project with ID ${id}`);
+      // Safe: invalidateByPrefix never throws (has internal try/catch)
+      await this.cacheInvalidationService.invalidateByPrefix('projects');
       return DeleteResponseDto.withMessage('Project successfully deleted');
     } catch (error) {
       if (error instanceof NotFoundException) {
