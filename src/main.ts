@@ -4,10 +4,16 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Logger } from '@nestjs/common';
 import { ValidationPipe } from '@core';
 import { loadAppConfig } from '@config/configuration.loaders';
+import { ClsMiddleware } from 'nestjs-cls';
 import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Mount CLS middleware first - before any other middleware that depends on it
+  // This ensures CLS context is available for RequestIdMiddleware and others
+  app.use(new ClsMiddleware({ global: true }).use);
+
   const appConfig = loadAppConfig();
 
   // Security headers — CSP configured to allow Swagger UI

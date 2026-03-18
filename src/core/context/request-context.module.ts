@@ -25,12 +25,7 @@ import { RequestIdMiddleware } from '@core/middleware/request-id.middleware';
     ClsModule.forRoot({
       global: true,
       middleware: {
-        mount: true,
-        setup: () => {
-          // Request context will be set by RequestIdMiddleware
-          // This ensures CLS is initialized for every request
-          // The middleware runs after CLS middleware, so context is available
-        },
+        mount: false, // Mounted manually in main.ts for proper ordering
       },
     }),
   ],
