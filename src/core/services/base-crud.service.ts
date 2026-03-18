@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Repository, FindOptionsWhere, DeepPartial } from 'typeorm';
 import { NotFoundException } from '@core/exceptions/not-found.exception';
-import { DeleteResponseDto } from '@projects/dto/delete-response.dto';
+import { DeleteResponseDto } from '@core/dto';
 
 /**
  * Base CRUD service for common database operations
