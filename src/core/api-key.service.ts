@@ -1,27 +1,47 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ConfigService } from '@nestjs/config';
 import { ApiKey } from '@core/entities/api-key.entity';
 import { ApiKeyListItem } from '@core/types/api-key-list-item.interface';
-
 import * as crypto from 'crypto';
 
 @Injectable()
 export class ApiKeyService {
+  private readonly apiKeySecret: string;
+
   constructor(
     @InjectRepository(ApiKey)
     private readonly apiKeyRepository: Repository<ApiKey>,
-  ) {}
+    private readonly configService: ConfigService,
+  ) {
+    const secret = this.configService.get<string>('API_KEY_SECRET');
+    if (!secret) {
+      throw new Error(
+        'API_KEY_SECRET environment variable is required but not set',
+      );
+    }
+    this.apiKeySecret = secret;
+  }
 
-  async create(description?: string): Promise<ApiKey> {
-    const key = crypto.randomBytes(32).toString('hex');
-    const apiKey = this.apiKeyRepository.create({ key, description });
-    return this.apiKeyRepository.save(apiKey);
+  private hashKey(plainKey: string): string {
+    return crypto
+      .createHmac('sha256', this.apiKeySecret)
+      .update(plainKey)
+      .digest('hex');
+  }
+
+  async create(
+    description?: string,
+  ): Promise<{ apiKey: ApiKey; plainKey: string }> {
+    const plainKey = crypto.randomBytes(32).toString('hex');
+    const hashedKey = this.hashKey(plainKey);
+    const apiKey = this.apiKeyRepository.create({ hashedKey, description });
+    return { apiKey: await this.apiKeyRepository.save(apiKey), plainKey };
   }
 
   async findAll(): Promise<ApiKeyListItem[]> {
     const keys = await this.apiKeyRepository.find();
-    // Do not expose the actual key for security, only show id, description, isActive, createdAt, updatedAt
     return keys.map(({ id, description, isActive, createdAt, updatedAt }) => ({
       id,
       description,
@@ -36,13 +56,10 @@ export class ApiKeyService {
   }
 
   async validate(key: string): Promise<boolean> {
+    const hashedKey = this.hashKey(key);
     const apiKey = await this.apiKeyRepository.findOne({
-      where: { key, isActive: true },
+      where: { hashedKey, isActive: true },
     });
     return !!apiKey;
-  }
-
-  async revoke(key: string): Promise<void> {
-    await this.apiKeyRepository.update({ key }, { isActive: false });
   }
 }
