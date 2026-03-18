@@ -1,7 +1,7 @@
 # Code Review Consolidado - Portfolio API
 
 **Fecha de Review:** 2026-01-08 (interno) + 2026-02-02 (externo Senior Dev)
-**Estado:** Mejoras críticas identificadas
+**Última Actualización:** 2026-03-17 - Mejoras críticas implementadas
 **Test Coverage:** 90.1% (165 tests, 25 test suites)
 
 ---
@@ -11,14 +11,14 @@
 | Categoría | Score | Notas |
 |-----------|-------|-------|
 | 🏗️ Arquitectura | 8/10 | Estructura modular limpia, fuga de abstracción en `@core` |
-| 🔒 Seguridad | 4/10 | **Penalizado por API keys en texto plano** |
+| 🔒 Seguridad | 7/10 | **API keys con hash ✅**, falta Helmet, persiste enumeración de usuarios |
 | 💻 Código y Calidad | 9/10 | Excelentes patrones, tipo seguro |
 | 🗄️ Database | 7/10 | Índices presentes, faltan transacciones |
 | 🌐 API Design | 8/10 | RESTful, falta versionado `/api/v1` |
 | 🧪 Testing | 10/10 | Cobertura excepcional |
 | ⚡ Performance | 7/10 | Sin caching, health check ineficiente |
 
-**Score General: 7.4/10**
+**Score General: 8.1/10** ⬆️ (+0.7 desde último review)
 
 ---
 
@@ -51,6 +51,8 @@
 - ✅ **CORS configuration** basada en environment
 - ✅ **Input validation** con global ValidationPipe
 - ✅ **Rate limiting** implementado con `@nestjs/throttler`
+- ✅ **API keys con hash** - HMAC-SHA256 con secret (desde 2026-03-17)
+- ✅ **Swagger dinámico** - Puerto desde env vars (desde 2026-03-17)
 
 ### 5. Calidad de Código
 - ✅ TypeScript strict typing
@@ -78,40 +80,43 @@
 
 ---
 
-## 🔴 Problemas Críticos (Acción Inmediata)
+## ✅ Mejoras Implementadas (2026-03-17)
 
-### 1. API Keys en Texto Plano
-- **Severidad:** CRÍTICA 🔴
-- **Ubicación:** `src/core/entities/api-key.entity.ts`, `src/core/api-key.service.ts:38`
-- **Problema:** Las API Keys se generan y guardan en texto plano en la base de datos
-- **Impacto:** Si la DB se compromete, todas las llaves son legibles y utilizables
-- **Solución:** Almacenar solo el hash de la llave (SHA-256 con salt)
-
+### 1. API Keys con Hash - RESUELTO ✅
+- **Estado:** IMPLEMENTADO
+- **Ubicación:** `src/core/api-key.service.ts`
+- **Solución:** HMAC-SHA256 con secret desde configuración
+- **Código actual:**
 ```typescript
-// src/core/api-key.service.ts - IMPLEMENTAR
-async create(description?: string): Promise<{ key: string; entity: ApiKey }> {
-  const plainKey = crypto.randomBytes(32).toString('hex');
-  const salt = crypto.randomBytes(16).toString('hex');
-  const hashedKey = crypto.createHmac('sha256', salt).update(plainKey).digest('hex');
-
-  const entity = await this.apiKeyRepository.save({
-    key: hashedKey,
-    salt,
-    description
-  });
-  return { key: plainKey, entity }; // Solo se muestra al crear
+private hashKey(plainKey: string): string {
+  return crypto
+    .createHmac('sha256', this.apiKeySecret)
+    .update(plainKey)
+    .digest('hex');
 }
 
-async validate(key: string): Promise<boolean> {
-  const hashedKey = crypto.createHmac('sha256', salt).update(key).digest('hex');
-  const apiKey = await this.apiKeyRepository.findOne({
-    where: { key: hashedKey, isActive: true },
-  });
-  return !!apiKey;
+async create(description?: string): Promise<{ apiKey: ApiKey; plainKey: string }> {
+  const plainKey = crypto.randomBytes(32).toString('hex');
+  const hashedKey = this.hashKey(plainKey);
+  const apiKey = this.apiKeyRepository.create({ hashedKey, description });
+  return { apiKey: await this.apiKeyRepository.save(apiKey), plainKey };
 }
 ```
 
-### 2. Falta de Security Headers (Helmet)
+### 2. Swagger con Puerto Dinámico - RESUELTO ✅
+- **Estado:** IMPLEMENTADO
+- **Ubicación:** `src/main.ts:91`
+- **Solución:** Usa `appConfig.port` desde env vars
+- **Código actual:**
+```typescript
+.addServer(`http://localhost:${appConfig.port}`, 'Development')
+```
+
+---
+
+## 🔴 Problemas Críticos (Pendientes)
+
+### 1. Falta de Security Headers (Helmet)
 - **Severidad:** ALTA 🟠
 - **Ubicación:** `src/main.ts`
 - **Problema:** No hay headers de seguridad (XSS protection, CSP, HSTS, etc.)
@@ -128,10 +133,10 @@ async function bootstrap() {
 }
 ```
 
-### 3. Enumeración de Usuarios en Auth
+### 2. Enumeración de Usuarios en Auth
 - **Severidad:** MEDIA 🟡
-- **Ubicación:** `src/auth/auth.service.ts:98`
-- **Problema:** Diferencia entre "User not found" e "Invalid credentials"
+- **Ubicación:** `src/auth/auth.service.ts:95-104`
+- **Problema:** Diferencia entre "User not found" (linea 98) e "Invalid credentials" (linea 102)
 - **Impacto:** Permite enumeración de usuarios válidos
 - **Solución:** Mensaje genérico para ambos casos
 
@@ -157,7 +162,7 @@ async validateUser(email: string, password: string): Promise<User> {
 
 ## 🟡 Problemas de Corto Plazo (Próximo Sprint)
 
-### 4. API Keys en Query Param (URL)
+### 1. API Keys en Query Param (URL)
 - **Severidad:** MEDIA 🟡
 - **Ubicación:** `src/core/api-key.guard.ts:13`
 - **Problema:** Se acepta `?api_key=` en URL, las URLs se loguean en servidores y navegadores
@@ -184,7 +189,7 @@ async canActivate(context: ExecutionContext): Promise<boolean> {
 }
 ```
 
-### 5. Falta Índice en Email de User
+### 2. Falta Índice en Email de User
 - **Severidad:** BAJA 🟢
 - **Ubicación:** `src/users/entities/user.entity.ts`
 - **Problema:** El campo `email` tiene `@Unique` pero no índice explícito
@@ -197,7 +202,7 @@ async canActivate(context: ExecutionContext): Promise<boolean> {
 email: string;
 ```
 
-### 6. Health Check Ineficiente
+### 3. Health Check Ineficiente
 - **Severidad:** BAJA 🟢
 - **Ubicación:** `src/health/health.controller.ts`
 - **Problema:** Hace ping a `docs.nestjs.com` - si la documentación de NestJS se cae, tu API marca "Unhealthy"
@@ -215,12 +220,12 @@ async check() {
 }
 ```
 
-### 7. Dependencias Redundantes
+### 4. Dependencias Redundantes
 - **Severidad:** BAJA 🟢
 - **Problema:** Proyecto usa `bcrypt` y `bcryptjs` simultáneamente
 - **Solución:** Migrar todo a `bcrypt` (ya está instalado) o `@node-rs/bcrypt`
 
-### 8. Falta Global Prefix
+### 5. Falta Global Prefix
 - **Severidad:** BAJA 🟢
 - **Ubicación:** `src/main.ts`
 - **Problema:** API sin versionado explícito
@@ -230,21 +235,21 @@ async check() {
 
 ## 🟢 Problemas de Largo Plazo (Backlog)
 
-### 9. Fuga de Abstracción en Core
+### 1. Fuga de Abstracción en Core
 - **Ubicación:** `src/core/services/base-crud.service.ts`
 - **Problema:** `BaseCrudService` importa `DeleteResponseDto` desde `@projects/dto`
 - **Impacto:** El core no debe depender de módulos de dominio
 - **Solución:** Mover DTOs genéricos a `@core/dto`
 
-### 10. Falta Transacciones en DB
+### 2. Falta Transacciones en DB
 - **Problema:** No hay uso de `@Transaction()` o `DataSource.transaction()`
 - **Solución:** Implementar transacciones para operaciones atómicas
 
-### 11. Falta Caching
+### 3. Falta Caching
 - **Problema:** Sin Redis o cache para `GET /projects`
 - **Solución:** Implementar caché para endpoints de lectura frecuente
 
-### 12. Falta Password Strength Validation
+### 4. Falta Password Strength Validation
 - **Ubicación:** `src/auth/dto/register.dto.ts`
 - **Solución:** Agregar validación de fortaleza de password
 
@@ -257,14 +262,14 @@ async check() {
 password: string;
 ```
 
-### 13. Falta Environment Variable Validation
+### 5. Falta Environment Variable Validation
 - **Solución:** Usar `joi` para validar variables de entorno al startup
 
-### 14. Refresh Tokens
+### 6. Refresh Tokens
 - **Problema:** Sin mecanismo de refresh token
 - **Solución:** Implementar refresh token para mejor seguridad
 
-### 15. Soft Delete No Implementado
+### 7. Soft Delete No Implementado
 - **Ubicación:** `src/core/entities/base.entity.ts:39` (campo existe)
 - **Problema:** Campo `deletedAt` existe pero no hay lógica de soft delete
 - **Solución:** Implementar soft delete en repositories o usar TypeORM soft delete
@@ -273,8 +278,11 @@ password: string;
 
 ## 📋 Checklist de Mejoras
 
-### 🔴 Crítico (Esta Semana)
-- [ ] **Hashear API Keys** - Implementar hashing con salt
+### ✅ Implementado (2026-03-17)
+- [x] **Hashear API Keys** - HMAC-SHA256 con secret
+- [x] **Swagger con puerto dinámico** - Desde `PORT` env var
+
+### 🔴 Crítico (Pendiente)
 - [ ] **Agregar Helmet** - Security headers básicos
 - [ ] **Unificar mensajes de auth** - Evitar enumeración de usuarios
 
@@ -300,12 +308,18 @@ password: string;
 
 El Portfolio API es una **API REST robusta** con arquitectura modular limpia y excelentes patrones de código. La cobertura de testing es excepcional (90.1%) y la documentación es comprehensiva.
 
-**Problema Principal:** La seguridad es el punto más débil (4/10) debido al almacenamiento de API keys en texto plano, lo cual es crítico de resolver.
+**Mejoras Recientes (2026-03-17):**
+- ✅ API keys ahora se almacenan con hash HMAC-SHA256
+- ✅ Swagger usa puerto dinámico desde variables de entorno
 
-**Estado General:** El código es **production-ready** en términos de arquitectura y calidad, pero las vulnerabilidades de seguridad deben addressed inmediatamente antes de cualquier deployment a producción.
+**Problemas Pendientes:** La seguridad mejoró de 4/10 a 7/10, pero quedan 2 issues críticos:
+1. Falta Helmet para security headers
+2. Enumeración de usuarios en auth (mensajes diferentes)
+
+**Estado General:** El código es **casi production-ready**. Con las 2 mejoras críticas pendientes resueltas, estaría en condiciones óptimas para deployment a producción.
 
 ---
 
-**Última Actualización:** 2026-02-02
+**Última Actualización:** 2026-03-17
 **Reviewers:** Internal Team + Senior Backend Developer External
-**Próxima Revisión:** Después de implementar mejoras críticas
+**Próxima Revisión:** Después de implementar Helmet y unificar mensajes de auth
