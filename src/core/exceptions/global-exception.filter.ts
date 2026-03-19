@@ -10,6 +10,7 @@ import { Request, Response } from 'express';
 import { ErrorResponseDto, ErrorCode } from '@core/dto';
 import { BaseException } from '@core/exceptions';
 import { RequestContextService } from '@core/context/request-context.service';
+import { HealthCheckError } from '@nestjs/terminus';
 
 /**
  * Global exception filter that transforms all exceptions into standardized error responses
@@ -66,6 +67,23 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       });
       errorResponse.request_id = requestId;
       response.status(exception.getStatus()).json(errorResponse);
+    } else if (exception instanceof HealthCheckError) {
+      // Handle Terminus HealthCheckError - preserve health check details
+      // HealthCheckError has a `causes` property with the health check result
+      const causes = exception.causes as any;
+
+      response.status(HttpStatus.SERVICE_UNAVAILABLE).json({
+        status: 'error',
+        request_id: requestId,
+        error: {
+          code: 'HEALTH_CHECK_FAILED',
+          message: 'One or more health checks failed',
+          details: causes?.error || {},
+        },
+        data: causes,
+        path,
+        timestamp,
+      });
     } else if (exception instanceof HttpException) {
       const status = exception.getStatus();
       const exceptionResponse = exception.getResponse();
