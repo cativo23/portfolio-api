@@ -10,7 +10,7 @@ const db = loadDatabaseConfig();
 export default new DataSource({
   ...(createTypeOrmOptions(db) as DataSourceOptions),
   entities: [__dirname + '/../**/*.entity.js'],
-  migrations: [__dirname + '/../database/migrations/*-migration.js'],
+  migrations: [__dirname + '/../database/migrations/*.js'],
   migrationsRun: false,
   logging: true,
 } as DataSourceOptions);
