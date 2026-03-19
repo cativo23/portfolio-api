@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.1] - 2026-03-19
+
+### Fixed
+
+- **TypeORM migration loading in production**: Changed migration pattern from `*-migration.js` to `*.js` to ensure all migration files are loaded, fixing the missing `HashApiKeys` migration that renames `api_keys.key` to `api_keys.hashedKey`
+
 ## [2.2.0] - 2026-03-18
 
 ### Added
