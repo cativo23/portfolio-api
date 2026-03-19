@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.2] - 2026-03-19
+
+### Fixed
+
+- **Production seeder script**: Removed `tsconfig-paths/register` from `seed:test:prod` script since it's a devDependency and path aliases are already resolved in compiled JavaScript
+
 ## [2.2.1] - 2026-03-19
 
 ### Fixed
