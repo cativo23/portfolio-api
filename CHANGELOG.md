@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.3] - 2026-03-21
+
+### Security
+
+- **Removed exposed port 3000** - API no longer exposes unencrypted HTTP traffic directly, Traefik handles all routing
+- **Protected MySQL password** - Healthcheck no longer exposes password via command line (`--password` flag instead of `-p`)
+- **Required REDIS_PASSWORD** - Removed insecure default password fallback (`${REDIS_PASSWORD?Missing Redis password}`)
+
+### Changed
+
+- **Optimized API healthcheck** - Replaced Node.js process with lightweight `wget` command
+- **Added Traefik security-headers middleware** - Enforces HSTS, XSS filtering, and other security headers
+
 ## [2.2.2] - 2026-03-19
 
 ### Fixed
@@ -189,7 +202,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Automated CI/CD with GitHub Actions
 - Auto-release workflow for release branches
 
-[Unreleased]: https://github.com/cativo23/portfolio-api/compare/v2.2.0...HEAD
+[Unreleased]: https://github.com/cativo23/portfolio-api/compare/v2.2.3...HEAD
+[2.2.3]: https://github.com/cativo23/portfolio-api/compare/v2.2.2...v2.2.3
+[2.2.2]: https://github.com/cativo23/portfolio-api/compare/v2.2.0...v2.2.2
 [2.2.0]: https://github.com/cativo23/portfolio-api/compare/v2.1.2...v2.2.0
 [2.1.2]: https://github.com/cativo23/portfolio-api/compare/v2.1.1...v2.1.2
 [2.1.1]: https://github.com/cativo23/portfolio-api/compare/v2.1.0...v2.1.1
