@@ -64,9 +64,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
-    # No exponer MySQL públicamente en producción
-    # ports:
-    #   - '3306:3306'
     deploy:
       resources:
         limits:
@@ -90,9 +87,6 @@ services:
       timeout: 5s
       retries: 3
       start_period: 5s
-    # No exponer Redis públicamente en producción
-    # ports:
-    #   - '6379:6379'
     deploy:
       resources:
         limits:
