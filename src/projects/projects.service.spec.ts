@@ -62,6 +62,10 @@ describe('ProjectsService', () => {
         description: 'Test Description',
         shortDescription: 'Short Description',
         repoUrl: 'url',
+        content: 'Project content',
+        heroImage: 'https://example.com/hero.png',
+        features: ['Feature 1', 'Feature 2'],
+        status: 'Completed',
       };
       const project = { id: 1, ...createProjectDto };
 
@@ -75,6 +79,10 @@ describe('ProjectsService', () => {
           id: project.id,
           title: project.title,
           description: project.description,
+          content: project.content,
+          heroImage: project.heroImage,
+          features: project.features,
+          status: project.status,
         }),
       );
       expect(logSpy).toHaveBeenCalledWith(
@@ -88,6 +96,10 @@ describe('ProjectsService', () => {
         description: 'Test Description',
         shortDescription: 'Short Description',
         repoUrl: 'url',
+        content: 'Project content',
+        heroImage: 'https://example.com/hero.png',
+        features: ['Feature 1', 'Feature 2'],
+        status: 'Completed',
       };
       const project = { id: 1, ...createProjectDto };
 
@@ -107,6 +119,10 @@ describe('ProjectsService', () => {
         description: 'Test Description',
         shortDescription: 'Short Description',
         repoUrl: 'url',
+        content: 'Project content',
+        heroImage: 'https://example.com/hero.png',
+        features: ['Feature 1', 'Feature 2'],
+        status: 'Completed',
       };
       const project = { id: 1, ...createProjectDto };
       const error = new Error('Database error');
@@ -252,6 +268,12 @@ describe('ProjectsService', () => {
         id: 1,
         title: 'Test Project',
         description: 'Test Description',
+        shortDescription: 'Short Description',
+        repoUrl: 'url',
+        content: 'Project content',
+        heroImage: 'https://example.com/hero.png',
+        features: ['Feature 1'],
+        status: 'Completed',
       };
 
       jest.spyOn(repository, 'findOne').mockResolvedValue(project as any);
@@ -263,6 +285,10 @@ describe('ProjectsService', () => {
           id: project.id,
           title: project.title,
           description: project.description,
+          content: project.content,
+          heroImage: project.heroImage,
+          features: project.features,
+          status: project.status,
         }),
       );
       expect(logSpy).toHaveBeenCalledWith(`Found project with ID 1`);
@@ -302,11 +328,21 @@ describe('ProjectsService', () => {
       const updateProjectDto: UpdateProjectDto = {
         title: 'Updated Project',
         description: 'Updated Description',
+        content: 'Updated content',
+        heroImage: 'https://example.com/new-hero.png',
+        features: ['New Feature'],
+        status: 'In Progress',
       };
       const existingProject = {
         id: 1,
         title: 'Original Project',
         description: 'Original Description',
+        shortDescription: 'Short Description',
+        repoUrl: 'url',
+        content: 'Original content',
+        heroImage: 'https://example.com/old-hero.png',
+        features: ['Old Feature'],
+        status: 'Completed',
       };
       const updatedProject = {
         id: 1,
@@ -327,6 +363,10 @@ describe('ProjectsService', () => {
           id: updatedProject.id,
           title: updatedProject.title,
           description: updatedProject.description,
+          content: updatedProject.content,
+          heroImage: updatedProject.heroImage,
+          features: updatedProject.features,
+          status: updatedProject.status,
         }),
       );
       expect(logSpy).toHaveBeenCalledWith(`Updated project with ID 1`);
@@ -336,11 +376,21 @@ describe('ProjectsService', () => {
       const updateProjectDto: UpdateProjectDto = {
         title: 'Updated Project',
         description: 'Updated Description',
+        content: 'Updated content',
+        heroImage: 'https://example.com/new-hero.png',
+        features: ['New Feature'],
+        status: 'In Progress',
       };
       const existingProject = {
         id: 1,
         title: 'Original',
         description: 'Original',
+        shortDescription: 'Short Description',
+        repoUrl: 'url',
+        content: null,
+        heroImage: null,
+        features: [],
+        status: 'Completed',
       };
       const updatedProject = { id: 1, ...updateProjectDto };
 
@@ -384,6 +434,12 @@ describe('ProjectsService', () => {
         id: 1,
         title: 'Original Project',
         description: 'Original Description',
+        shortDescription: 'Short Description',
+        repoUrl: 'url',
+        content: null,
+        heroImage: null,
+        features: [],
+        status: 'Completed',
       };
       const error = new Error('Database error');
       error.stack = 'Error stack';

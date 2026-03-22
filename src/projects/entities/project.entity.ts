@@ -26,4 +26,16 @@ export class Project extends BaseEntity {
 
   @Column({ type: 'simple-json', nullable: true })
   techStack: string[];
+
+  @Column({ type: 'text', nullable: true })
+  content: string;
+
+  @Column({ nullable: true })
+  heroImage: string;
+
+  @Column({ type: 'simple-json', nullable: true })
+  features: string[];
+
+  @Column({ default: 'Completed' })
+  status: string;
 }

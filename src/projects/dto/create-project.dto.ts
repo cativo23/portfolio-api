@@ -7,6 +7,7 @@ import {
   IsArray,
   IsUrl,
   IsBoolean,
+  IsEnum,
 } from 'class-validator';
 
 export class CreateProjectDto {
@@ -45,4 +46,29 @@ export class CreateProjectDto {
   @IsString({ each: true })
   @ApiPropertyOptional({ description: 'Tech stack', type: [String] })
   techStack?: string[];
+
+  @IsOptional()
+  @IsString()
+  @ApiPropertyOptional({ description: 'Main content (Markdown or HTML) for case study' })
+  content?: string;
+
+  @IsOptional()
+  @IsString()
+  @ApiPropertyOptional({ description: 'URL to hero image or architecture diagram' })
+  heroImage?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @ApiPropertyOptional({ description: 'Key features of the project', type: [String] })
+  features?: string[];
+
+  @IsOptional()
+  @IsEnum(['Completed', 'In Progress', 'Maintained'])
+  @ApiPropertyOptional({
+    description: 'Project status',
+    enum: ['Completed', 'In Progress', 'Maintained'],
+    default: 'Completed',
+  })
+  status?: string;
 }

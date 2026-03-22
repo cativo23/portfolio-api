@@ -43,6 +43,28 @@ async function seed() {
         repoUrl: 'https://github.com/cativo23/portfolio',
         isFeatured: true,
         techStack: ['Nuxt.js', 'Tailwind CSS', 'Vue.js', 'TypeScript'],
+        content: `# Portfolio Website
+
+This is my personal portfolio website showcasing my work as a developer.
+
+## Features
+
+- Responsive design
+- Dark mode support
+- Project showcase
+- Contact form
+
+## Technologies
+
+Built with Nuxt.js 3, Tailwind CSS, and deployed on Vercel.`,
+        heroImage: 'https://cativo.dev/og-image.png',
+        features: [
+          'Responsive design',
+          'Dark mode',
+          'SEO optimized',
+          'Fast performance',
+        ],
+        status: 'Completed',
       }),
       projectRepo.create({
         title: 'Portfolio API',
@@ -59,6 +81,30 @@ async function seed() {
           'Docker',
           'JWT',
         ],
+        content: `# Portfolio API
+
+A RESTful API for managing portfolio projects and contacts.
+
+## Architecture
+
+- Clean architecture with separation of concerns
+- JWT authentication
+- Role-based access control
+- Caching layer for performance
+
+## Endpoints
+
+- /projects - CRUD operations for projects
+- /contacts - Contact form submissions
+- /auth - Authentication endpoints`,
+        heroImage: 'https://api.cativo.dev/architecture-diagram.png',
+        features: [
+          'JWT authentication',
+          'Swagger documentation',
+          'Automated testing',
+          'Docker support',
+        ],
+        status: 'Maintained',
       }),
       projectRepo.create({
         title: 'Blog Platform',
@@ -69,8 +115,20 @@ async function seed() {
         repoUrl: 'https://github.com/cativo23/blog-platform',
         isFeatured: false,
         techStack: ['Next.js', 'Tailwind CSS', 'TypeScript'],
-      }),
+        content: `# Blog Platform
 
+A modern blogging platform with rich text editing capabilities.
+
+## Features
+
+- Markdown editor
+- User authentication
+- Comment system
+- Tag management`,
+        heroImage: 'https://blog.example.com/hero.png',
+        features: ['Markdown support', 'User management', 'SEO friendly'],
+        status: 'Completed',
+      }),
       projectRepo.create({
         title: 'Blog Platform',
         description:
@@ -80,8 +138,20 @@ async function seed() {
         repoUrl: 'https://github.com/cativo23/blog-platform',
         isFeatured: false,
         techStack: ['Next.js', 'Tailwind CSS', 'TypeScript'],
-      }),
+        content: `# Blog Platform
 
+A modern blogging platform with rich text editing capabilities.
+
+## Features
+
+- Markdown editor
+- User authentication
+- Comment system
+- Tag management`,
+        heroImage: 'https://blog.example.com/hero.png',
+        features: ['Markdown support', 'User management', 'SEO friendly'],
+        status: 'Completed',
+      }),
       projectRepo.create({
         title: 'E-commerce Store',
         description:
@@ -91,8 +161,24 @@ async function seed() {
         repoUrl: 'https://github.com/cativo23/ecommerce-store',
         isFeatured: false,
         techStack: ['React', 'Node.js', 'Express', 'MongoDB', 'TypeScript'],
-      }),
+        content: `# E-commerce Store
 
+Full-featured e-commerce platform with payment processing.
+
+## Features
+
+- Product catalog
+- Shopping cart
+- Stripe payment integration
+- Order management`,
+        heroImage: 'https://store.example.com/hero.png',
+        features: [
+          'Payment integration',
+          'Inventory management',
+          'Order tracking',
+        ],
+        status: 'In Progress',
+      }),
       projectRepo.create({
         title: 'Task Manager',
         description:
@@ -102,8 +188,24 @@ async function seed() {
         repoUrl: 'https://github.com/cativo23/task-manager',
         isFeatured: false,
         techStack: ['Angular', 'Firebase', 'TypeScript'],
-      }),
+        content: `# Task Manager
 
+Real-time task management application with team collaboration features.
+
+## Features
+
+- Real-time sync
+- Team collaboration
+- Task priorities
+- Due dates and reminders`,
+        heroImage: 'https://tasks.example.com/hero.png',
+        features: [
+          'Real-time updates',
+          'Team collaboration',
+          'Mobile responsive',
+        ],
+        status: 'Completed',
+      }),
       projectRepo.create({
         title: 'Social Media App',
         description:
@@ -113,6 +215,24 @@ async function seed() {
         repoUrl: 'https://github.com/cativo23/social-media-app',
         isFeatured: false,
         techStack: ['React', 'Node.js', 'Express', 'MongoDB', 'TypeScript'],
+        content: `# Social Media App
+
+A social networking platform with real-time messaging and content sharing.
+
+## Features
+
+- User profiles
+- News feed
+- Direct messaging
+- Media sharing`,
+        heroImage: 'https://social.example.com/hero.png',
+        features: [
+          'Real-time messaging',
+          'Media uploads',
+          'Friend system',
+          'Notifications',
+        ],
+        status: 'In Progress',
       }),
     ];
     await projectRepo.save(projects);
