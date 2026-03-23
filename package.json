@@ -1,12 +1,13 @@
 {
   "name": "portfolio-api",
-  "version": "2.3.1",
+  "version": "2.4.0",
   "description": "",
   "author": "",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
+    "typecheck": "tsc --noEmit",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"eslint.config.js\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\" \"eslint.config.js\"",
     "start": "nest start",

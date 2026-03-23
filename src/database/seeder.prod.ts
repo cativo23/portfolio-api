@@ -2,6 +2,7 @@ import AppDataSource from '@config/typeorm.config.prod';
 import { User } from '@users/entities/user.entity';
 import { Project } from '@projects/entities/project.entity';
 import { Contact } from '@contacts/entities/contact.entity';
+import { ProjectStatus } from '@projects/types/project-status';
 import * as bcrypt from 'bcrypt';
 
 async function seed() {
@@ -59,7 +60,7 @@ Built with Nuxt.js 3, Tailwind CSS, and deployed on Vercel.`,
           'SEO optimized',
           'Fast performance',
         ],
-        status: 'Completed',
+        status: ProjectStatus.COMPLETED,
       }),
       projectRepo.create({
         title: 'Portfolio API',
@@ -99,7 +100,7 @@ A RESTful API for managing portfolio projects and contacts.
           'Automated testing',
           'Docker support',
         ],
-        status: 'Maintained',
+        status: ProjectStatus.MAINTAINED,
       }),
       projectRepo.create({
         title: 'Myths and Legends from El Salvador API',
@@ -125,7 +126,7 @@ An API providing information about myths and legends from El Salvador.
           'Search functionality',
           'Educational content',
         ],
-        status: 'Completed',
+        status: ProjectStatus.COMPLETED,
       }),
       projectRepo.create({
         title: 'Tacoview',
@@ -160,7 +161,7 @@ Event-driven restaurant review platform demonstrating modern microservices archi
           'Real-time processing',
           'Scalable design',
         ],
-        status: 'In Progress',
+        status: ProjectStatus.IN_PROGRESS,
       }),
     ];
     await projectRepo.save(projects);

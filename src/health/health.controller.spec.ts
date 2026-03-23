@@ -71,7 +71,7 @@ describe('HealthController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should return health check results with summary, checks, and checkedAt', async () => {
+  it('should return health check results with status, timestamp, and components', async () => {
     const healthCheckResult: HealthCheckResult = {
       status: 'ok',
       info: {
@@ -130,8 +130,9 @@ describe('HealthController', () => {
     const result = await controller.check();
 
     expect(result).toHaveProperty('status');
-    expect(result).toHaveProperty('components');
     expect(result).toHaveProperty('timestamp');
+    expect(result).toHaveProperty('components');
+    expect(result.status).toBe('ok');
     expect(result.components.database).toBeDefined();
     expect(result.components.redis).toBeDefined();
     expect(result.components.memory).toBeDefined();
