@@ -26,9 +26,10 @@ import { SuccessResponseDto } from '@core/dto';
  * 4. Testable - easier to mock in tests
  */
 @Injectable()
-export class ResponseTransformInterceptor<T>
-  implements NestInterceptor<T, SuccessResponseDto<T>>
-{
+export class ResponseTransformInterceptor<T> implements NestInterceptor<
+  T,
+  SuccessResponseDto<T>
+> {
   constructor(private readonly requestContext: RequestContextService) {}
 
   /**

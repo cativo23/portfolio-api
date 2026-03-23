@@ -22,7 +22,9 @@ export function validateConfiguration(
   }
 
   // Try to get config from namespaces first, fall back to process.env
-  const db = config.database as { host?: string; username?: string; database?: string } | undefined;
+  const db = config.database as
+    | { host?: string; username?: string; database?: string }
+    | undefined;
   const jwt = config.jwt as { secret?: string } | undefined;
   const redis = config.redis as { host?: string } | undefined;
   const apiKey = config.apiKey as { secret?: string } | undefined;
@@ -30,7 +32,9 @@ export function validateConfiguration(
   // Build validation rules using config namespaces or process.env as fallback
   const rules: ValidationRule[] = [
     {
-      condition: !(jwt?.secret?.length || trimEnvQuotes(process.env.JWT_SECRET)),
+      condition: !(
+        jwt?.secret?.length || trimEnvQuotes(process.env.JWT_SECRET)
+      ),
       message: 'JWT_SECRET is required',
     },
     {
@@ -38,7 +42,9 @@ export function validateConfiguration(
       message: 'DB_HOST is required',
     },
     {
-      condition: !(db?.username?.length || trimEnvQuotes(process.env.DB_USERNAME)),
+      condition: !(
+        db?.username?.length || trimEnvQuotes(process.env.DB_USERNAME)
+      ),
       message: 'DB_USERNAME is required',
     },
     {
@@ -46,11 +52,15 @@ export function validateConfiguration(
       message: 'DB_NAME is required',
     },
     {
-      condition: !(redis?.host?.length || trimEnvQuotes(process.env.REDIS_HOST)),
+      condition: !(
+        redis?.host?.length || trimEnvQuotes(process.env.REDIS_HOST)
+      ),
       message: 'REDIS_HOST is required',
     },
     {
-      condition: !(apiKey?.secret?.length || trimEnvQuotes(process.env.API_KEY_SECRET)),
+      condition: !(
+        apiKey?.secret?.length || trimEnvQuotes(process.env.API_KEY_SECRET)
+      ),
       message: 'API_KEY_SECRET is required',
     },
   ];

@@ -228,7 +228,8 @@ export class HealthService {
     if (redis.status === 'down') notReady.push('redis');
 
     return {
-      status: notReady.length === 0 ? ('ready' as const) : ('not_ready' as const),
+      status:
+        notReady.length === 0 ? ('ready' as const) : ('not_ready' as const),
       timestamp: new Date().toISOString(),
       ...(notReady.length > 0 && { notReadyDependencies: notReady }),
     };

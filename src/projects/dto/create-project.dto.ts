@@ -53,13 +53,20 @@ export class CreateProjectDto {
   @IsArray()
   @IsString({ each: true })
   @MaxLength(50, { each: true })
-  @ApiPropertyOptional({ description: 'Tech stack', type: [String], maxItems: 20 })
+  @ApiPropertyOptional({
+    description: 'Tech stack',
+    type: [String],
+    maxItems: 20,
+  })
   techStack?: string[];
 
   @IsOptional()
   @IsString()
   @MaxLength(50000)
-  @ApiPropertyOptional({ description: 'Main content (Markdown or HTML) for case study', maxLength: 50000 })
+  @ApiPropertyOptional({
+    description: 'Main content (Markdown or HTML) for case study',
+    maxLength: 50000,
+  })
   content?: string;
 
   @IsOptional()
@@ -73,7 +80,11 @@ export class CreateProjectDto {
   @IsArray()
   @IsString({ each: true })
   @MaxLength(100, { each: true })
-  @ApiPropertyOptional({ description: 'Key features of the project', type: [String], maxItems: 20 })
+  @ApiPropertyOptional({
+    description: 'Key features of the project',
+    type: [String],
+    maxItems: 20,
+  })
   features?: string[];
 
   @IsOptional()
