@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Project } from '@projects/entities/project.entity';
+import { ProjectStatus } from '@projects/types/project-status';
 
 /**
  * DTO for project response
@@ -26,8 +27,8 @@ export class ProjectResponseDto {
   @ApiProperty({ description: 'Is the project featured?' })
   isFeatured: boolean;
 
-  @ApiProperty({ description: 'Tech stack', type: [String], required: false })
-  techStack?: string[];
+  @ApiProperty({ description: 'Tech stack', type: [String] })
+  techStack: string[];
 
   @ApiProperty({ description: 'Main content (Markdown or HTML)', required: false })
   content?: string;
@@ -35,11 +36,11 @@ export class ProjectResponseDto {
   @ApiProperty({ description: 'Hero image URL', required: false })
   heroImage?: string;
 
-  @ApiProperty({ description: 'Key features', type: [String], required: false })
-  features?: string[];
+  @ApiProperty({ description: 'Key features', type: [String] })
+  features: string[];
 
-  @ApiProperty({ description: 'Project status', default: 'Completed' })
-  status: string;
+  @ApiProperty({ description: 'Project status', enum: ProjectStatus, default: ProjectStatus.COMPLETED })
+  status: ProjectStatus;
 
   @ApiProperty({ description: 'Creation date' })
   createdAt: Date;
@@ -61,11 +62,11 @@ export class ProjectResponseDto {
     dto.liveUrl = project.liveUrl;
     dto.repoUrl = project.repoUrl;
     dto.isFeatured = project.isFeatured;
-    dto.techStack = project.techStack || [];
+    dto.techStack = project.techStack ?? [];
     dto.content = project.content;
     dto.heroImage = project.heroImage;
-    dto.features = project.features || [];
-    dto.status = project.status || 'Completed';
+    dto.features = project.features ?? [];
+    dto.status = project.status ?? ProjectStatus.COMPLETED;
     dto.createdAt = project.createdAt;
     dto.updatedAt = project.updatedAt;
     return dto;

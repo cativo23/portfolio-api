@@ -8,6 +8,7 @@ import { UpdateProjectDto } from '@projects/dto';
 import { NotFoundException, Logger } from '@nestjs/common';
 import { SuccessResponseDto } from '@core/dto';
 import { CacheInvalidationService } from '@src/cache/cache-invalidation.service';
+import { ProjectStatus } from './types/project-status';
 
 describe('ProjectsService', () => {
   let service: ProjectsService;
@@ -65,7 +66,7 @@ describe('ProjectsService', () => {
         content: 'Project content',
         heroImage: 'https://example.com/hero.png',
         features: ['Feature 1', 'Feature 2'],
-        status: 'Completed',
+        status: ProjectStatus.COMPLETED,
       };
       const project = { id: 1, ...createProjectDto };
 
@@ -99,7 +100,7 @@ describe('ProjectsService', () => {
         content: 'Project content',
         heroImage: 'https://example.com/hero.png',
         features: ['Feature 1', 'Feature 2'],
-        status: 'Completed',
+        status: ProjectStatus.COMPLETED,
       };
       const project = { id: 1, ...createProjectDto };
 
@@ -122,7 +123,7 @@ describe('ProjectsService', () => {
         content: 'Project content',
         heroImage: 'https://example.com/hero.png',
         features: ['Feature 1', 'Feature 2'],
-        status: 'Completed',
+        status: ProjectStatus.COMPLETED,
       };
       const project = { id: 1, ...createProjectDto };
       const error = new Error('Database error');
@@ -273,7 +274,7 @@ describe('ProjectsService', () => {
         content: 'Project content',
         heroImage: 'https://example.com/hero.png',
         features: ['Feature 1'],
-        status: 'Completed',
+        status: ProjectStatus.COMPLETED,
       };
 
       jest.spyOn(repository, 'findOne').mockResolvedValue(project as any);
@@ -331,7 +332,7 @@ describe('ProjectsService', () => {
         content: 'Updated content',
         heroImage: 'https://example.com/new-hero.png',
         features: ['New Feature'],
-        status: 'In Progress',
+        status: ProjectStatus.IN_PROGRESS,
       };
       const existingProject = {
         id: 1,
@@ -342,7 +343,7 @@ describe('ProjectsService', () => {
         content: 'Original content',
         heroImage: 'https://example.com/old-hero.png',
         features: ['Old Feature'],
-        status: 'Completed',
+        status: ProjectStatus.COMPLETED,
       };
       const updatedProject = {
         id: 1,
@@ -379,7 +380,7 @@ describe('ProjectsService', () => {
         content: 'Updated content',
         heroImage: 'https://example.com/new-hero.png',
         features: ['New Feature'],
-        status: 'In Progress',
+        status: ProjectStatus.IN_PROGRESS,
       };
       const existingProject = {
         id: 1,
@@ -390,7 +391,7 @@ describe('ProjectsService', () => {
         content: null,
         heroImage: null,
         features: [],
-        status: 'Completed',
+        status: ProjectStatus.COMPLETED,
       };
       const updatedProject = { id: 1, ...updateProjectDto };
 
@@ -439,7 +440,7 @@ describe('ProjectsService', () => {
         content: null,
         heroImage: null,
         features: [],
-        status: 'Completed',
+        status: ProjectStatus.COMPLETED,
       };
       const error = new Error('Database error');
       error.stack = 'Error stack';

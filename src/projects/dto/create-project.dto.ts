@@ -9,22 +9,27 @@ import {
   IsBoolean,
   IsEnum,
   MaxLength,
+  MinLength,
 } from 'class-validator';
+import { ProjectStatus } from '@projects/types/project-status';
 
 export class CreateProjectDto {
   @IsNotEmpty()
   @IsString()
-  @ApiProperty({ description: 'Project title' })
+  @MaxLength(200)
+  @ApiProperty({ description: 'Project title', maxLength: 200 })
   title: string;
 
   @IsNotEmpty()
   @IsString()
-  @ApiProperty({ description: 'Project description' })
+  @MaxLength(1000)
+  @ApiProperty({ description: 'Project description', maxLength: 1000 })
   description: string;
 
   @IsNotEmpty()
   @IsString()
-  @ApiProperty({ description: 'Short description' })
+  @MaxLength(500)
+  @ApiProperty({ description: 'Short description', maxLength: 500 })
   shortDescription: string;
 
   @IsOptional()
@@ -47,7 +52,8 @@ export class CreateProjectDto {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  @ApiPropertyOptional({ description: 'Tech stack', type: [String] })
+  @MaxLength(50, { each: true })
+  @ApiPropertyOptional({ description: 'Tech stack', type: [String], maxItems: 20 })
   techStack?: string[];
 
   @IsOptional()
@@ -66,15 +72,16 @@ export class CreateProjectDto {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  @ApiPropertyOptional({ description: 'Key features of the project', type: [String] })
+  @MaxLength(100, { each: true })
+  @ApiPropertyOptional({ description: 'Key features of the project', type: [String], maxItems: 20 })
   features?: string[];
 
   @IsOptional()
-  @IsEnum(['Completed', 'In Progress', 'Maintained'])
+  @IsEnum(ProjectStatus)
   @ApiPropertyOptional({
     description: 'Project status',
-    enum: ['Completed', 'In Progress', 'Maintained'],
-    default: 'Completed',
+    enum: ProjectStatus,
+    default: ProjectStatus.COMPLETED,
   })
-  status?: string;
+  status?: ProjectStatus;
 }

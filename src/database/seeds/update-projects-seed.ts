@@ -189,13 +189,13 @@ async function updateProjects() {
     for (const project of projects) {
       const updateData = projectUpdates[project.title];
 
-      // Only update if the project has missing data
-      if (updateData && (!project.content || !project.heroImage || !project.features || !project.status)) {
+      // Only update if the project has missing data (null or undefined)
+      if (updateData && (project.content == null || project.heroImage == null || project.features == null || project.status == null)) {
         await projectRepo.update(project.id, {
-          content: project.content || updateData.content,
-          heroImage: project.heroImage || updateData.heroImage,
-          features: project.features || updateData.features,
-          status: project.status || updateData.status,
+          content: project.content ?? updateData.content,
+          heroImage: project.heroImage ?? updateData.heroImage,
+          features: project.features ?? updateData.features,
+          status: project.status ?? updateData.status,
         });
         updatedCount++;
         console.log(`Updated project: ${project.title}`);
