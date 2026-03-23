@@ -26,7 +26,8 @@
     "migration:run:prod": "node ./node_modules/typeorm/cli.js migration:run -d ./dist/src/config/typeorm.config.prod.js",
     "migration:revert:prod": "node ./node_modules/typeorm/cli.js migration:revert -d ./dist/src/config/typeorm.config.prod.js",
     "seed:test": "npx ts-node -r tsconfig-paths/register src/database/seeder.ts",
-    "seed:test:prod": "node dist/src/database/seeder.prod.js"
+    "seed:test:prod": "node dist/src/database/seeder.prod.js",
+    "seed:update-projects": "npx ts-node -r tsconfig-paths/register src/database/seeds/update-projects-seed.ts"
   },
   "dependencies": {
     "@nestjs/axios": "^4.0.0",
@@ -58,6 +59,7 @@
     "passport-local": "^1.0.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
+    "sanitize-html": "^2.17.2",
     "swagger-ui-express": "^5.0.1",
     "typeorm": "^0.3.24",
     "webpack": "^5.99.9"
@@ -69,6 +71,7 @@
     "@types/express": "^5.0.3",
     "@types/jest": "^29.5.14",
     "@types/node": "^24.0.1",
+    "@types/sanitize-html": "^2.16.1",
     "@types/supertest": "^6.0.3",
     "@typescript-eslint/eslint-plugin": "^8.34.0",
     "@typescript-eslint/parser": "^8.34.0",

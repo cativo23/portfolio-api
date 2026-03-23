@@ -17,6 +17,7 @@ import { NotFoundException } from '@core/exceptions/not-found.exception';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { ProjectStatus } from './types/project-status';
 
 describe('ProjectsController', () => {
   let controller: ProjectsController;
@@ -31,6 +32,10 @@ describe('ProjectsController', () => {
     liveUrl: null,
     isFeatured: false,
     techStack: ['NestJS', 'TypeORM'],
+    content: 'Project content in Markdown',
+    heroImage: 'https://example.com/hero.png',
+    features: ['Feature 1', 'Feature 2'],
+    status: ProjectStatus.COMPLETED,
     createdAt: new Date('2023-01-01T00:00:00Z'),
     updatedAt: new Date('2023-01-01T00:00:00Z'),
     deletedAt: null,

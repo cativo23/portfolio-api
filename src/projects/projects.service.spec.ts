@@ -8,6 +8,7 @@ import { UpdateProjectDto } from '@projects/dto';
 import { NotFoundException, Logger } from '@nestjs/common';
 import { SuccessResponseDto } from '@core/dto';
 import { CacheInvalidationService } from '@src/cache/cache-invalidation.service';
+import { ProjectStatus } from './types/project-status';
 
 describe('ProjectsService', () => {
   let service: ProjectsService;
@@ -62,6 +63,10 @@ describe('ProjectsService', () => {
         description: 'Test Description',
         shortDescription: 'Short Description',
         repoUrl: 'url',
+        content: 'Project content',
+        heroImage: 'https://example.com/hero.png',
+        features: ['Feature 1', 'Feature 2'],
+        status: ProjectStatus.COMPLETED,
       };
       const project = { id: 1, ...createProjectDto };
 
@@ -75,6 +80,10 @@ describe('ProjectsService', () => {
           id: project.id,
           title: project.title,
           description: project.description,
+          content: project.content,
+          heroImage: project.heroImage,
+          features: project.features,
+          status: project.status,
         }),
       );
       expect(logSpy).toHaveBeenCalledWith(
@@ -88,6 +97,10 @@ describe('ProjectsService', () => {
         description: 'Test Description',
         shortDescription: 'Short Description',
         repoUrl: 'url',
+        content: 'Project content',
+        heroImage: 'https://example.com/hero.png',
+        features: ['Feature 1', 'Feature 2'],
+        status: ProjectStatus.COMPLETED,
       };
       const project = { id: 1, ...createProjectDto };
 
@@ -107,6 +120,10 @@ describe('ProjectsService', () => {
         description: 'Test Description',
         shortDescription: 'Short Description',
         repoUrl: 'url',
+        content: 'Project content',
+        heroImage: 'https://example.com/hero.png',
+        features: ['Feature 1', 'Feature 2'],
+        status: ProjectStatus.COMPLETED,
       };
       const project = { id: 1, ...createProjectDto };
       const error = new Error('Database error');
@@ -252,6 +269,12 @@ describe('ProjectsService', () => {
         id: 1,
         title: 'Test Project',
         description: 'Test Description',
+        shortDescription: 'Short Description',
+        repoUrl: 'url',
+        content: 'Project content',
+        heroImage: 'https://example.com/hero.png',
+        features: ['Feature 1'],
+        status: ProjectStatus.COMPLETED,
       };
 
       jest.spyOn(repository, 'findOne').mockResolvedValue(project as any);
@@ -263,6 +286,10 @@ describe('ProjectsService', () => {
           id: project.id,
           title: project.title,
           description: project.description,
+          content: project.content,
+          heroImage: project.heroImage,
+          features: project.features,
+          status: project.status,
         }),
       );
       expect(logSpy).toHaveBeenCalledWith(`Found project with ID 1`);
@@ -302,11 +329,21 @@ describe('ProjectsService', () => {
       const updateProjectDto: UpdateProjectDto = {
         title: 'Updated Project',
         description: 'Updated Description',
+        content: 'Updated content',
+        heroImage: 'https://example.com/new-hero.png',
+        features: ['New Feature'],
+        status: ProjectStatus.IN_PROGRESS,
       };
       const existingProject = {
         id: 1,
         title: 'Original Project',
         description: 'Original Description',
+        shortDescription: 'Short Description',
+        repoUrl: 'url',
+        content: 'Original content',
+        heroImage: 'https://example.com/old-hero.png',
+        features: ['Old Feature'],
+        status: ProjectStatus.COMPLETED,
       };
       const updatedProject = {
         id: 1,
@@ -327,6 +364,10 @@ describe('ProjectsService', () => {
           id: updatedProject.id,
           title: updatedProject.title,
           description: updatedProject.description,
+          content: updatedProject.content,
+          heroImage: updatedProject.heroImage,
+          features: updatedProject.features,
+          status: updatedProject.status,
         }),
       );
       expect(logSpy).toHaveBeenCalledWith(`Updated project with ID 1`);
@@ -336,11 +377,21 @@ describe('ProjectsService', () => {
       const updateProjectDto: UpdateProjectDto = {
         title: 'Updated Project',
         description: 'Updated Description',
+        content: 'Updated content',
+        heroImage: 'https://example.com/new-hero.png',
+        features: ['New Feature'],
+        status: ProjectStatus.IN_PROGRESS,
       };
       const existingProject = {
         id: 1,
         title: 'Original',
         description: 'Original',
+        shortDescription: 'Short Description',
+        repoUrl: 'url',
+        content: null,
+        heroImage: null,
+        features: [],
+        status: ProjectStatus.COMPLETED,
       };
       const updatedProject = { id: 1, ...updateProjectDto };
 
@@ -384,6 +435,12 @@ describe('ProjectsService', () => {
         id: 1,
         title: 'Original Project',
         description: 'Original Description',
+        shortDescription: 'Short Description',
+        repoUrl: 'url',
+        content: null,
+        heroImage: null,
+        features: [],
+        status: ProjectStatus.COMPLETED,
       };
       const error = new Error('Database error');
       error.stack = 'Error stack';
