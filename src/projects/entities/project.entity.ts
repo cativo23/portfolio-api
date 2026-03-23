@@ -38,6 +38,10 @@ export class Project extends BaseEntity {
   features: string[];
 
   @Index()
-  @Column({ type: 'enum', enum: ProjectStatus, default: ProjectStatus.COMPLETED })
+  @Column({
+    type: 'enum',
+    enum: ProjectStatus,
+    default: ProjectStatus.COMPLETED,
+  })
   status: ProjectStatus;
 }
