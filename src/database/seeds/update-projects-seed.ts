@@ -1,5 +1,6 @@
 import AppDataSource from '@config/typeorm.config';
 import { Project } from '@projects/entities/project.entity';
+import { ProjectStatus } from '@projects/types/project-status';
 
 /**
  * Sample data to fill missing fields for existing projects
@@ -27,7 +28,7 @@ Built with Nuxt.js 3, Tailwind CSS, and deployed on Vercel.`,
       'SEO optimized',
       'Fast performance',
     ],
-    status: 'Completed',
+    status: ProjectStatus.COMPLETED,
   },
   'Portfolio API': {
     content: `# Portfolio API
@@ -53,7 +54,7 @@ A RESTful API for managing portfolio projects and contacts.
       'Automated testing',
       'Docker support',
     ],
-    status: 'Maintained',
+    status: ProjectStatus.MAINTAINED,
   },
   'Blog Platform': {
     content: `# Blog Platform
@@ -68,7 +69,7 @@ A modern blogging platform with rich text editing capabilities.
 - Tag management`,
     heroImage: 'https://blog.example.com/hero.png',
     features: ['Markdown support', 'User management', 'SEO friendly'],
-    status: 'Completed',
+    status: ProjectStatus.COMPLETED,
   },
   'E-commerce Store': {
     content: `# E-commerce Store
@@ -83,7 +84,7 @@ Full-featured e-commerce platform with payment processing.
 - Order management`,
     heroImage: 'https://store.example.com/hero.png',
     features: ['Payment integration', 'Inventory management', 'Order tracking'],
-    status: 'In Progress',
+    status: ProjectStatus.IN_PROGRESS,
   },
   'Task Manager': {
     content: `# Task Manager
@@ -98,7 +99,7 @@ Real-time task management application with team collaboration features.
 - Due dates and reminders`,
     heroImage: 'https://tasks.example.com/hero.png',
     features: ['Real-time updates', 'Team collaboration', 'Mobile responsive'],
-    status: 'Completed',
+    status: ProjectStatus.COMPLETED,
   },
   'Social Media App': {
     content: `# Social Media App
@@ -118,7 +119,7 @@ A social networking platform with real-time messaging and content sharing.
       'Friend system',
       'Notifications',
     ],
-    status: 'In Progress',
+    status: ProjectStatus.IN_PROGRESS,
   },
   'Myths and Legends from El Salvador API': {
     content: `# Myths and Legends API
@@ -136,7 +137,7 @@ An API providing information about myths and legends from El Salvador.
       'Search functionality',
       'Educational content',
     ],
-    status: 'Completed',
+    status: ProjectStatus.COMPLETED,
   },
   Tacoview: {
     content: `# Tacoview
@@ -163,7 +164,7 @@ Event-driven restaurant review platform demonstrating modern microservices archi
       'Real-time processing',
       'Scalable design',
     ],
-    status: 'In Progress',
+    status: ProjectStatus.IN_PROGRESS,
   },
 };
 

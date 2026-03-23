@@ -2,6 +2,7 @@ import AppDataSource from '@config/typeorm.config';
 import { User } from '@users/entities/user.entity';
 import { Project } from '@projects/entities/project.entity';
 import { Contact } from '@contacts/entities/contact.entity';
+import { ProjectStatus } from '@projects/types/project-status';
 import * as bcrypt from 'bcrypt';
 
 async function seed() {
@@ -64,7 +65,7 @@ Built with Nuxt.js 3, Tailwind CSS, and deployed on Vercel.`,
           'SEO optimized',
           'Fast performance',
         ],
-        status: 'Completed',
+        status: ProjectStatus.COMPLETED,
       }),
       projectRepo.create({
         title: 'Portfolio API',
@@ -104,7 +105,7 @@ A RESTful API for managing portfolio projects and contacts.
           'Automated testing',
           'Docker support',
         ],
-        status: 'Maintained',
+        status: ProjectStatus.MAINTAINED,
       }),
       projectRepo.create({
         title: 'Blog Platform',
@@ -127,7 +128,7 @@ A modern blogging platform with rich text editing capabilities.
 - Tag management`,
         heroImage: 'https://blog.example.com/hero.png',
         features: ['Markdown support', 'User management', 'SEO friendly'],
-        status: 'Completed',
+        status: ProjectStatus.COMPLETED,
       }),
       projectRepo.create({
         title: 'E-commerce Store',
@@ -154,7 +155,7 @@ Full-featured e-commerce platform with payment processing.
           'Inventory management',
           'Order tracking',
         ],
-        status: 'In Progress',
+        status: ProjectStatus.IN_PROGRESS,
       }),
       projectRepo.create({
         title: 'Task Manager',
@@ -181,7 +182,7 @@ Real-time task management application with team collaboration features.
           'Team collaboration',
           'Mobile responsive',
         ],
-        status: 'Completed',
+        status: ProjectStatus.COMPLETED,
       }),
       projectRepo.create({
         title: 'Social Media App',
@@ -209,7 +210,7 @@ A social networking platform with real-time messaging and content sharing.
           'Friend system',
           'Notifications',
         ],
-        status: 'In Progress',
+        status: ProjectStatus.IN_PROGRESS,
       }),
     ];
     await projectRepo.save(projects);
