@@ -12,11 +12,13 @@ import type { JwtModuleOptions } from '@nestjs/jwt';
  * @returns JWT module configuration object with secret and sign options
  * @throws Error if required environment variables are missing
  */
-export async function jwtConfigFactory(configService: ConfigService): Promise<JwtModuleOptions> {
+export async function jwtConfigFactory(
+  configService: ConfigService,
+): Promise<JwtModuleOptions> {
   return {
     secret: configService.get<string>('JWT_SECRET'),
     signOptions: {
-      expiresIn: configService.getOrThrow<string>('JWT_EXPIRES_IN') + 's',
+      expiresAt: configService.getOrThrow<string>('JWT_EXPIRES_IN') + 's',
     },
   };
 }
