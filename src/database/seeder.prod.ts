@@ -106,7 +106,7 @@ A RESTful API for managing portfolio projects and contacts.
         description:
           'An API providing information about myths and legends from El Salvador using python and FastAPI',
         shortDescription: 'API for myths and legends',
-        liveUrl: '',
+        liveUrl: null,
         repoUrl: 'https://github.com/cativo23/myths-and-legends-api',
         isFeatured: false,
         techStack: ['Python', 'FastAPI', 'PostgreSQL'],

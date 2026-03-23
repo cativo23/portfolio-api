@@ -24,7 +24,7 @@ export class Project extends BaseEntity {
   @Column({ default: false })
   isFeatured: boolean;
 
-  @Column({ type: 'simple-json', nullable: true })
+  @Column({ type: 'json', nullable: true })
   techStack: string[];
 
   @Column({ type: 'text', nullable: true })
@@ -33,7 +33,7 @@ export class Project extends BaseEntity {
   @Column({ nullable: true })
   heroImage: string;
 
-  @Column({ type: 'simple-json', nullable: true })
+  @Column({ type: 'json', nullable: true })
   features: string[];
 
   @Column({ default: 'Completed' })

@@ -130,29 +130,6 @@ A modern blogging platform with rich text editing capabilities.
         status: 'Completed',
       }),
       projectRepo.create({
-        title: 'Blog Platform',
-        description:
-          'A blogging platform with rich text editing and user management',
-        shortDescription: 'Blogging platform',
-        liveUrl: 'https://blog.example.com',
-        repoUrl: 'https://github.com/cativo23/blog-platform',
-        isFeatured: false,
-        techStack: ['Next.js', 'Tailwind CSS', 'TypeScript'],
-        content: `# Blog Platform
-
-A modern blogging platform with rich text editing capabilities.
-
-## Features
-
-- Markdown editor
-- User authentication
-- Comment system
-- Tag management`,
-        heroImage: 'https://blog.example.com/hero.png',
-        features: ['Markdown support', 'User management', 'SEO friendly'],
-        status: 'Completed',
-      }),
-      projectRepo.create({
         title: 'E-commerce Store',
         description:
           'An e-commerce store with shopping cart and payment integration',

@@ -8,6 +8,7 @@ import {
   IsUrl,
   IsBoolean,
   IsEnum,
+  MaxLength,
 } from 'class-validator';
 
 export class CreateProjectDto {
@@ -27,12 +28,14 @@ export class CreateProjectDto {
   shortDescription: string;
 
   @IsOptional()
-  @IsUrl()
+  @IsUrl({ protocols: ['http', 'https'], require_protocol: true })
+  @MaxLength(2048)
   @ApiPropertyOptional({ description: 'Live URL' })
   liveUrl?: string;
 
   @IsNotEmpty()
-  @IsUrl()
+  @IsUrl({ protocols: ['http', 'https'], require_protocol: true })
+  @MaxLength(2048)
   @ApiProperty({ description: 'Repository URL' })
   repoUrl: string;
 
@@ -49,12 +52,15 @@ export class CreateProjectDto {
 
   @IsOptional()
   @IsString()
-  @ApiPropertyOptional({ description: 'Main content (Markdown or HTML) for case study' })
+  @MaxLength(50000)
+  @ApiPropertyOptional({ description: 'Main content (Markdown or HTML) for case study', maxLength: 50000 })
   content?: string;
 
   @IsOptional()
   @IsString()
-  @ApiPropertyOptional({ description: 'URL to hero image or architecture diagram' })
+  @IsUrl({ protocols: ['http', 'https'], require_protocol: true })
+  @MaxLength(2048)
+  @ApiPropertyOptional({ description: 'Hero image URL', maxLength: 2048 })
   heroImage?: string;
 
   @IsOptional()
