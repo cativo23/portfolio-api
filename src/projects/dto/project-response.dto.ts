@@ -30,7 +30,10 @@ export class ProjectResponseDto {
   @ApiProperty({ description: 'Tech stack', type: [String] })
   techStack: string[];
 
-  @ApiProperty({ description: 'Main content (Markdown or HTML)', required: false })
+  @ApiProperty({
+    description: 'Main content (Markdown or HTML)',
+    required: false,
+  })
   content?: string;
 
   @ApiProperty({ description: 'Hero image URL', required: false })
@@ -39,7 +42,11 @@ export class ProjectResponseDto {
   @ApiProperty({ description: 'Key features', type: [String] })
   features: string[];
 
-  @ApiProperty({ description: 'Project status', enum: ProjectStatus, default: ProjectStatus.COMPLETED })
+  @ApiProperty({
+    description: 'Project status',
+    enum: ProjectStatus,
+    default: ProjectStatus.COMPLETED,
+  })
   status: ProjectStatus;
 
   @ApiProperty({ description: 'Creation date' })

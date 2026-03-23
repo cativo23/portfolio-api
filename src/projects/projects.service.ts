@@ -30,8 +30,26 @@ interface FindAllOptions {
  * Allowed HTML tags for content sanitization
  */
 const ALLOWED_CONTENT_TAGS = [
-  'p', 'br', 'strong', 'em', 'u', 's', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-  'ul', 'ol', 'li', 'blockquote', 'pre', 'code', 'a', 'img',
+  'p',
+  'br',
+  'strong',
+  'em',
+  'u',
+  's',
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
+  'ul',
+  'ol',
+  'li',
+  'blockquote',
+  'pre',
+  'code',
+  'a',
+  'img',
 ];
 
 /**

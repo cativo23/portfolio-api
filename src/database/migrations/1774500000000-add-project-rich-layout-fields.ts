@@ -30,17 +30,13 @@ export class AddProjectRichLayoutFields1774500000000 implements MigrationInterfa
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(
-      `ALTER TABLE \`projects\` DROP COLUMN \`status\``,
-    );
+    await queryRunner.query(`ALTER TABLE \`projects\` DROP COLUMN \`status\``);
     await queryRunner.query(
       `ALTER TABLE \`projects\` DROP COLUMN \`features\``,
     );
     await queryRunner.query(
       `ALTER TABLE \`projects\` DROP COLUMN \`heroImage\``,
     );
-    await queryRunner.query(
-      `ALTER TABLE \`projects\` DROP COLUMN \`content\``,
-    );
+    await queryRunner.query(`ALTER TABLE \`projects\` DROP COLUMN \`content\``);
   }
 }

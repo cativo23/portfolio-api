@@ -82,11 +82,7 @@ Full-featured e-commerce platform with payment processing.
 - Stripe payment integration
 - Order management`,
     heroImage: 'https://store.example.com/hero.png',
-    features: [
-      'Payment integration',
-      'Inventory management',
-      'Order tracking',
-    ],
+    features: ['Payment integration', 'Inventory management', 'Order tracking'],
     status: 'In Progress',
   },
   'Task Manager': {
@@ -101,11 +97,7 @@ Real-time task management application with team collaboration features.
 - Task priorities
 - Due dates and reminders`,
     heroImage: 'https://tasks.example.com/hero.png',
-    features: [
-      'Real-time updates',
-      'Team collaboration',
-      'Mobile responsive',
-    ],
+    features: ['Real-time updates', 'Team collaboration', 'Mobile responsive'],
     status: 'Completed',
   },
   'Social Media App': {
@@ -190,7 +182,13 @@ async function updateProjects() {
       const updateData = projectUpdates[project.title];
 
       // Only update if the project has missing data (null or undefined)
-      if (updateData && (project.content == null || project.heroImage == null || project.features == null || project.status == null)) {
+      if (
+        updateData &&
+        (project.content == null ||
+          project.heroImage == null ||
+          project.features == null ||
+          project.status == null)
+      ) {
         await projectRepo.update(project.id, {
           content: project.content ?? updateData.content,
           heroImage: project.heroImage ?? updateData.heroImage,
