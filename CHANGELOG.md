@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.3.1] - 2026-03-23
+
+### Fixed
+
+- **Updated yarn.lock** - Added missing `sanitize-html` and `@types/sanitize-html` dependencies to lockfile to fix Docker build failures
+
 ## [2.3.0] - 2026-03-22
 
 ### Added
