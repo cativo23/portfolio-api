@@ -9,7 +9,6 @@ import {
   IsBoolean,
   IsEnum,
   MaxLength,
-  MinLength,
 } from 'class-validator';
 import { ProjectStatus } from '@projects/types/project-status';
 
