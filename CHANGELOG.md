@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.4.0] - 2026-03-23
+
+### Added
+
+- **TypeScript type checking**: Added `typecheck` script to package.json for running TypeScript compiler without emitting files
+
+### Changed
+
+- **JWT config type fix**: Changed `expiresIn` from string concatenation to number type for proper JWT module compatibility
+- **Seeder type safety**: Replaced string literals with `ProjectStatus` enum in all seeder files for type-safe status values
+
+### Fixed
+
+- **TypeScript errors**: Resolved 19 type errors across auth module, seeders, and health controller tests
+- **Health controller test**: Updated test assertions to match actual return type from `HealthService.getFullHealth()`
+- **Updated yarn.lock** - Added missing `sanitize-html` and `@types/sanitize-html` dependencies to lockfile to fix Docker build failures
+
+### Database Migrations
+
+- No new migrations required
+
+### Testing
+
+- All TypeScript type checks passing (`yarn typecheck`)
+
 ## [2.3.0] - 2026-03-22
 
 ### Added
@@ -255,7 +280,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Automated CI/CD with GitHub Actions
 - Auto-release workflow for release branches
 
-[Unreleased]: https://github.com/cativo23/portfolio-api/compare/v2.2.3...HEAD
+[Unreleased]: https://github.com/cativo23/portfolio-api/compare/v2.4.0...HEAD
+[2.4.0]: https://github.com/cativo23/portfolio-api/compare/v2.3.0...v2.4.0
+[2.3.0]: https://github.com/cativo23/portfolio-api/compare/v2.2.3...v2.3.0
 [2.2.3]: https://github.com/cativo23/portfolio-api/compare/v2.2.2...v2.2.3
 [2.2.2]: https://github.com/cativo23/portfolio-api/compare/v2.2.0...v2.2.2
 [2.2.0]: https://github.com/cativo23/portfolio-api/compare/v2.1.2...v2.2.0
