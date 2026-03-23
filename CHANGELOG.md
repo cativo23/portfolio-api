@@ -7,6 +7,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-03-22
+
+### Added
+
+- **New Project fields for rich portfolio layout**:
+  - `content`: Text field for Markdown/HTML case study content
+  - `heroImage`: URL field for main hero image or architecture diagram
+  - `features`: JSON array of key feature strings
+  - `status`: Enum field with values 'Completed', 'In Progress', 'Maintained'
+- **ProjectStatus enum type** for type-safe status handling
+- **Database index** on `status` column for query optimization
+- **Update seed script** (`npm run seed:update-projects`) to populate existing projects
+
+### Security
+
+- **XSS prevention**: Added HTML sanitization using `sanitize-html` library
+  - Allowed tags: `p, br, strong, em, h1-h6, ul, ol, li, blockquote, pre, code, a, img`
+  - Sanitization applied in `ProjectsService.create()` and `update()`
+- **URL protocol restriction**: Limited `liveUrl`, `heroImage`, and `repoUrl` to `http`/`https` only
+- **Input validation**: Added `@MaxLength` decorators to all string fields
+  - `title`: 200 chars, `description`: 1000 chars, `shortDescription`: 500 chars
+  - `content`: 50000 chars, URLs: 2048 chars
+  - Array items: `techStack` 50 chars, `features` 100 chars
+
+### Changed
+
+- **Database column types**:
+  - Changed `techStack` and `features` from `simple-json` to native MySQL `JSON`
+  - Changed `status` from `VARCHAR` to MySQL `ENUM` type
+  - Added explicit `VARCHAR(255)` type for `heroImage` column
+- **Response DTO**: Standardized null handling using nullish coalescing (`??`)
+- **Export ProjectStatus** from `@projects/dto` for easier imports
+
+### Fixed
+
+- **Duplicate seed data**: Removed duplicate "Blog Platform" entry from seeder
+- **Data consistency**: Changed `liveUrl: ''` to `liveUrl: null` in production seeder
+- **Entity-migration type mismatch**: Aligned `simple-json` entity with native `JSON` migration
+- **Update seed script logic**: Fixed empty string overwrite issue using `??` operator
+
+### Database Migrations
+
+- `1774500000000-add-project-rich-layout-fields`: Add new project columns
+- `1774600000000-fix-project-json-type`: Fix JSON column type mismatch
+- `1774700000000-add-project-status-enum`: Add status ENUM and heroImage type
+- `1774800000000-add-status-index`: Add index on status column
+
+### Testing
+
+- All 36 tests passing
+- Updated service and controller tests with new fields
+- Full type safety with `ProjectStatus` enum
+
 ## [2.2.3] - 2026-03-21
 
 ### Security
