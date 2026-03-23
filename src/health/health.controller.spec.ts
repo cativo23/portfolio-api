@@ -97,12 +97,12 @@ describe('HealthController', () => {
 
     const result = await controller.check();
 
-    expect(result).toHaveProperty('summary');
-    expect(result).toHaveProperty('checks');
-    expect(result).toHaveProperty('checkedAt');
-    expect(result.summary).toContain('nestjs-docs: up');
-    expect(result.summary).toContain('storage: up');
-    expect(result.summary).toContain('database: up');
-    expect(result.checks).toEqual(healthCheckResult.info);
+    expect(result).toHaveProperty('status');
+    expect(result).toHaveProperty('components');
+    expect(result).toHaveProperty('timestamp');
+    expect(result.components.database).toBeDefined();
+    expect(result.components.redis).toBeDefined();
+    expect(result.components.memory).toBeDefined();
+    expect(result.components.disk).toBeDefined();
   });
 });
