@@ -1,4 +1,5 @@
 import { ConfigService } from '@nestjs/config';
+import type { JwtModuleOptions } from '@nestjs/jwt';
 
 /**
  * Factory function that creates JWT configuration options
@@ -11,7 +12,7 @@ import { ConfigService } from '@nestjs/config';
  * @returns JWT module configuration object with secret and sign options
  * @throws Error if required environment variables are missing
  */
-export async function jwtConfigFactory(configService: ConfigService) {
+export async function jwtConfigFactory(configService: ConfigService): Promise<JwtModuleOptions> {
   return {
     secret: configService.get<string>('JWT_SECRET'),
     signOptions: {
