@@ -8,6 +8,7 @@ import {
   TypeOrmHealthIndicator,
 } from '@nestjs/terminus';
 import { HealthController } from './health.controller';
+import { HealthService } from './health.service';
 
 describe('HealthController', () => {
   let controller: HealthController;
@@ -42,6 +43,14 @@ describe('HealthController', () => {
           provide: TypeOrmHealthIndicator,
           useValue: {
             pingCheck: jest.fn(),
+          },
+        },
+        {
+          provide: HealthService,
+          useValue: {
+            getFullHealth: jest.fn(),
+            getLiveness: jest.fn(),
+            getReadiness: jest.fn(),
           },
         },
       ],
