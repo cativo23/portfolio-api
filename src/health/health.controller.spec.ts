@@ -16,6 +16,7 @@ describe('HealthController', () => {
   let httpHealthIndicator: HttpHealthIndicator;
   let diskHealthIndicator: DiskHealthIndicator;
   let typeOrmHealthIndicator: TypeOrmHealthIndicator;
+  let healthService: HealthService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -63,6 +64,7 @@ describe('HealthController', () => {
     typeOrmHealthIndicator = module.get<TypeOrmHealthIndicator>(
       TypeOrmHealthIndicator,
     );
+    healthService = module.get<HealthService>(HealthService);
   });
 
   it('should be defined', () => {
@@ -103,6 +105,27 @@ describe('HealthController', () => {
     jest
       .spyOn(healthCheckService, 'check')
       .mockReturnValue(Promise.resolve(healthCheckResult));
+
+    const mockHealthResult = {
+      status: 'ok' as const,
+      version: '1.0.0',
+      environment: 'test',
+      timestamp: new Date().toISOString(),
+      uptime: 100,
+      process: {
+        cpuUsage: { user: 0, system: 0 },
+        memoryUsage: { rss: 0, heapTotal: 0, heapUsed: 0, external: 0 },
+      },
+      components: {
+        database: { status: 'up' as const, latency: 10 },
+        redis: { status: 'up' as const, latency: 5 },
+        memory: { status: 'up' as const, used: 0, total: 0, usagePercent: 0 },
+        disk: { status: 'up' as const, used: 0, total: 0, usagePercent: 0 },
+      },
+    };
+    jest
+      .spyOn(healthService, 'getFullHealth')
+      .mockResolvedValue(mockHealthResult);
 
     const result = await controller.check();
 
