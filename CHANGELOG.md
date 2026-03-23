@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **TypeScript errors**: Resolved 19 type errors across auth module, seeders, and health controller tests
 - **Health controller test**: Updated test assertions to match actual return type from `HealthService.getFullHealth()`
+- **Updated yarn.lock** - Added missing `sanitize-html` and `@types/sanitize-html` dependencies to lockfile to fix Docker build failures
 
 ### Database Migrations
 
