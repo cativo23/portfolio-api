@@ -26,7 +26,7 @@ describe('jwtConfigFactory', () => {
 
     expect(config).toEqual({
       secret: 'my-secret',
-      signOptions: { expiresIn: '3600s' },
+      signOptions: { expiresIn: 3600 },
     });
 
     expect(mockConfigService.get).toHaveBeenCalledWith('JWT_SECRET');
@@ -41,7 +41,7 @@ describe('jwtConfigFactory', () => {
     const config = await jwtConfigFactory(mockConfigService);
 
     expect(config.secret).toBeUndefined();
-    expect(config.signOptions.expiresIn).toBe('3600s');
+    expect(config.signOptions.expiresIn).toBe(3600);
   });
 
   it('should throw error when JWT_EXPIRES_IN is not defined', async () => {
