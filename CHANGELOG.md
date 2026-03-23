@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.4.1] - 2026-03-23
+
+### Added
+
+- **Production seed script**: Added `seed:update-projects:prod` script to run database seeder in production Docker containers
+- **Production seed file**: Created `update-projects-seed.prod.ts` using compiled JavaScript instead of ts-node
+
+### Fixed
+
+- **Docker seed execution**: Fixed "Cannot find module" error when running `seed:update-projects` in production by using compiled `.js` file instead of TypeScript
+
+### Database Migrations
+
+- No new migrations required
+
 ## [2.4.0] - 2026-03-23
 
 ### Added
@@ -280,7 +295,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Automated CI/CD with GitHub Actions
 - Auto-release workflow for release branches
 
-[Unreleased]: https://github.com/cativo23/portfolio-api/compare/v2.4.0...HEAD
+[Unreleased]: https://github.com/cativo23/portfolio-api/compare/v2.4.1...HEAD
+[2.4.1]: https://github.com/cativo23/portfolio-api/compare/v2.4.0...v2.4.1
 [2.4.0]: https://github.com/cativo23/portfolio-api/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/cativo23/portfolio-api/compare/v2.2.3...v2.3.0
 [2.2.3]: https://github.com/cativo23/portfolio-api/compare/v2.2.2...v2.2.3
