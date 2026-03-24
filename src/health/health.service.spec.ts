@@ -42,8 +42,6 @@ describe('HealthService', () => {
 
     service = module.get<HealthService>(HealthService);
     configService = module.get<ConfigService>(ConfigService);
-    dataSource = module.get<DataSource>(DataSource);
-    cacheManager = module.get<Cache>(CACHE_MANAGER);
 
     jest.clearAllMocks();
   });
