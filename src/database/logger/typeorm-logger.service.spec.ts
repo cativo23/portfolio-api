@@ -257,14 +257,15 @@ describe('TypeOrmLoggerService', () => {
       const service = new TypeOrmLoggerService(configService);
 
       // Spy on stringifyParameter to make it throw
-      jest.spyOn(service as any, 'stringifyParameter').mockImplementation(() => {
-        throw new Error('Cannot stringify');
-      });
+      jest
+        .spyOn(service as any, 'stringifyParameter')
+        .mockImplementation(() => {
+          throw new Error('Cannot stringify');
+        });
 
-      const result = (service as any).buildSqlString(
-        'SELECT * FROM users',
-        [{ complex: 'object' }],
-      );
+      const result = (service as any).buildSqlString('SELECT * FROM users', [
+        { complex: 'object' },
+      ]);
 
       expect(result).toContain('SELECT * FROM users');
       expect(result).toContain('Parameters:');

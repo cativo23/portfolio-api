@@ -16,8 +16,13 @@ class TestUpdateDto {
   name?: string;
 }
 
-class TestService extends BaseCrudService<TestEntity, TestCreateDto, TestUpdateDto> {
-  protected readonly repository: Repository<TestEntity> = {} as Repository<TestEntity>;
+class TestService extends BaseCrudService<
+  TestEntity,
+  TestCreateDto,
+  TestUpdateDto
+> {
+  protected readonly repository: Repository<TestEntity> =
+    {} as Repository<TestEntity>;
   protected readonly logger: Logger = new Logger(TestService.name);
 
   protected getEntityName(): string {

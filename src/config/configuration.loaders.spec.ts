@@ -48,7 +48,8 @@ describe('configuration.loaders', () => {
     });
 
     it('should handle quoted CORS origins', () => {
-      process.env.CORS_ORIGINS = '"https://example.com","https://api.example.com"';
+      process.env.CORS_ORIGINS =
+        '"https://example.com","https://api.example.com"';
 
       const config = loadAppConfig();
 

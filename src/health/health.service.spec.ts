@@ -200,7 +200,9 @@ describe('HealthService', () => {
       const result = await service.checkDisk();
 
       expect(result.status).toBe('up');
-      expect(result.message).toBe('Disk stats unavailable (running in container?)');
+      expect(result.message).toBe(
+        'Disk stats unavailable (running in container?)',
+      );
 
       mockFs.statfs = originalStatfs;
       jest.restoreAllMocks();
@@ -251,15 +253,13 @@ describe('HealthService', () => {
 
       // Mock memoryUsage to return >90% usage (down status)
       const originalMemoryUsage = process.memoryUsage;
-      jest
-        .spyOn(process, 'memoryUsage')
-        .mockReturnValue({
-          rss: 1000,
-          heapTotal: 1000,
-          heapUsed: 950,
-          external: 100,
-          arrayBuffers: 0,
-        });
+      jest.spyOn(process, 'memoryUsage').mockReturnValue({
+        rss: 1000,
+        heapTotal: 1000,
+        heapUsed: 950,
+        external: 100,
+        arrayBuffers: 0,
+      });
 
       // Mock checkDisk to return down status
       const originalCheckDisk = service.checkDisk;
