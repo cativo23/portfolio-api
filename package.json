@@ -1,7 +1,7 @@
 {
   "name": "portfolio-api",
   "version": "2.4.1",
-  "description": "",
+  "description": "Production NestJS REST API — JWT auth, TypeORM, rate limiting, Docker, 90%+ test coverage",
   "author": "",
   "private": true,
   "license": "UNLICENSED",
