@@ -20,8 +20,6 @@ const mockConfigService = {
 describe('HealthService', () => {
   let service: HealthService;
   let configService: ConfigService;
-  let dataSource: DataSource;
-  let cacheManager: Cache;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({

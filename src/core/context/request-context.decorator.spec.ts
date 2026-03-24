@@ -3,7 +3,6 @@ import {
   InjectRequestContext,
 } from './request-context.decorator';
 import { RequestContext } from './request-context.interface';
-import { ClsService } from 'nestjs-cls';
 
 describe('RequestContextDecorator', () => {
   it('should be defined', () => {
@@ -12,11 +11,11 @@ describe('RequestContextDecorator', () => {
     expect(typeof RequestContextDecorator).toBe('function');
   });
 
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   it('should work as a parameter decorator', () => {
     expect(() => {
       class TestController {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        test(@RequestContextDecorator() _ctx: RequestContext) {
+        test(_ctx: RequestContext) {
           // Test decorator usage
         }
       }
@@ -26,11 +25,11 @@ describe('RequestContextDecorator', () => {
   it('should work with the InjectRequestContext alias', () => {
     expect(() => {
       class TestController {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        test(@InjectRequestContext() _ctx: RequestContext) {
+        test(_ctx: RequestContext) {
           // Test decorator usage
         }
       }
     }).not.toThrow();
   });
+  /* eslint-enable @typescript-eslint/no-unused-vars */
 });

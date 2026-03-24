@@ -1,4 +1,4 @@
-import { Logger, NotFoundException } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { BaseCrudService } from './base-crud.service';
 import { DeleteResponseDto } from '@core/dto';
