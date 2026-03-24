@@ -4972,6 +4972,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"istanbul-badges-readme@npm:^1.9.0":
+  version: 1.9.0
+  resolution: "istanbul-badges-readme@npm:1.9.0"
+  bin:
+    istanbul-badges-readme: lib/index.js
+  checksum: 10c0/70dbab3f2d09915998a43d380f731421ea020bd1f040f6848cc6525c149e752620e4819aca27afcdd9b147ae7dc04a1711ba5b0c0ecee91d622a7db254c45d7d
+  languageName: node
+  linkType: hard
+
 "istanbul-lib-coverage@npm:^3.0.0, istanbul-lib-coverage@npm:^3.2.0":
   version: 3.2.2
   resolution: "istanbul-lib-coverage@npm:3.2.2"
@@ -6692,6 +6701,7 @@ __metadata:
     eslint-config-prettier: "npm:^10.1.5"
     express: "npm:^5.1.0"
     helmet: "npm:^8.1.0"
+    istanbul-badges-readme: "npm:^1.9.0"
     jest: "npm:^29.x"
     mysql2: "npm:^3.14.1"
     nestjs-cls: "npm:^6.2.0"

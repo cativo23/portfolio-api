@@ -1,10 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import {
   HealthCheckService,
-  HttpHealthIndicator,
-  DiskHealthIndicator,
   HealthCheckResult,
-  HealthIndicatorResult,
   TypeOrmHealthIndicator,
 } from '@nestjs/terminus';
 import { HealthController } from './health.controller';
@@ -13,10 +10,8 @@ import { HealthService } from './health.service';
 describe('HealthController', () => {
   let controller: HealthController;
   let healthCheckService: HealthCheckService;
-  let httpHealthIndicator: HttpHealthIndicator;
-  let diskHealthIndicator: DiskHealthIndicator;
-  let typeOrmHealthIndicator: TypeOrmHealthIndicator;
   let healthService: HealthService;
+  let typeOrmHealthIndicator: TypeOrmHealthIndicator;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -29,18 +24,6 @@ describe('HealthController', () => {
           },
         },
         {
-          provide: HttpHealthIndicator,
-          useValue: {
-            pingCheck: jest.fn(),
-          },
-        },
-        {
-          provide: DiskHealthIndicator,
-          useValue: {
-            checkStorage: jest.fn(),
-          },
-        },
-        {
           provide: TypeOrmHealthIndicator,
           useValue: {
             pingCheck: jest.fn(),
@@ -50,8 +33,6 @@ describe('HealthController', () => {
           provide: HealthService,
           useValue: {
             getFullHealth: jest.fn(),
-            getLiveness: jest.fn(),
-            getReadiness: jest.fn(),
           },
         },
       ],
@@ -59,83 +40,187 @@ describe('HealthController', () => {
 
     controller = module.get<HealthController>(HealthController);
     healthCheckService = module.get<HealthCheckService>(HealthCheckService);
-    httpHealthIndicator = module.get<HttpHealthIndicator>(HttpHealthIndicator);
-    diskHealthIndicator = module.get<DiskHealthIndicator>(DiskHealthIndicator);
+    healthService = module.get<HealthService>(HealthService);
     typeOrmHealthIndicator = module.get<TypeOrmHealthIndicator>(
       TypeOrmHealthIndicator,
     );
-    healthService = module.get<HealthService>(HealthService);
+
   });
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should return health check results with status, timestamp, and components', async () => {
-    const healthCheckResult: HealthCheckResult = {
-      status: 'ok',
-      info: {
-        'nestjs-docs': { status: 'up' },
-        storage: { status: 'up' },
-        database: { status: 'up' },
-      },
-      error: {},
-      details: {
-        'nestjs-docs': { status: 'up' },
-        storage: { status: 'up' },
-        database: { status: 'up' },
-      },
-    };
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
 
-    jest.spyOn(httpHealthIndicator, 'pingCheck').mockReturnValue(
-      Promise.resolve({
-        'nestjs-docs': { status: 'up' },
-      } as HealthIndicatorResult),
-    );
-    jest
-      .spyOn(diskHealthIndicator, 'checkStorage')
-      .mockReturnValue(
-        Promise.resolve({ storage: { status: 'up' } } as HealthIndicatorResult),
-      );
-    jest.spyOn(typeOrmHealthIndicator, 'pingCheck').mockReturnValue(
-      Promise.resolve({
-        database: { status: 'up' },
-      } as HealthIndicatorResult),
-    );
-    jest
-      .spyOn(healthCheckService, 'check')
-      .mockReturnValue(Promise.resolve(healthCheckResult));
+  describe('health (GET /health)', () => {
+    it('should return simplified health status', async () => {
+      const mockFullHealth = {
+        status: 'ok' as const,
+        version: '1.0.0',
+        environment: 'test',
+        timestamp: '2024-01-01T00:00:00Z',
+        uptime: 100,
+        process: {
+          cpuUsage: { user: 0, system: 0 },
+          memoryUsage: { rss: 0, heapTotal: 0, heapUsed: 0, external: 0 },
+        },
+        components: {
+          database: { status: 'up' as const, latency: 10 },
+          redis: { status: 'up' as const, latency: 5 },
+          memory: { status: 'up' as const, used: 0, total: 0, usagePercent: 0 },
+          disk: { status: 'up' as const, used: 0, total: 0, usagePercent: 0 },
+        },
+      };
+      jest.spyOn(healthService, 'getFullHealth').mockResolvedValue(mockFullHealth);
 
-    const mockHealthResult = {
-      status: 'ok' as const,
-      version: '1.0.0',
-      environment: 'test',
-      timestamp: new Date().toISOString(),
-      uptime: 100,
-      process: {
-        cpuUsage: { user: 0, system: 0 },
-        memoryUsage: { rss: 0, heapTotal: 0, heapUsed: 0, external: 0 },
-      },
-      components: {
-        database: { status: 'up' as const, latency: 10 },
-        redis: { status: 'up' as const, latency: 5 },
-        memory: { status: 'up' as const, used: 0, total: 0, usagePercent: 0 },
-        disk: { status: 'up' as const, used: 0, total: 0, usagePercent: 0 },
-      },
-    };
-    jest
-      .spyOn(healthService, 'getFullHealth')
-      .mockResolvedValue(mockHealthResult);
+      const result = await controller.health();
 
-    const result = await controller.check();
+      expect(result).toEqual({
+        status: 'ok',
+        timestamp: '2024-01-01T00:00:00Z',
+        components: {
+          database: { status: 'up' },
+          redis: { status: 'up' },
+          memory: { status: 'up' },
+          disk: { status: 'up' },
+        },
+      });
+    });
 
-    expect(result).toHaveProperty('status');
-    expect(result).toHaveProperty('timestamp');
-    expect(result).toHaveProperty('components');
-    expect(result.status).toBe('ok');
-    expect(result.components.database).toBeDefined();
-    expect(result.components.redis).toBeDefined();
-    expect(result.components.memory).toBeDefined();
-    expect(result.components.disk).toBeDefined();
+    it('should return degraded status when some components are down', async () => {
+      const mockFullHealth = {
+        status: 'degraded' as const,
+        version: '1.0.0',
+        environment: 'test',
+        timestamp: '2024-01-01T00:00:00Z',
+        uptime: 100,
+        process: {
+          cpuUsage: { user: 0, system: 0 },
+          memoryUsage: { rss: 0, heapTotal: 0, heapUsed: 0, external: 0 },
+        },
+        components: {
+          database: { status: 'up' as const, latency: 10 },
+          redis: { status: 'down' as const, message: 'Redis unavailable' },
+          memory: { status: 'up' as const, used: 0, total: 0, usagePercent: 0 },
+          disk: { status: 'up' as const, used: 0, total: 0, usagePercent: 0 },
+        },
+      };
+      jest.spyOn(healthService, 'getFullHealth').mockResolvedValue(mockFullHealth);
+
+      const result = await controller.health();
+
+      expect(result.status).toBe('degraded');
+      expect(result.components.redis.status).toBe('down');
+    });
+  });
+
+  describe('detailed (GET /health/detailed)', () => {
+    it('should return detailed health status', async () => {
+      const mockFullHealth = {
+        status: 'ok' as const,
+        version: '1.0.0',
+        environment: 'test',
+        timestamp: '2024-01-01T00:00:00Z',
+        uptime: 100,
+        process: {
+          cpuUsage: { user: 0, system: 0 },
+          memoryUsage: { rss: 0, heapTotal: 0, heapUsed: 0, external: 0 },
+        },
+        components: {
+          database: { status: 'up' as const, latency: 10 },
+          redis: { status: 'up' as const, latency: 5 },
+          memory: { status: 'up' as const, used: 0, total: 0, usagePercent: 0 },
+          disk: { status: 'up' as const, used: 0, total: 0, usagePercent: 0 },
+        },
+      };
+      jest.spyOn(healthService, 'getFullHealth').mockResolvedValue(mockFullHealth);
+
+      const result = await controller.detailed();
+
+      expect(result).toEqual(mockFullHealth);
+    });
+  });
+
+  describe('liveness (GET /health/live)', () => {
+    it('should return liveness check result', async () => {
+      const mockLiveness: HealthCheckResult = {
+        status: 'ok',
+        info: {},
+        error: {},
+        details: {},
+      };
+      jest.spyOn(healthCheckService, 'check').mockResolvedValue(mockLiveness);
+
+      const result = await controller.liveness();
+
+      expect(result).toEqual(mockLiveness);
+      expect(healthCheckService.check).toHaveBeenCalledWith([]);
+    });
+  });
+
+  describe('readiness (GET /health/ready)', () => {
+    it('should return readiness check result when database is ready', async () => {
+      const mockReadiness: HealthCheckResult = {
+        status: 'ok',
+        info: { database: { status: 'up' } },
+        error: {},
+        details: { database: { status: 'up' } },
+      };
+      jest
+        .spyOn(typeOrmHealthIndicator, 'pingCheck')
+        .mockResolvedValue({ database: { status: 'up' } });
+      jest.spyOn(healthCheckService, 'check').mockResolvedValue(mockReadiness);
+
+      const result = await controller.readiness();
+
+      expect(result).toEqual(mockReadiness);
+    });
+
+    it('should return service unavailable when database is not ready', async () => {
+      const mockReadiness: HealthCheckResult = {
+        status: 'error',
+        info: {},
+        error: { database: { status: 'down' } },
+        details: { database: { status: 'down' } },
+      };
+      jest
+        .spyOn(typeOrmHealthIndicator, 'pingCheck')
+        .mockResolvedValue({ database: { status: 'down' } });
+      jest.spyOn(healthCheckService, 'check').mockResolvedValue(mockReadiness);
+
+      const result = await controller.readiness();
+
+      expect(result.status).toBe('error');
+    });
+  });
+
+  describe('check (GET /health/check) - legacy', () => {
+    it('should return full health status (legacy endpoint)', async () => {
+      const mockFullHealth = {
+        status: 'ok' as const,
+        version: '1.0.0',
+        environment: 'test',
+        timestamp: '2024-01-01T00:00:00Z',
+        uptime: 100,
+        process: {
+          cpuUsage: { user: 0, system: 0 },
+          memoryUsage: { rss: 0, heapTotal: 0, heapUsed: 0, external: 0 },
+        },
+        components: {
+          database: { status: 'up' as const, latency: 10 },
+          redis: { status: 'up' as const, latency: 5 },
+          memory: { status: 'up' as const, used: 0, total: 0, usagePercent: 0 },
+          disk: { status: 'up' as const, used: 0, total: 0, usagePercent: 0 },
+        },
+      };
+      jest.spyOn(healthService, 'getFullHealth').mockResolvedValue(mockFullHealth);
+
+      const result = await controller.check();
+
+      expect(result).toEqual(mockFullHealth);
+    });
   });
 });
