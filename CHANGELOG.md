@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.5.0] - 2026-03-24
+
+### Added
+
+- **Automated coverage badges**: Added `istanbul-badges-readme` package for dynamic coverage badge generation in CI
+- **Coverage badge CI workflow**: GitHub Action now runs `yarn test:cov` and generates badges on every push to `develop`
+- **New test suites** (11 new files, +25% coverage):
+  - Config loaders and env utils tests (`configuration.loaders.spec.ts`, `env.utils.spec.ts`, `validate-configuration.spec.ts`)
+  - Query DTO transformation tests (`pagination-query.dto.spec.ts`, `find-all-projects-query.dto.spec.ts`, `find-all-contacts-query.dto.spec.ts`)
+  - Base CRUD service tests (`base-crud.service.spec.ts`)
+  - Database service tests (`connection-retry.service.spec.ts`, `transaction.service.spec.ts`, `typeorm-logger.service.spec.ts`)
+  - Health service tests (`health.service.spec.ts`)
+- **Extended guard tests**: Added comprehensive API key guard and JWT/API key guard authentication flow tests
+
+### Changed
+
+- **README.md badges**: Updated from static single coverage badge to dynamic multi-metric badges (Lines, Statements, Branches, Functions)
+- **jest.config.ts**: Added `json-summary` reporter for badge generation and excluded coverage directory from reports
+
+### Fixed
+
+- **Coverage exclusion**: Added seed files and typeorm-common.config.ts to coverage exclusions
+
+### Testing
+
+- **404 tests** across **40 test suites** - all passing
+- **Coverage: 94.34%** statements (up from 69%)
+
+### Database Migrations
+
+- No new migrations required
+
 ## [2.4.1] - 2026-03-23
 
 ### Added
