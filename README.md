@@ -10,7 +10,7 @@
 
 </div>
 
-[![Coverage](https://img.shields.io/badge/coverage-90.1%25-brightgreen)](https://github.com/cativo23/portfolio-api)
+[![Coverage](https://img.shields.io/badge/coverage-94.3%25-brightgreen)](https://github.com/cativo23/portfolio-api)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Node Version](https://img.shields.io/badge/node-%3E%3D23.0.0-brightgreen.svg)](https://nodejs.org/)
 [![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](https://hub.docker.com/)
