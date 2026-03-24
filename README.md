@@ -10,7 +10,12 @@
 
 </div>
 
-[![Coverage](https://img.shields.io/badge/coverage-94.3%25-brightgreen)](https://github.com/cativo23/portfolio-api)
+<!-- istanbul-badges-readme-start -->
+[![Lines](https://img.shields.io/badge/lines-94.13%25-brightgreen.svg?style=flat)](https://github.com/cativo23/portfolio-api)
+[![Statements](https://img.shields.io/badge/statements-94.34%25-brightgreen.svg?style=flat)](https://github.com/cativo23/portfolio-api)
+[![Branches](https://img.shields.io/badge/branches-86.66%25-yellow.svg?style=flat)](https://github.com/cativo23/portfolio-api)
+[![Functions](https://img.shields.io/badge/functions-91.5%25-brightgreen.svg?style=flat)](https://github.com/cativo23/portfolio-api)
+<!-- istanbul-badges-readme-end -->
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Node Version](https://img.shields.io/badge/node-%3E%3D23.0.0-brightgreen.svg)](https://nodejs.org/)
 [![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](https://hub.docker.com/)

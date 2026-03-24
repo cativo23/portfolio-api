@@ -4,17 +4,18 @@ import { pathsToModuleNameMapper } from 'ts-jest';
 
 const config: Config = {
   moduleFileExtensions: ['js', 'json', 'ts'],
-  //rootDir: 'src',
   testRegex: '.*\\.spec\\.ts$',
   transform: {
     '^.+\\.(t|j)s$': 'ts-jest',
   },
   collectCoverageFrom: ['**/*.(t|j)s'],
-  coverageDirectory: '../coverage',
+  coverageDirectory: 'coverage',
+  coverageReporters: ['json-summary', 'text', 'lcov'],
   coveragePathIgnorePatterns: [
     '/node_modules/',
-    'dist/',
-    'test/',
+    '/dist/',
+    '/test/',
+    '/coverage/',
     '.module.ts$',
     'eslint.config.js',
     'jest.config.ts',
