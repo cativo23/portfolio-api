@@ -86,6 +86,28 @@ describe('configuration.loaders', () => {
 
   describe('loadDatabaseConfig', () => {
     it('should return default values when no env vars are set', () => {
+      // Clear all DB-related env vars to test defaults
+      delete process.env.DB_HOST;
+      delete process.env.DB_PORT;
+      delete process.env.DB_USERNAME;
+      delete process.env.DB_PASSWORD;
+      delete process.env.DB_NAME;
+      delete process.env.DB_POOL_SIZE;
+      delete process.env.DB_CONNECT_TIMEOUT;
+      delete process.env.DB_CONNECTION_LIMIT;
+      delete process.env.DB_QUEUE_LIMIT;
+      delete process.env.DB_MAX_RETRIES;
+      delete process.env.DB_RETRY_DELAY;
+      delete process.env.DB_SSL_ENABLED;
+      delete process.env.DB_SSL_REJECT_UNAUTHORIZED;
+      delete process.env.DB_SSL_CA;
+      delete process.env.DB_SSL_KEY;
+      delete process.env.DB_SSL_CERT;
+      delete process.env.DB_LOG_LEVELS;
+      delete process.env.DB_CACHE_ENABLED;
+      delete process.env.DB_CACHE_DURATION;
+      delete process.env.DB_CACHE_ALWAYS_ENABLED;
+
       const config = loadDatabaseConfig();
 
       expect(config).toEqual({
