@@ -1,4 +1,4 @@
-import { Logger, NotFoundException } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { BaseCrudService } from './base-crud.service';
 import { DeleteResponseDto } from '@core/dto';
@@ -16,8 +16,13 @@ class TestUpdateDto {
   name?: string;
 }
 
-class TestService extends BaseCrudService<TestEntity, TestCreateDto, TestUpdateDto> {
-  protected readonly repository: Repository<TestEntity> = {} as Repository<TestEntity>;
+class TestService extends BaseCrudService<
+  TestEntity,
+  TestCreateDto,
+  TestUpdateDto
+> {
+  protected readonly repository: Repository<TestEntity> =
+    {} as Repository<TestEntity>;
   protected readonly logger: Logger = new Logger(TestService.name);
 
   protected getEntityName(): string {

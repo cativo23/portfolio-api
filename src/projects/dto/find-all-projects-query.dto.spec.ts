@@ -5,13 +5,17 @@ import { FindAllProjectsQueryDto } from './find-all-projects-query.dto';
 describe('FindAllProjectsQueryDto', () => {
   describe('is_featured transformation', () => {
     it('should transform string "true" to boolean true', async () => {
-      const dto = plainToClass(FindAllProjectsQueryDto, { is_featured: 'true' });
+      const dto = plainToClass(FindAllProjectsQueryDto, {
+        is_featured: 'true',
+      });
 
       expect(dto.is_featured).toBe(true);
     });
 
     it('should transform string "false" to boolean false', async () => {
-      const dto = plainToClass(FindAllProjectsQueryDto, { is_featured: 'false' });
+      const dto = plainToClass(FindAllProjectsQueryDto, {
+        is_featured: 'false',
+      });
 
       expect(dto.is_featured).toBe(false);
     });

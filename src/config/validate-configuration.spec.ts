@@ -177,9 +177,7 @@ describe('validateConfiguration', () => {
       process.env.REDIS_HOST = 'localhost';
       process.env.API_KEY_SECRET = 'secret';
 
-      expect(() => validateConfiguration({})).toThrow(
-        'JWT_SECRET is required',
-      );
+      expect(() => validateConfiguration({})).toThrow('JWT_SECRET is required');
     });
 
     it('should throw for missing DB_HOST', () => {
@@ -225,9 +223,7 @@ describe('validateConfiguration', () => {
       process.env.REDIS_HOST = '';
       process.env.API_KEY_SECRET = 'secret';
 
-      expect(() => validateConfiguration({})).toThrow(
-        'REDIS_HOST is required',
-      );
+      expect(() => validateConfiguration({})).toThrow('REDIS_HOST is required');
     });
 
     it('should throw for missing API_KEY_SECRET', () => {
@@ -251,9 +247,7 @@ describe('validateConfiguration', () => {
       process.env.REDIS_HOST = '';
       process.env.API_KEY_SECRET = '';
 
-      expect(() => validateConfiguration({})).toThrow(
-        'Configuration errors',
-      );
+      expect(() => validateConfiguration({})).toThrow('Configuration errors');
     });
 
     it('should pass validation when all configs are provided', () => {

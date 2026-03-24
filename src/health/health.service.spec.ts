@@ -2,7 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
 import { HealthService } from './health.service';
 
 const mockDataSource = {
@@ -20,8 +19,6 @@ const mockConfigService = {
 describe('HealthService', () => {
   let service: HealthService;
   let configService: ConfigService;
-  let dataSource: DataSource;
-  let cacheManager: Cache;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -44,8 +41,6 @@ describe('HealthService', () => {
 
     service = module.get<HealthService>(HealthService);
     configService = module.get<ConfigService>(ConfigService);
-    dataSource = module.get<DataSource>(DataSource);
-    cacheManager = module.get<Cache>(CACHE_MANAGER);
 
     jest.clearAllMocks();
   });
@@ -200,7 +195,9 @@ describe('HealthService', () => {
       const result = await service.checkDisk();
 
       expect(result.status).toBe('up');
-      expect(result.message).toBe('Disk stats unavailable (running in container?)');
+      expect(result.message).toBe(
+        'Disk stats unavailable (running in container?)',
+      );
 
       mockFs.statfs = originalStatfs;
       jest.restoreAllMocks();
@@ -251,15 +248,13 @@ describe('HealthService', () => {
 
       // Mock memoryUsage to return >90% usage (down status)
       const originalMemoryUsage = process.memoryUsage;
-      jest
-        .spyOn(process, 'memoryUsage')
-        .mockReturnValue({
-          rss: 1000,
-          heapTotal: 1000,
-          heapUsed: 950,
-          external: 100,
-          arrayBuffers: 0,
-        });
+      jest.spyOn(process, 'memoryUsage').mockReturnValue({
+        rss: 1000,
+        heapTotal: 1000,
+        heapUsed: 950,
+        external: 100,
+        arrayBuffers: 0,
+      });
 
       // Mock checkDisk to return down status
       const originalCheckDisk = service.checkDisk;

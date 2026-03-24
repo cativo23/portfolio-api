@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { DataSource, EntityManager, QueryRunner } from 'typeorm';
+import { DataSource, EntityManager } from 'typeorm';
 import { TransactionService } from './transaction.service';
 
 const mockQueryRunner = {

@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.5.1] - 2026-03-24
+
+### Changed
+
+- **Production container memory**: Increased API container memory limits for better performance under load
+  - Memory limit: 512M → 768M (+50%)
+  - Memory reservation: 128M → 256M (+100%)
+
+### Database Migrations
+
+- No new migrations required
+
 ## [2.5.0] - 2026-03-24
 
 ### Added

@@ -44,7 +44,6 @@ describe('HealthController', () => {
     typeOrmHealthIndicator = module.get<TypeOrmHealthIndicator>(
       TypeOrmHealthIndicator,
     );
-
   });
 
   it('should be defined', () => {
@@ -74,7 +73,9 @@ describe('HealthController', () => {
           disk: { status: 'up' as const, used: 0, total: 0, usagePercent: 0 },
         },
       };
-      jest.spyOn(healthService, 'getFullHealth').mockResolvedValue(mockFullHealth);
+      jest
+        .spyOn(healthService, 'getFullHealth')
+        .mockResolvedValue(mockFullHealth);
 
       const result = await controller.health();
 
@@ -108,7 +109,9 @@ describe('HealthController', () => {
           disk: { status: 'up' as const, used: 0, total: 0, usagePercent: 0 },
         },
       };
-      jest.spyOn(healthService, 'getFullHealth').mockResolvedValue(mockFullHealth);
+      jest
+        .spyOn(healthService, 'getFullHealth')
+        .mockResolvedValue(mockFullHealth);
 
       const result = await controller.health();
 
@@ -136,7 +139,9 @@ describe('HealthController', () => {
           disk: { status: 'up' as const, used: 0, total: 0, usagePercent: 0 },
         },
       };
-      jest.spyOn(healthService, 'getFullHealth').mockResolvedValue(mockFullHealth);
+      jest
+        .spyOn(healthService, 'getFullHealth')
+        .mockResolvedValue(mockFullHealth);
 
       const result = await controller.detailed();
 
@@ -216,7 +221,9 @@ describe('HealthController', () => {
           disk: { status: 'up' as const, used: 0, total: 0, usagePercent: 0 },
         },
       };
-      jest.spyOn(healthService, 'getFullHealth').mockResolvedValue(mockFullHealth);
+      jest
+        .spyOn(healthService, 'getFullHealth')
+        .mockResolvedValue(mockFullHealth);
 
       const result = await controller.check();
 
