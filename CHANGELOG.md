@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.5.2] - 2026-03-26
+
+### Fixed
+
+- **Health check memory metrics**: Fixed misleading memory usage percentage in `/health/detailed` endpoint
+  - Changed from `heapUsed/heapTotal` to `RSS` (Resident Set Size) for accurate container memory tracking
+  - Added automatic detection of memory limits from Docker cgroups (v1 and v2)
+  - Falls back to system total memory in local development without container limits
+  - Fixes false positive ~80% usage alerts when container has plenty of available memory
+
+### Database Migrations
+
+- No new migrations required
+
 ## [2.5.1] - 2026-03-24
 
 ### Changed
