@@ -124,8 +124,8 @@ describe('HealthService', () => {
   });
 
   describe('checkMemory', () => {
-    it('should return memory stats with status up when usage is below 90%', () => {
-      const result = service.checkMemory();
+    it('should return memory stats with status up when usage is below 90%', async () => {
+      const result = await service.checkMemory();
 
       expect(result).toHaveProperty('status');
       expect(result).toHaveProperty('used');
@@ -136,7 +136,7 @@ describe('HealthService', () => {
       expect(result.usagePercent).toBeLessThanOrEqual(100);
     });
 
-    it('should return status down when memory usage is above 90%', () => {
+    it('should return status down when memory usage is above 90%', async () => {
       const originalMemoryUsage = process.memoryUsage;
       jest.spyOn(process, 'memoryUsage').mockReturnValue({
         rss: 1000,
@@ -146,7 +146,7 @@ describe('HealthService', () => {
         arrayBuffers: 0,
       });
 
-      const result = service.checkMemory();
+      const result = await service.checkMemory();
 
       expect(result.status).toBe('down');
       expect(result.message).toContain('Memory usage critical');
