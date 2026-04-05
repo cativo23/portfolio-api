@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional, ApiHideProperty } from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsOptional,
@@ -6,6 +6,7 @@ import {
   IsEmail,
   MinLength,
   MaxLength,
+  IsEmpty,
 } from 'class-validator';
 
 /**
@@ -53,4 +54,9 @@ export class CreateContactDto {
     maxLength: 200,
   })
   subject?: string;
+
+  @IsOptional()
+  @IsEmpty({ message: 'If this field is filled, the request will be rejected' })
+  @ApiHideProperty()
+  website?: string;
 }
