@@ -8,6 +8,7 @@ import {
 } from '@config/configuration.loaders';
 import { validateConfiguration } from '@config/validate-configuration';
 import apiKeyConfig from '@config/api-key.config';
+import mailConfig from '@config/mail.config';
 
 export const appConfiguration = registerAs('app', loadAppConfig);
 export const databaseConfiguration = registerAs('database', loadDatabaseConfig);
@@ -32,6 +33,7 @@ export const jwtConfiguration = registerAs('jwt', loadJwtConfig);
         redisConfiguration,
         jwtConfiguration,
         apiKeyConfig,
+        mailConfig,
       ],
       validate: validateConfiguration,
     }),
