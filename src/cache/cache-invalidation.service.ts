@@ -1,6 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
+import type { Cache } from 'cache-manager';
 
 @Injectable()
 export class CacheInvalidationService {
@@ -10,21 +10,31 @@ export class CacheInvalidationService {
 
   async invalidateByPrefix(prefix: string): Promise<void> {
     try {
-      const client = (this.cacheManager as any).stores[0]._cache.client;
-      const keys: string[] = [];
+      // cache-manager v7 wraps stores in Keyv instances
+      // Keyv.store gives the KeyvAdapter, which has _cache pointing to the original store
+      // cache-manager-redis-yet store exposes the Redis client
+      const stores = this.cacheManager.stores;
 
-      for await (const key of client.scanIterator({
-        MATCH: `${prefix}:*`,
-        COUNT: 100,
-      })) {
-        keys.push(key);
-      }
+      for (const keyv of stores) {
+        const adapter = (keyv as any).store;
+        if (!adapter?._cache?.client) continue;
 
-      if (keys.length > 0) {
-        await client.del(keys);
-        this.logger.log(
-          `Invalidated ${keys.length} cache keys with prefix "${prefix}"`,
-        );
+        const client = adapter._cache.client;
+        const keys: string[] = [];
+
+        for await (const key of client.scanIterator({
+          MATCH: `${prefix}:*`,
+          COUNT: 100,
+        })) {
+          keys.push(key);
+        }
+
+        if (keys.length > 0) {
+          await client.del(keys);
+          this.logger.log(
+            `Invalidated ${keys.length} cache keys with prefix "${prefix}"`,
+          );
+        }
       }
     } catch (error) {
       this.logger.error(

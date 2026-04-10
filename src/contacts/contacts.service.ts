@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationUtil } from '@core/utils/pagination.util';
 import { BaseCrudService } from '@core/services/base-crud.service';
 import { NotFoundException } from '@core/exceptions';
+import { EmailService } from '@email/email.service';
 
 /**
  * Interface defining options for finding contacts with pagination, search, and filtering
@@ -44,6 +45,7 @@ export class ContactsService extends BaseCrudService<
   constructor(
     @InjectRepository(Contact)
     protected readonly contactsRepository: Repository<Contact>,
+    private readonly emailService: EmailService,
   ) {
     super();
   }
@@ -54,6 +56,28 @@ export class ContactsService extends BaseCrudService<
 
   protected getEntityName(): string {
     return 'Contact';
+  }
+
+  /**
+   * Creates a new contact form submission and sends email notification
+   *
+   * @param createContactDto - The contact form data
+   * @returns Promise resolving to the created contact entity
+   */
+  override async create(createContactDto: CreateContactDto): Promise<Contact> {
+    const contact = this.contactsRepository.create(createContactDto);
+    const savedContact = await this.contactsRepository.save(contact);
+
+    // Send email notification (non-blocking, errors are handled internally)
+    this.emailService.sendNewContactNotification(
+      savedContact.name,
+      savedContact.email,
+      savedContact.message,
+      savedContact.subject ?? undefined,
+    );
+
+    this.logger.log(`Created new contact: ${savedContact.name}`);
+    return savedContact;
   }
 
   /**
