@@ -6070,7 +6070,6 @@ __metadata:
     prettier: "npm:^3"
     reflect-metadata: "npm:^0.2"
     rxjs: "npm:^7.8"
-    source-map-support: "npm:^0.5"
     supertest: "npm:^7"
     swagger-ui-express: "npm:^5"
     ts-loader: "npm:^9"
@@ -6639,7 +6638,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"source-map-support@npm:^0.5, source-map-support@npm:~0.5.20":
+"source-map-support@npm:~0.5.20":
   version: 0.5.21
   resolution: "source-map-support@npm:0.5.21"
   dependencies:

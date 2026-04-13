@@ -75,7 +75,6 @@
     "eslint": "^9",
     "eslint-config-prettier": "^10",
     "prettier": "^3",
-    "source-map-support": "^0.5",
     "supertest": "^7",
     "ts-loader": "^9",
     "ts-node": "^10",
