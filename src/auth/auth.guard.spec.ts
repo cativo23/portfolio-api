@@ -1,3 +1,4 @@
+import { vi, type Mock, type SpyInstance, type Mocked } from 'vitest';
 import { ExecutionContext } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -7,8 +8,8 @@ import { AuthenticationException } from '@core/exceptions';
 
 describe('AuthGuard', () => {
   let guard: AuthGuard;
-  let jwtService: jest.Mocked<JwtService>;
-  let configService: jest.Mocked<ConfigService>;
+  let jwtService: Mocked<JwtService>;
+  let configService: Mocked<ConfigService>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -17,21 +18,21 @@ describe('AuthGuard', () => {
         {
           provide: JwtService,
           useValue: {
-            verifyAsync: jest.fn(),
+            verifyAsync: vi.fn(),
           },
         },
         {
           provide: ConfigService,
           useValue: {
-            get: jest.fn(),
+            get: vi.fn(),
           },
         },
       ],
     }).compile();
 
     guard = module.get<AuthGuard>(AuthGuard);
-    jwtService = module.get(JwtService) as jest.Mocked<JwtService>;
-    configService = module.get(ConfigService) as jest.Mocked<ConfigService>;
+    jwtService = module.get(JwtService) as Mocked<JwtService>;
+    configService = module.get(ConfigService) as Mocked<ConfigService>;
   });
 
   it('should be defined', () => {
@@ -47,8 +48,8 @@ describe('AuthGuard', () => {
         headers: {},
       };
       mockContext = {
-        switchToHttp: jest.fn().mockReturnValue({
-          getRequest: jest.fn().mockReturnValue(mockRequest),
+        switchToHttp: vi.fn().mockReturnValue({
+          getRequest: vi.fn().mockReturnValue(mockRequest),
         }),
       } as unknown as ExecutionContext;
     });

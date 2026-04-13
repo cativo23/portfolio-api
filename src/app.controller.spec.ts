@@ -1,3 +1,4 @@
+import { vi, type Mock, type SpyInstance, type Mocked } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
@@ -8,7 +9,7 @@ describe('AppController', () => {
 
   beforeEach(async () => {
     const mockConfigService = {
-      getOrThrow: jest.fn((key: string) => {
+      getOrThrow: vi.fn((key: string) => {
         if (key === 'app') {
           return {
             nodeEnv: 'test',

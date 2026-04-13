@@ -1,17 +1,18 @@
+import { vi, type Mock, type SpyInstance, type Mocked } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import {
   HealthCheckService,
   HttpHealthIndicator,
   DiskHealthIndicator,
-  HealthCheckResult,
-  HealthIndicatorResult,
   TypeOrmHealthIndicator,
 } from '@nestjs/terminus';
 import { HealthController } from './health.controller';
+import { HealthService } from './health.service';
 
 describe('HealthController', () => {
   let controller: HealthController;
   let healthCheckService: HealthCheckService;
+  let healthService: HealthService;
   let httpHealthIndicator: HttpHealthIndicator;
   let diskHealthIndicator: DiskHealthIndicator;
   let typeOrmHealthIndicator: TypeOrmHealthIndicator;
@@ -23,25 +24,31 @@ describe('HealthController', () => {
         {
           provide: HealthCheckService,
           useValue: {
-            check: jest.fn(),
+            check: vi.fn(),
+          },
+        },
+        {
+          provide: HealthService,
+          useValue: {
+            getFullHealth: vi.fn(),
           },
         },
         {
           provide: HttpHealthIndicator,
           useValue: {
-            pingCheck: jest.fn(),
+            pingCheck: vi.fn(),
           },
         },
         {
           provide: DiskHealthIndicator,
           useValue: {
-            checkStorage: jest.fn(),
+            checkStorage: vi.fn(),
           },
         },
         {
           provide: TypeOrmHealthIndicator,
           useValue: {
-            pingCheck: jest.fn(),
+            pingCheck: vi.fn(),
           },
         },
       ],
@@ -49,6 +56,7 @@ describe('HealthController', () => {
 
     controller = module.get<HealthController>(HealthController);
     healthCheckService = module.get<HealthCheckService>(HealthCheckService);
+    healthService = module.get<HealthService>(HealthService);
     httpHealthIndicator = module.get<HttpHealthIndicator>(HttpHealthIndicator);
     diskHealthIndicator = module.get<DiskHealthIndicator>(DiskHealthIndicator);
     typeOrmHealthIndicator = module.get<TypeOrmHealthIndicator>(
@@ -61,48 +69,29 @@ describe('HealthController', () => {
   });
 
   it('should return health check results with summary, checks, and checkedAt', async () => {
-    const healthCheckResult: HealthCheckResult = {
+    const mockHealthResult = {
       status: 'ok',
-      info: {
-        'nestjs-docs': { status: 'up' },
-        storage: { status: 'up' },
+      timestamp: '2023-01-01T00:00:00Z',
+      components: {
         database: { status: 'up' },
-      },
-      error: {},
-      details: {
-        'nestjs-docs': { status: 'up' },
-        storage: { status: 'up' },
-        database: { status: 'up' },
+        redis: { status: 'up' },
+        memory: { status: 'up' },
+        disk: { status: 'up' },
       },
     };
 
-    jest.spyOn(httpHealthIndicator, 'pingCheck').mockReturnValue(
-      Promise.resolve({
-        'nestjs-docs': { status: 'up' },
-      } as HealthIndicatorResult),
+    vi.spyOn(healthService, 'getFullHealth').mockResolvedValue(
+      mockHealthResult as any,
     );
-    jest
-      .spyOn(diskHealthIndicator, 'checkStorage')
-      .mockReturnValue(
-        Promise.resolve({ storage: { status: 'up' } } as HealthIndicatorResult),
-      );
-    jest.spyOn(typeOrmHealthIndicator, 'pingCheck').mockReturnValue(
-      Promise.resolve({
-        database: { status: 'up' },
-      } as HealthIndicatorResult),
-    );
-    jest
-      .spyOn(healthCheckService, 'check')
-      .mockReturnValue(Promise.resolve(healthCheckResult));
 
     const result = await controller.check();
 
-    expect(result).toHaveProperty('summary');
-    expect(result).toHaveProperty('checks');
-    expect(result).toHaveProperty('checkedAt');
-    expect(result.summary).toContain('nestjs-docs: up');
-    expect(result.summary).toContain('storage: up');
-    expect(result.summary).toContain('database: up');
-    expect(result.checks).toEqual(healthCheckResult.info);
+    expect(result).toHaveProperty('status');
+    expect(result).toHaveProperty('timestamp');
+    expect(result).toHaveProperty('components');
+    expect(result.status).toBe('ok');
+    expect(result.components.database.status).toBe('up');
+    expect(result.components.database).not.toHaveProperty('latency');
+    expect(result.components.redis).not.toHaveProperty('latency');
   });
 });

@@ -1,3 +1,4 @@
+import { vi, type Mock, type SpyInstance, type Mocked } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
 import { Repository } from 'typeorm';
@@ -9,9 +10,9 @@ import { Logger } from '@nestjs/common';
 describe('UsersService', () => {
   let service: UsersService;
   let repository: Repository<User>;
-  const loggerSpy = jest
+  const loggerSpy = vi
     .spyOn(Logger.prototype, 'log')
-    .mockImplementation(jest.fn());
+    .mockImplementation(vi.fn());
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -29,7 +30,7 @@ describe('UsersService', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks(); // Reset spies between tests
+    vi.clearAllMocks(); // Reset spies between tests
   });
 
   it('should be defined', () => {
@@ -49,8 +50,8 @@ describe('UsersService', () => {
         ...dto,
       } as User;
 
-      jest.spyOn(repository, 'create').mockReturnValue(expectedUser);
-      jest.spyOn(repository, 'save').mockResolvedValue(expectedUser);
+      vi.spyOn(repository, 'create').mockReturnValue(expectedUser);
+      vi.spyOn(repository, 'save').mockResolvedValue(expectedUser);
 
       const result = await service.create(dto);
 
@@ -74,7 +75,7 @@ describe('UsersService', () => {
         username: 'testuser',
       } as User;
 
-      jest.spyOn(repository, 'findOneBy').mockResolvedValue(user);
+      vi.spyOn(repository, 'findOneBy').mockResolvedValue(user);
 
       const result = await service.findOneByEmail(email);
 
@@ -85,7 +86,7 @@ describe('UsersService', () => {
 
     it('should return undefined and log when user is not found', async () => {
       const email = 'notfound@email.com';
-      jest.spyOn(repository, 'findOneBy').mockResolvedValue(undefined);
+      vi.spyOn(repository, 'findOneBy').mockResolvedValue(undefined);
 
       const result = await service.findOneByEmail(email);
       expect(result).toBeUndefined();

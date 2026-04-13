@@ -1,3 +1,4 @@
+import { vi, type Mock, type SpyInstance, type Mocked } from 'vitest';
 import { JwtOrApiKeyGuard } from './jwt-or-api-key.guard';
 import { ExecutionContext } from '@nestjs/common';
 
@@ -8,10 +9,10 @@ describe('JwtOrApiKeyGuard', () => {
   let apiKeyGuard: any;
 
   beforeEach(() => {
-    authGuard = { canActivate: jest.fn() };
-    apiKeyGuard = { canActivate: jest.fn() };
+    authGuard = { canActivate: vi.fn() };
+    apiKeyGuard = { canActivate: vi.fn() };
     moduleRef = {
-      get: jest.fn((token) => {
+      get: vi.fn((token) => {
         if (token.name === 'AuthGuard') return authGuard;
         if (token.name === 'ApiKeyGuard') return apiKeyGuard;
         return undefined;

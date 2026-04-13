@@ -1,3 +1,4 @@
+import { vi, type Mock, type SpyInstance, type Mocked } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProjectsController } from './projects.controller';
 import { ProjectsService } from './projects.service';
@@ -53,11 +54,11 @@ describe('ProjectsController', () => {
   );
 
   const mockService = {
-    create: jest.fn(),
-    findAll: jest.fn(),
-    findOne: jest.fn(),
-    update: jest.fn(),
-    remove: jest.fn(),
+    create: vi.fn(),
+    findAll: vi.fn(),
+    findOne: vi.fn(),
+    update: vi.fn(),
+    remove: vi.fn(),
   };
 
   beforeEach(async () => {
@@ -71,20 +72,20 @@ describe('ProjectsController', () => {
         },
         {
           provide: JwtService,
-          useValue: { sign: jest.fn(), verify: jest.fn() },
+          useValue: { sign: vi.fn(), verify: vi.fn() },
         },
         {
           provide: ConfigService,
           useValue: {
-            get: jest.fn((key: string) => ({ JWT_SECRET: 'test-secret' })[key]),
+            get: vi.fn((key: string) => ({ JWT_SECRET: 'test-secret' })[key]),
           },
         },
         {
           provide: CACHE_MANAGER,
           useValue: {
-            get: jest.fn(),
-            set: jest.fn(),
-            del: jest.fn(),
+            get: vi.fn(),
+            set: vi.fn(),
+            del: vi.fn(),
             stores: [],
           },
         },
@@ -96,7 +97,7 @@ describe('ProjectsController', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should be defined', () => {

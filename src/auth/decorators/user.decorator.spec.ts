@@ -3,12 +3,12 @@ import { extractUser, User } from './user.decorator';
 
 describe('User Decorator', () => {
   let mockExecutionContext: ExecutionContext;
-  let getRequestMock: jest.Mock;
+  let getRequestMock: Mock;
 
   beforeEach(() => {
-    getRequestMock = jest.fn();
+    getRequestMock = vi.fn();
     mockExecutionContext = {
-      switchToHttp: jest.fn().mockReturnValue({
+      switchToHttp: vi.fn().mockReturnValue({
         getRequest: getRequestMock,
       }),
     } as unknown as ExecutionContext;

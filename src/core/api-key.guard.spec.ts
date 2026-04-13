@@ -1,3 +1,4 @@
+import { vi, type Mock, type SpyInstance, type Mocked } from 'vitest';
 import { ApiKeyGuard } from './api-key.guard';
 import { ApiKeyService } from './api-key.service';
 
@@ -7,7 +8,7 @@ describe('ApiKeyGuard', () => {
 
   beforeEach(() => {
     apiKeyService = {
-      validate: jest.fn(),
+      validate: vi.fn(),
     } as any;
     guard = new ApiKeyGuard(apiKeyService);
   });
@@ -29,7 +30,7 @@ describe('ApiKeyGuard', () => {
   });
 
   it('should throw if key is invalid', async () => {
-    (apiKeyService.validate as jest.Mock).mockResolvedValue(false);
+    (apiKeyService.validate as Mock).mockResolvedValue(false);
     const context: any = {
       switchToHttp: () => ({
         getRequest: () => ({ headers: { 'x-api-key': 'bad' } }),
@@ -39,7 +40,7 @@ describe('ApiKeyGuard', () => {
   });
 
   it('should return true if key is valid', async () => {
-    (apiKeyService.validate as jest.Mock).mockResolvedValue(true);
+    (apiKeyService.validate as Mock).mockResolvedValue(true);
     const context: any = {
       switchToHttp: () => ({
         getRequest: () => ({ headers: { 'x-api-key': 'good' } }),

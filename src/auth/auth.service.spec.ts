@@ -1,3 +1,4 @@
+import { vi, type Mock, type SpyInstance, type Mocked } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { UsersService } from '@users/users.service';
@@ -10,9 +11,9 @@ import { ConflictException, AuthenticationException } from '@core/exceptions';
 
 describe('AuthService', () => {
   let service: AuthService;
-  let usersService: jest.Mocked<UsersService>;
-  let jwtService: jest.Mocked<JwtService>;
-  let configService: jest.Mocked<ConfigService>;
+  let usersService: Mocked<UsersService>;
+  let jwtService: Mocked<JwtService>;
+  let configService: Mocked<ConfigService>;
 
   const password = '123456';
   let hashedPassword: string;
@@ -22,13 +23,13 @@ describe('AuthService', () => {
   });
 
   beforeEach(async () => {
-    const mockUsersService: Partial<jest.Mocked<UsersService>> = {
-      findOneByEmail: jest.fn(),
-      create: jest.fn(),
+    const mockUsersService: Partial<Mocked<UsersService>> = {
+      findOneByEmail: vi.fn(),
+      create: vi.fn(),
     };
 
-    const mockJwtService: Partial<jest.Mocked<JwtService>> = {
-      signAsync: jest.fn(),
+    const mockJwtService: Partial<Mocked<JwtService>> = {
+      signAsync: vi.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -39,7 +40,7 @@ describe('AuthService', () => {
         {
           provide: ConfigService,
           useValue: {
-            get: jest.fn().mockImplementation((key: string) => {
+            get: vi.fn().mockImplementation((key: string) => {
               const config = {
                 JWT_SECRET: 'test-secret',
               };
@@ -51,9 +52,9 @@ describe('AuthService', () => {
     }).compile();
 
     service = module.get<AuthService>(AuthService);
-    usersService = module.get(UsersService) as jest.Mocked<UsersService>;
-    jwtService = module.get(JwtService) as jest.Mocked<JwtService>;
-    configService = module.get(ConfigService) as jest.Mocked<ConfigService>;
+    usersService = module.get(UsersService) as Mocked<UsersService>;
+    jwtService = module.get(JwtService) as Mocked<JwtService>;
+    configService = module.get(ConfigService) as Mocked<ConfigService>;
   });
 
   it('should be defined', () => {
@@ -147,11 +148,11 @@ describe('AuthService', () => {
     const fixedNow = 1700000000000;
 
     beforeEach(() => {
-      jest.spyOn(global.Date, 'now').mockImplementation(() => fixedNow);
+      vi.spyOn(global.Date, 'now').mockImplementation(() => fixedNow);
     });
 
     afterEach(() => {
-      jest.restoreAllMocks();
+      vi.restoreAllMocks();
     });
 
     it('should return access token and user info on success', async () => {
