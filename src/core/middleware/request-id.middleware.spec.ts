@@ -17,8 +17,8 @@ describe('RequestIdMiddleware', () => {
         {
           provide: ClsService,
           useValue: {
-            set: jest.fn(),
-            get: jest.fn(),
+            set: vi.fn(),
+            get: vi.fn(),
           },
         },
       ],
@@ -37,10 +37,10 @@ describe('RequestIdMiddleware', () => {
     };
 
     mockResponse = {
-      setHeader: jest.fn(),
+      setHeader: vi.fn(),
     };
 
-    mockNext = jest.fn();
+    mockNext = vi.fn();
   });
 
   it('should be defined', () => {
@@ -131,7 +131,7 @@ describe('RequestIdMiddleware', () => {
 
   it('should generate unique request IDs on multiple calls', () => {
     const requestIds: string[] = [];
-    const setSpy = clsService.set as jest.Mock;
+    const setSpy = clsService.set as Mock;
 
     // First call
     middleware.use(mockRequest as Request, mockResponse as Response, mockNext);

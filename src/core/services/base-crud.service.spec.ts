@@ -1,3 +1,4 @@
+import { vi, type Mock, type SpyInstance, type Mocked } from 'vitest';
 import { Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { BaseCrudService } from './base-crud.service';
@@ -37,7 +38,7 @@ class TestService extends BaseCrudService<
 
 describe('BaseCrudService', () => {
   let service: TestService;
-  let repository: jest.Mocked<Repository<TestEntity>>;
+  let repository: Mocked<Repository<TestEntity>>;
   let logger: Logger;
 
   const mockEntity: TestEntity = {
@@ -47,12 +48,12 @@ describe('BaseCrudService', () => {
 
   beforeEach(async () => {
     repository = {
-      create: jest.fn(),
-      save: jest.fn(),
-      findOne: jest.fn(),
-      merge: jest.fn(),
-      softRemove: jest.fn(),
-      restore: jest.fn(),
+      create: vi.fn(),
+      save: vi.fn(),
+      findOne: vi.fn(),
+      merge: vi.fn(),
+      softRemove: vi.fn(),
+      restore: vi.fn(),
     } as any;
 
     service = new TestService();
@@ -61,7 +62,7 @@ describe('BaseCrudService', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should be defined', () => {
@@ -86,7 +87,7 @@ describe('BaseCrudService', () => {
     it('should log the creation', async () => {
       repository.create.mockReturnValue(createdEntity as any);
       repository.save.mockResolvedValue(createdEntity as any);
-      jest.spyOn(logger, 'log').mockImplementation(() => {});
+      vi.spyOn(logger, 'log').mockImplementation(() => {});
 
       await service.create(createDto);
 
@@ -116,7 +117,7 @@ describe('BaseCrudService', () => {
 
     it('should log warning when entity is not found', async () => {
       repository.findOne.mockResolvedValue(null);
-      jest.spyOn(logger, 'warn').mockImplementation(() => {});
+      vi.spyOn(logger, 'warn').mockImplementation(() => {});
 
       try {
         await service.findOne(999);
@@ -131,7 +132,7 @@ describe('BaseCrudService', () => {
 
     it('should log when entity is found', async () => {
       repository.findOne.mockResolvedValue(mockEntity as any);
-      jest.spyOn(logger, 'log').mockImplementation(() => {});
+      vi.spyOn(logger, 'log').mockImplementation(() => {});
 
       await service.findOne(1);
 
@@ -169,7 +170,7 @@ describe('BaseCrudService', () => {
 
     it('should log warning when entity to update is not found', async () => {
       repository.findOne.mockResolvedValue(null);
-      jest.spyOn(logger, 'warn').mockImplementation(() => {});
+      vi.spyOn(logger, 'warn').mockImplementation(() => {});
 
       try {
         await service.update(999, updateDto);
@@ -186,7 +187,7 @@ describe('BaseCrudService', () => {
       repository.findOne.mockResolvedValue(existingEntity as any);
       repository.merge.mockReturnValue(updatedEntity as any);
       repository.save.mockResolvedValue(updatedEntity as any);
-      jest.spyOn(logger, 'log').mockImplementation(() => {});
+      vi.spyOn(logger, 'log').mockImplementation(() => {});
 
       await service.update(1, updateDto);
 
@@ -217,7 +218,7 @@ describe('BaseCrudService', () => {
 
     it('should log warning when entity to delete is not found', async () => {
       repository.findOne.mockResolvedValue(null);
-      jest.spyOn(logger, 'warn').mockImplementation(() => {});
+      vi.spyOn(logger, 'warn').mockImplementation(() => {});
 
       try {
         await service.remove(999);
@@ -233,7 +234,7 @@ describe('BaseCrudService', () => {
     it('should log when entity is deleted', async () => {
       repository.findOne.mockResolvedValue(mockEntity as any);
       repository.softRemove.mockResolvedValue(mockEntity as any);
-      jest.spyOn(logger, 'log').mockImplementation(() => {});
+      vi.spyOn(logger, 'log').mockImplementation(() => {});
 
       await service.remove(1);
 
@@ -265,7 +266,7 @@ describe('BaseCrudService', () => {
 
     it('should log warning when entity to restore is not found', async () => {
       repository.restore.mockResolvedValue({ affected: 0 } as any);
-      jest.spyOn(logger, 'warn').mockImplementation(() => {});
+      vi.spyOn(logger, 'warn').mockImplementation(() => {});
 
       try {
         await service.restore(999);
@@ -281,7 +282,7 @@ describe('BaseCrudService', () => {
     it('should log when entity is restored', async () => {
       repository.restore.mockResolvedValue({ affected: 1 } as any);
       repository.findOne.mockResolvedValue(mockEntity as any);
-      jest.spyOn(logger, 'log').mockImplementation(() => {});
+      vi.spyOn(logger, 'log').mockImplementation(() => {});
 
       await service.restore(1);
 

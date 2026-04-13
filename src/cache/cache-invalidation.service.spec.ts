@@ -1,3 +1,4 @@
+import { vi, type Mock, type SpyInstance, type Mocked } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { CacheInvalidationService } from './cache-invalidation.service';
@@ -10,8 +11,8 @@ describe('CacheInvalidationService', () => {
 
   beforeEach(async () => {
     mockRedisClient = {
-      scanIterator: jest.fn(),
-      del: jest.fn(),
+      scanIterator: vi.fn(),
+      del: vi.fn(),
     };
 
     mockCacheManager = {
@@ -26,9 +27,9 @@ describe('CacheInvalidationService', () => {
       ],
     };
 
-    jest.spyOn(Logger.prototype, 'log').mockImplementation(jest.fn());
-    jest.spyOn(Logger.prototype, 'warn').mockImplementation(jest.fn());
-    jest.spyOn(Logger.prototype, 'error').mockImplementation(jest.fn());
+    vi.spyOn(Logger.prototype, 'log').mockImplementation(vi.fn());
+    vi.spyOn(Logger.prototype, 'warn').mockImplementation(vi.fn());
+    vi.spyOn(Logger.prototype, 'error').mockImplementation(vi.fn());
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -41,7 +42,7 @@ describe('CacheInvalidationService', () => {
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('should be defined', () => {

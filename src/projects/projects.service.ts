@@ -10,7 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationUtil } from '@core/utils/pagination.util';
 import { BaseCrudService } from '@core/services/base-crud.service';
 import { CacheInvalidationService } from '@src/cache/cache-invalidation.service';
-import * as sanitizeHtml from 'sanitize-html';
+import sanitizeHtml from 'sanitize-html';
 
 /**
  * Interface defining options for finding projects with pagination, search, and filtering

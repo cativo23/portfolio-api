@@ -1,3 +1,4 @@
+import { vi, type Mock, type SpyInstance, type Mocked } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ContactsController } from './contacts.controller';
 import { ContactsService } from './contacts.service';
@@ -49,11 +50,11 @@ describe('ContactsController', () => {
   );
 
   const mockService = {
-    create: jest.fn(),
-    findAll: jest.fn(),
-    findOne: jest.fn(),
-    markAsRead: jest.fn(),
-    remove: jest.fn(),
+    create: vi.fn(),
+    findAll: vi.fn(),
+    findOne: vi.fn(),
+    markAsRead: vi.fn(),
+    remove: vi.fn(),
   };
 
   beforeEach(async () => {
@@ -67,12 +68,12 @@ describe('ContactsController', () => {
         },
         {
           provide: JwtService,
-          useValue: { sign: jest.fn(), verify: jest.fn() },
+          useValue: { sign: vi.fn(), verify: vi.fn() },
         },
         {
           provide: ConfigService,
           useValue: {
-            get: jest.fn((key: string) => ({ JWT_SECRET: 'test-secret' })[key]),
+            get: vi.fn((key: string) => ({ JWT_SECRET: 'test-secret' })[key]),
           },
         },
       ],
@@ -83,7 +84,7 @@ describe('ContactsController', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should be defined', () => {

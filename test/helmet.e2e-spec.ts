@@ -1,5 +1,5 @@
-import * as express from 'express';
-import * as request from 'supertest';
+import express from 'express';
+import request from 'supertest';
 import helmet from 'helmet';
 
 /**
@@ -13,7 +13,7 @@ describe('Helmet Security Headers (e2e)', () => {
   let app: express.Express;
 
   beforeAll(() => {
-    app = (express as any)();
+    app = express();
     app.use(
       helmet({
         contentSecurityPolicy: {

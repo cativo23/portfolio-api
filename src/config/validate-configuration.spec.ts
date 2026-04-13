@@ -1,10 +1,11 @@
+import { vi, type Mock, type SpyInstance, type Mocked } from 'vitest';
 import { validateConfiguration } from './validate-configuration';
 
 describe('validateConfiguration', () => {
   const originalEnv = process.env;
 
   beforeEach(() => {
-    jest.resetModules();
+    vi.resetModules();
     process.env = { ...originalEnv };
   });
 
@@ -33,11 +34,11 @@ describe('validateConfiguration', () => {
   describe('development environment', () => {
     beforeEach(() => {
       process.env.NODE_ENV = 'development';
-      jest.spyOn(console, 'warn').mockImplementation(() => {});
+      vi.spyOn(console, 'warn').mockImplementation(() => {});
     });
 
     afterEach(() => {
-      jest.restoreAllMocks();
+      vi.restoreAllMocks();
     });
 
     it('should warn but not throw for missing JWT_SECRET', () => {
@@ -266,11 +267,11 @@ describe('validateConfiguration', () => {
   describe('default environment (undefined)', () => {
     beforeEach(() => {
       delete process.env.NODE_ENV;
-      jest.spyOn(console, 'warn').mockImplementation(() => {});
+      vi.spyOn(console, 'warn').mockImplementation(() => {});
     });
 
     afterEach(() => {
-      jest.restoreAllMocks();
+      vi.restoreAllMocks();
     });
 
     it('should treat as development and warn for missing configs', () => {

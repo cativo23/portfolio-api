@@ -6,12 +6,12 @@ import { User } from '@users/entities/user.entity';
 
 describe('LocalStrategy', () => {
   let strategy: LocalStrategy;
-  let authService: jest.Mocked<AuthService>;
+  let authService: Mocked<AuthService>;
 
   beforeEach(async () => {
     // Mock the AuthService
     const mockAuthService = {
-      validateUser: jest.fn(),
+      validateUser: vi.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -25,7 +25,7 @@ describe('LocalStrategy', () => {
     }).compile();
 
     strategy = module.get<LocalStrategy>(LocalStrategy);
-    authService = module.get(AuthService) as jest.Mocked<AuthService>;
+    authService = module.get(AuthService) as Mocked<AuthService>;
   });
 
   it('should be defined', () => {

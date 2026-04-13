@@ -1,3 +1,4 @@
+import { vi, type Mock, type SpyInstance, type Mocked } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
 import { Repository } from 'typeorm';
@@ -10,9 +11,9 @@ import { Logger, NotFoundException } from '@nestjs/common';
 describe('UsersService', () => {
   let service: UsersService;
   let repository: Repository<User>;
-  const loggerSpy = jest
+  const loggerSpy = vi
     .spyOn(Logger.prototype, 'log')
-    .mockImplementation(jest.fn());
+    .mockImplementation(vi.fn());
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -30,7 +31,7 @@ describe('UsersService', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks(); // Reset spies between tests
+    vi.clearAllMocks(); // Reset spies between tests
   });
 
   it('should be defined', () => {
@@ -50,8 +51,8 @@ describe('UsersService', () => {
         ...dto,
       } as User;
 
-      jest.spyOn(repository, 'create').mockReturnValue(expectedUser);
-      jest.spyOn(repository, 'save').mockResolvedValue(expectedUser);
+      vi.spyOn(repository, 'create').mockReturnValue(expectedUser);
+      vi.spyOn(repository, 'save').mockResolvedValue(expectedUser);
 
       const result = await service.create(dto);
 
@@ -75,7 +76,7 @@ describe('UsersService', () => {
         username: 'testuser',
       } as User;
 
-      jest.spyOn(repository, 'findOneBy').mockResolvedValue(user);
+      vi.spyOn(repository, 'findOneBy').mockResolvedValue(user);
 
       const result = await service.findOneByEmail(email);
 
@@ -86,7 +87,7 @@ describe('UsersService', () => {
 
     it('should return undefined and log when user is not found', async () => {
       const email = 'notfound@email.com';
-      jest.spyOn(repository, 'findOneBy').mockResolvedValue(undefined);
+      vi.spyOn(repository, 'findOneBy').mockResolvedValue(undefined);
 
       const result = await service.findOneByEmail(email);
       expect(result).toBeUndefined();
@@ -104,7 +105,7 @@ describe('UsersService', () => {
         { id: 2, username: 'user2', email: 'c@d.com', password: 'hash' } as User,
       ];
 
-      jest.spyOn(repository, 'find').mockResolvedValue(users);
+      vi.spyOn(repository, 'find').mockResolvedValue(users);
 
       const result = await service.findAll();
 
@@ -124,7 +125,7 @@ describe('UsersService', () => {
         password: 'hashedpassword',
       } as User;
 
-      jest.spyOn(repository, 'findOneBy').mockResolvedValue(user);
+      vi.spyOn(repository, 'findOneBy').mockResolvedValue(user);
 
       const result = await service.findOne(1);
 
@@ -133,7 +134,7 @@ describe('UsersService', () => {
     });
 
     it('should throw NotFoundException when user is not found', async () => {
-      jest.spyOn(repository, 'findOneBy').mockResolvedValue(null);
+      vi.spyOn(repository, 'findOneBy').mockResolvedValue(null);
 
       await expect(service.findOne(999)).rejects.toThrow(NotFoundException);
     });
@@ -155,8 +156,8 @@ describe('UsersService', () => {
         email: 'new@email.com',
       };
 
-      jest.spyOn(repository, 'findOneBy').mockResolvedValue(existingUser);
-      jest.spyOn(repository, 'save').mockResolvedValue({
+      vi.spyOn(repository, 'findOneBy').mockResolvedValue(existingUser);
+      vi.spyOn(repository, 'save').mockResolvedValue({
         ...existingUser,
         ...updateDto,
       });
@@ -177,8 +178,8 @@ describe('UsersService', () => {
 
       const updateDto: UpdateUserDto = { password: 'NewStr0ng!Pass' };
 
-      jest.spyOn(repository, 'findOneBy').mockResolvedValue(existingUser);
-      jest.spyOn(repository, 'save').mockImplementation((user) =>
+      vi.spyOn(repository, 'findOneBy').mockResolvedValue(existingUser);
+      vi.spyOn(repository, 'save').mockImplementation((user) =>
         Promise.resolve(user as User),
       );
 
@@ -189,7 +190,7 @@ describe('UsersService', () => {
     });
 
     it('should throw NotFoundException for non-existent user', async () => {
-      jest.spyOn(repository, 'findOneBy').mockResolvedValue(null);
+      vi.spyOn(repository, 'findOneBy').mockResolvedValue(null);
 
       const updateDto: UpdateUserDto = { username: 'newname' };
 
@@ -208,8 +209,8 @@ describe('UsersService', () => {
         password: 'hashedpassword',
       } as User;
 
-      jest.spyOn(repository, 'findOneBy').mockResolvedValue(user);
-      jest.spyOn(repository, 'softRemove').mockResolvedValue(user);
+      vi.spyOn(repository, 'findOneBy').mockResolvedValue(user);
+      vi.spyOn(repository, 'softRemove').mockResolvedValue(user);
 
       await service.remove(1);
 
@@ -217,7 +218,7 @@ describe('UsersService', () => {
     });
 
     it('should throw NotFoundException for non-existent user', async () => {
-      jest.spyOn(repository, 'findOneBy').mockResolvedValue(null);
+      vi.spyOn(repository, 'findOneBy').mockResolvedValue(null);
 
       await expect(service.remove(999)).rejects.toThrow(NotFoundException);
     });

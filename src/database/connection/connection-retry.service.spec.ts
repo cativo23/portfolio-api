@@ -1,21 +1,22 @@
+import { vi, type Mock, type SpyInstance, type Mocked } from 'vitest';
 import { DataSource } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { ConnectionRetryService } from './connection-retry.service';
 
 describe('ConnectionRetryService', () => {
   let service: ConnectionRetryService;
-  let mockDataSource: jest.Mocked<DataSource>;
+  let mockDataSource: Mocked<DataSource>;
   let mockConfigService: Partial<ConfigService>;
 
   beforeEach(() => {
     mockDataSource = {
       isInitialized: false,
-      initialize: jest.fn(),
-      query: jest.fn(),
+      initialize: vi.fn(),
+      query: vi.fn(),
     } as any;
 
     mockConfigService = {
-      getOrThrow: jest.fn().mockReturnValue({
+      getOrThrow: vi.fn().mockReturnValue({
         maxRetries: 3,
         retryDelay: 100, // Usar delay corto para tests
       }),
@@ -28,7 +29,7 @@ describe('ConnectionRetryService', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should be defined', () => {
@@ -81,7 +82,7 @@ describe('ConnectionRetryService', () => {
   describe('isHealthy', () => {
     it('should return true when database is connected and query succeeds', async () => {
       (mockDataSource as any).isInitialized = true;
-      (mockDataSource.query as jest.Mock).mockResolvedValueOnce([{ '1': 1 }]);
+      (mockDataSource.query as Mock).mockResolvedValueOnce([{ '1': 1 }]);
 
       const result = await service.isHealthy();
 
@@ -100,7 +101,7 @@ describe('ConnectionRetryService', () => {
 
     it('should return false when query fails', async () => {
       (mockDataSource as any).isInitialized = true;
-      (mockDataSource.query as jest.Mock).mockRejectedValueOnce(
+      (mockDataSource.query as Mock).mockRejectedValueOnce(
         new Error('Query failed'),
       );
 
