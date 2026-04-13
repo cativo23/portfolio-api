@@ -30,7 +30,7 @@ COPY --chown=node:node package.json ./
 COPY --chown=node:node yarn.lock ./
 
 # Install dependencies
-RUN yarn install --immutable
+RUN yarn install
 RUN yarn dlx @nestjs/cli
 
 # Add yarn global bin to the PATH

@@ -90,19 +90,57 @@ export class HealthService {
 
   /**
    * Check memory usage health
+   *
+   * Uses RSS (Resident Set Size) instead of heap metrics because:
+   * - RSS represents actual memory used by the process
+   * - V8 heap metrics (heapUsed/heapTotal) are internal to Node.js
+   *   and can show high utilization even when the container has plenty of memory
+   * - RSS is the metric Kubernetes and Docker use for memory limits
    */
-  checkMemory(): MemoryStats {
-    const used = process.memoryUsage().heapUsed;
-    const total = process.memoryUsage().heapTotal;
-    const usagePercent = (used / total) * 100;
+  async checkMemory(): Promise<MemoryStats> {
+    const memoryUsage = process.memoryUsage();
+    const used = memoryUsage.rss; // Use RSS instead of heapUsed
 
-    // Consider unhealthy if using more than 90% of heap
+    // Get container memory limit from cgroups (works in Docker/Kubernetes)
+    let containerLimit: number;
+    try {
+      const fs = await import('fs/promises');
+      // Try cgroups v2 first, then v1
+      try {
+        const limitStr = await fs.readFile('/sys/fs/cgroup/memory.max', 'utf8');
+        if (limitStr.trim() === 'max') {
+          // No limit set (e.g., Docker Desktop without memory constraints)
+          // Fall through to os.totalmem() below
+          throw new Error('No memory limit set');
+        }
+        containerLimit = parseInt(limitStr.trim(), 10);
+      } catch {
+        // Fallback to cgroups v1
+        const limitStr = await fs.readFile(
+          '/sys/fs/cgroup/memory/memory.limit_in_bytes',
+          'utf8',
+        );
+        containerLimit = parseInt(limitStr.trim(), 10);
+      }
+    } catch {
+      // No cgroups available or no limit set
+      // Use env var if provided, otherwise use actual system memory
+      const envLimit = parseInt(process.env.CONTAINER_MEMORY_LIMIT || '', 10);
+      if (envLimit > 0) {
+        containerLimit = envLimit;
+      } else {
+        const os = await import('os');
+        containerLimit = os.totalmem();
+      }
+    }
+
+    const usagePercent = (used / containerLimit) * 100;
     const status: 'up' | 'down' = usagePercent > 90 ? 'down' : 'up';
 
     return {
       status,
       used,
-      total,
+      total: containerLimit,
       usagePercent,
       message:
         status === 'down'
@@ -154,7 +192,7 @@ export class HealthService {
     const [database, redis, memory, disk] = await Promise.all([
       this.checkDatabase(),
       this.checkRedis(),
-      Promise.resolve(this.checkMemory()),
+      this.checkMemory(),
       this.checkDisk(),
     ]);
 
@@ -228,7 +266,8 @@ export class HealthService {
     if (redis.status === 'down') notReady.push('redis');
 
     return {
-      status: notReady.length === 0 ? ('ready' as const) : ('not_ready' as const),
+      status:
+        notReady.length === 0 ? ('ready' as const) : ('not_ready' as const),
       timestamp: new Date().toISOString(),
       ...(notReady.length > 0 && { notReadyDependencies: notReady }),
     };

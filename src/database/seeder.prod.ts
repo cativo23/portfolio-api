@@ -2,6 +2,7 @@ import AppDataSource from '@config/typeorm.config.prod';
 import { User } from '@users/entities/user.entity';
 import { Project } from '@projects/entities/project.entity';
 import { Contact } from '@contacts/entities/contact.entity';
+import { ProjectStatus } from '@projects/types/project-status';
 import * as bcrypt from 'bcrypt';
 
 async function seed() {
@@ -38,6 +39,28 @@ async function seed() {
         repoUrl: 'https://github.com/cativo23/portfolio',
         isFeatured: true,
         techStack: ['Nuxt.js', 'Tailwind CSS', 'Vue.js', 'TypeScript'],
+        content: `# Portfolio Website
+
+This is my personal portfolio website showcasing my work as a developer.
+
+## Features
+
+- Responsive design
+- Dark mode support
+- Project showcase
+- Contact form
+
+## Technologies
+
+Built with Nuxt.js 3, Tailwind CSS, and deployed on Vercel.`,
+        heroImage: 'https://cativo.dev/og-image.png',
+        features: [
+          'Responsive design',
+          'Dark mode',
+          'SEO optimized',
+          'Fast performance',
+        ],
+        status: ProjectStatus.COMPLETED,
       }),
       projectRepo.create({
         title: 'Portfolio API',
@@ -54,18 +77,57 @@ async function seed() {
           'Docker',
           'JWT',
         ],
+        content: `# Portfolio API
+
+A RESTful API for managing portfolio projects and contacts.
+
+## Architecture
+
+- Clean architecture with separation of concerns
+- JWT authentication
+- Role-based access control
+- Caching layer for performance
+
+## Endpoints
+
+- /projects - CRUD operations for projects
+- /contacts - Contact form submissions
+- /auth - Authentication endpoints`,
+        heroImage: 'https://api.cativo.dev/architecture-diagram.png',
+        features: [
+          'JWT authentication',
+          'Swagger documentation',
+          'Automated testing',
+          'Docker support',
+        ],
+        status: ProjectStatus.MAINTAINED,
       }),
       projectRepo.create({
         title: 'Myths and Legends from El Salvador API',
         description:
           'An API providing information about myths and legends from El Salvador using python and FastAPI',
         shortDescription: 'API for myths and legends',
-        liveUrl: '',
+        liveUrl: null,
         repoUrl: 'https://github.com/cativo23/myths-and-legends-api',
         isFeatured: false,
         techStack: ['Python', 'FastAPI', 'PostgreSQL'],
-      }),
+        content: `# Myths and Legends API
 
+An API providing information about myths and legends from El Salvador.
+
+## Features
+
+- Comprehensive database of Salvadoran folklore
+- Search and filter capabilities
+- Cultural context and historical background`,
+        heroImage: 'https://myths-and-legends.example.com/hero.png',
+        features: [
+          'Cultural preservation',
+          'Search functionality',
+          'Educational content',
+        ],
+        status: ProjectStatus.COMPLETED,
+      }),
       projectRepo.create({
         title: 'Tacoview',
         description:
@@ -75,6 +137,31 @@ async function seed() {
         repoUrl: 'https://github.com/cativo23/tacoview',
         isFeatured: false,
         techStack: ['Vue.js', 'NestJS', 'Apache Kafka', 'PostgreSQL'],
+        content: `# Tacoview
+
+Event-driven restaurant review platform demonstrating modern microservices architecture.
+
+## Architecture
+
+- Event-driven design with Apache Kafka
+- Microservices communication
+- Eventual consistency patterns
+- Real-time data processing
+
+## Features
+
+- Restaurant reviews
+- User ratings
+- Real-time updates
+- Scalable architecture`,
+        heroImage: 'https://tacoview.example.com/architecture.png',
+        features: [
+          'Event-driven architecture',
+          'Microservices',
+          'Real-time processing',
+          'Scalable design',
+        ],
+        status: ProjectStatus.IN_PROGRESS,
       }),
     ];
     await projectRepo.save(projects);

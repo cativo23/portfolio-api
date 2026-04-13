@@ -1,12 +1,13 @@
 {
   "name": "portfolio-api",
-  "version": "2.2.0",
-  "description": "",
+  "version": "2.5.1",
+  "description": "Production NestJS REST API — JWT auth, TypeORM, rate limiting, Docker, 90%+ test coverage",
   "author": "",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
+    "typecheck": "tsc --noEmit",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"eslint.config.js\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\" \"eslint.config.js\"",
     "start": "nest start",
@@ -17,6 +18,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
+    "cov:badge": "istanbul-badges-readme --coverageDir=\"./coverage\"",
     "test:debug": "vitest --inspect-brk --no-file-parallelism",
     "test:e2e": "vitest run --config ./test/vitest-e2e.config.ts",
     "migration:generate": "npx ts-node -P ./tsconfig.json -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -d ./src/config/typeorm.config.ts ./src/database/migrations/migration",
@@ -26,7 +28,9 @@
     "migration:run:prod": "node ./node_modules/typeorm/cli.js migration:run -d ./dist/src/config/typeorm.config.prod.js",
     "migration:revert:prod": "node ./node_modules/typeorm/cli.js migration:revert -d ./dist/src/config/typeorm.config.prod.js",
     "seed:test": "npx ts-node -r tsconfig-paths/register src/database/seeder.ts",
-    "seed:test:prod": "TS_NODE_PROJECT=./tsconfig.prod.json node -r tsconfig-paths/register dist/src/database/seeder.prod.js"
+    "seed:test:prod": "node dist/src/database/seeder.prod.js",
+    "seed:update-projects": "npx ts-node -r tsconfig-paths/register src/database/seeds/update-projects-seed.ts",
+    "seed:update-projects:prod": "node dist/src/database/seeds/update-projects-seed.prod.js"
   },
   "dependencies": {
     "@nestjs/axios": "^4",
@@ -53,11 +57,13 @@
     "helmet": "^8",
     "mysql2": "^3",
     "nestjs-cls": "^6",
+    "nodemailer": "^6",
     "passport": "^0.7",
     "passport-jwt": "^4",
     "passport-local": "^1",
     "reflect-metadata": "^0.2",
     "rxjs": "^7.8",
+    "sanitize-html": "^2",
     "swagger-ui-express": "^5",
     "typeorm": "^0.3",
     "webpack": "^5"
@@ -68,19 +74,22 @@
     "@nestjs/testing": "^11",
     "@types/express": "^5",
     "@types/node": "^24",
+    "@types/nodemailer": "^6",
+    "@types/sanitize-html": "^2",
     "@types/supertest": "^6",
     "@typescript-eslint/eslint-plugin": "^8",
     "@typescript-eslint/parser": "^8",
-    "@vitest/coverage-v8": "^4.1.4",
+    "@vitest/coverage-v8": "^4",
     "eslint": "^9",
     "eslint-config-prettier": "^10",
+    "istanbul-badges-readme": "^1.9",
     "prettier": "^3",
     "supertest": "^7",
     "ts-loader": "^9",
     "ts-node": "^10",
     "tsconfig-paths": "^4",
     "typescript": "^5.8",
-    "vitest": "^4.1.4"
+    "vitest": "^4"
   },
   "packageManager": "yarn@4.9.2"
 }

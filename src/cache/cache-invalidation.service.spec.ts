@@ -18,8 +18,10 @@ describe('CacheInvalidationService', () => {
     mockCacheManager = {
       stores: [
         {
-          _cache: {
-            client: mockRedisClient,
+          store: {
+            _cache: {
+              client: mockRedisClient,
+            },
           },
         },
       ],

@@ -7,6 +7,182 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.5.2] - 2026-03-26
+
+### Fixed
+
+- **Health check memory metrics**: Fixed misleading memory usage percentage in `/health/detailed` endpoint
+  - Changed from `heapUsed/heapTotal` to `RSS` (Resident Set Size) for accurate container memory tracking
+  - Added automatic detection of memory limits from Docker cgroups (v1 and v2)
+  - Falls back to system total memory in local development without container limits
+  - Fixes false positive ~80% usage alerts when container has plenty of available memory
+
+### Database Migrations
+
+- No new migrations required
+
+## [2.5.1] - 2026-03-24
+
+### Changed
+
+- **Production container memory**: Increased API container memory limits for better performance under load
+  - Memory limit: 512M → 768M (+50%)
+  - Memory reservation: 128M → 256M (+100%)
+
+### Database Migrations
+
+- No new migrations required
+
+## [2.5.0] - 2026-03-24
+
+### Added
+
+- **Automated coverage badges**: Added `istanbul-badges-readme` package for dynamic coverage badge generation in CI
+- **Coverage badge CI workflow**: GitHub Action now runs `yarn test:cov` and generates badges on every push to `develop`
+- **New test suites** (11 new files, +25% coverage):
+  - Config loaders and env utils tests (`configuration.loaders.spec.ts`, `env.utils.spec.ts`, `validate-configuration.spec.ts`)
+  - Query DTO transformation tests (`pagination-query.dto.spec.ts`, `find-all-projects-query.dto.spec.ts`, `find-all-contacts-query.dto.spec.ts`)
+  - Base CRUD service tests (`base-crud.service.spec.ts`)
+  - Database service tests (`connection-retry.service.spec.ts`, `transaction.service.spec.ts`, `typeorm-logger.service.spec.ts`)
+  - Health service tests (`health.service.spec.ts`)
+- **Extended guard tests**: Added comprehensive API key guard and JWT/API key guard authentication flow tests
+
+### Changed
+
+- **README.md badges**: Updated from static single coverage badge to dynamic multi-metric badges (Lines, Statements, Branches, Functions)
+- **jest.config.ts**: Added `json-summary` reporter for badge generation and excluded coverage directory from reports
+
+### Fixed
+
+- **Coverage exclusion**: Added seed files and typeorm-common.config.ts to coverage exclusions
+
+### Testing
+
+- **404 tests** across **40 test suites** - all passing
+- **Coverage: 94.34%** statements (up from 69%)
+
+### Database Migrations
+
+- No new migrations required
+
+## [2.4.1] - 2026-03-23
+
+### Added
+
+- **Production seed script**: Added `seed:update-projects:prod` script to run database seeder in production Docker containers
+- **Production seed file**: Created `update-projects-seed.prod.ts` using compiled JavaScript instead of ts-node
+
+### Fixed
+
+- **Docker seed execution**: Fixed "Cannot find module" error when running `seed:update-projects` in production by using compiled `.js` file instead of TypeScript
+
+### Database Migrations
+
+- No new migrations required
+
+## [2.4.0] - 2026-03-23
+
+### Added
+
+- **TypeScript type checking**: Added `typecheck` script to package.json for running TypeScript compiler without emitting files
+
+### Changed
+
+- **JWT config type fix**: Changed `expiresIn` from string concatenation to number type for proper JWT module compatibility
+- **Seeder type safety**: Replaced string literals with `ProjectStatus` enum in all seeder files for type-safe status values
+
+### Fixed
+
+- **TypeScript errors**: Resolved 19 type errors across auth module, seeders, and health controller tests
+- **Health controller test**: Updated test assertions to match actual return type from `HealthService.getFullHealth()`
+- **Updated yarn.lock** - Added missing `sanitize-html` and `@types/sanitize-html` dependencies to lockfile to fix Docker build failures
+
+### Database Migrations
+
+- No new migrations required
+
+### Testing
+
+- All TypeScript type checks passing (`yarn typecheck`)
+
+## [2.3.0] - 2026-03-22
+
+### Added
+
+- **New Project fields for rich portfolio layout**:
+  - `content`: Text field for Markdown/HTML case study content
+  - `heroImage`: URL field for main hero image or architecture diagram
+  - `features`: JSON array of key feature strings
+  - `status`: Enum field with values 'Completed', 'In Progress', 'Maintained'
+- **ProjectStatus enum type** for type-safe status handling
+- **Database index** on `status` column for query optimization
+- **Update seed script** (`npm run seed:update-projects`) to populate existing projects
+
+### Security
+
+- **XSS prevention**: Added HTML sanitization using `sanitize-html` library
+  - Allowed tags: `p, br, strong, em, h1-h6, ul, ol, li, blockquote, pre, code, a, img`
+  - Sanitization applied in `ProjectsService.create()` and `update()`
+- **URL protocol restriction**: Limited `liveUrl`, `heroImage`, and `repoUrl` to `http`/`https` only
+- **Input validation**: Added `@MaxLength` decorators to all string fields
+  - `title`: 200 chars, `description`: 1000 chars, `shortDescription`: 500 chars
+  - `content`: 50000 chars, URLs: 2048 chars
+  - Array items: `techStack` 50 chars, `features` 100 chars
+
+### Changed
+
+- **Database column types**:
+  - Changed `techStack` and `features` from `simple-json` to native MySQL `JSON`
+  - Changed `status` from `VARCHAR` to MySQL `ENUM` type
+  - Added explicit `VARCHAR(255)` type for `heroImage` column
+- **Response DTO**: Standardized null handling using nullish coalescing (`??`)
+- **Export ProjectStatus** from `@projects/dto` for easier imports
+
+### Fixed
+
+- **Duplicate seed data**: Removed duplicate "Blog Platform" entry from seeder
+- **Data consistency**: Changed `liveUrl: ''` to `liveUrl: null` in production seeder
+- **Entity-migration type mismatch**: Aligned `simple-json` entity with native `JSON` migration
+- **Update seed script logic**: Fixed empty string overwrite issue using `??` operator
+
+### Database Migrations
+
+- `1774500000000-add-project-rich-layout-fields`: Add new project columns
+- `1774600000000-fix-project-json-type`: Fix JSON column type mismatch
+- `1774700000000-add-project-status-enum`: Add status ENUM and heroImage type
+- `1774800000000-add-status-index`: Add index on status column
+
+### Testing
+
+- All 36 tests passing
+- Updated service and controller tests with new fields
+- Full type safety with `ProjectStatus` enum
+
+## [2.2.3] - 2026-03-21
+
+### Security
+
+- **Removed exposed port 3000** - API no longer exposes unencrypted HTTP traffic directly, Traefik handles all routing
+- **Protected MySQL password** - Healthcheck no longer exposes password via command line (`--password` flag instead of `-p`)
+- **Required REDIS_PASSWORD** - Removed insecure default password fallback (`${REDIS_PASSWORD?Missing Redis password}`)
+
+### Changed
+
+- **Optimized API healthcheck** - Replaced Node.js process with lightweight `wget` command
+- **Added Traefik security-headers middleware** - Enforces HSTS, XSS filtering, and other security headers
+
+## [2.2.2] - 2026-03-19
+
+### Fixed
+
+- **Production seeder script**: Removed `tsconfig-paths/register` from `seed:test:prod` script since it's a devDependency and path aliases are already resolved in compiled JavaScript
+
+## [2.2.1] - 2026-03-19
+
+### Fixed
+
+- **TypeORM migration loading in production**: Changed migration pattern from `*-migration.js` to `*.js` to ensure all migration files are loaded, fixing the missing `HashApiKeys` migration that renames `api_keys.key` to `api_keys.hashedKey`
+
 ## [2.2.0] - 2026-03-18
 
 ### Added
@@ -177,7 +353,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Automated CI/CD with GitHub Actions
 - Auto-release workflow for release branches
 
-[Unreleased]: https://github.com/cativo23/portfolio-api/compare/v2.2.0...HEAD
+[Unreleased]: https://github.com/cativo23/portfolio-api/compare/v2.4.1...HEAD
+[2.4.1]: https://github.com/cativo23/portfolio-api/compare/v2.4.0...v2.4.1
+[2.4.0]: https://github.com/cativo23/portfolio-api/compare/v2.3.0...v2.4.0
+[2.3.0]: https://github.com/cativo23/portfolio-api/compare/v2.2.3...v2.3.0
+[2.2.3]: https://github.com/cativo23/portfolio-api/compare/v2.2.2...v2.2.3
+[2.2.2]: https://github.com/cativo23/portfolio-api/compare/v2.2.0...v2.2.2
 [2.2.0]: https://github.com/cativo23/portfolio-api/compare/v2.1.2...v2.2.0
 [2.1.2]: https://github.com/cativo23/portfolio-api/compare/v2.1.1...v2.1.2
 [2.1.1]: https://github.com/cativo23/portfolio-api/compare/v2.1.0...v2.1.1

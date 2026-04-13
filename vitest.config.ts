@@ -9,6 +9,8 @@ export default defineConfig({
       '@users': path.resolve(__dirname, 'src/users'),
       '@projects': path.resolve(__dirname, 'src/projects'),
       '@contacts': path.resolve(__dirname, 'src/contacts'),
+      '@profile': path.resolve(__dirname, 'src/profile'),
+      '@email': path.resolve(__dirname, 'src/email'),
       '@config': path.resolve(__dirname, 'src/config'),
       '@database': path.resolve(__dirname, 'src/database'),
       '@health': path.resolve(__dirname, 'src/health'),

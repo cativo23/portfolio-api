@@ -15,15 +15,15 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Use Node.js 24.x
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 24
 
       - name: Cache Yarn dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             **/node_modules
@@ -41,7 +41,7 @@ jobs:
       - name: Run linter
         run: yarn lint
 
-      - name: Run tests
+      - name: Run tests and coverage
         env:
           NODE_ENV: test
           API_KEY_SECRET: ci-test-api-key-secret
@@ -53,10 +53,14 @@ jobs:
           DB_USERNAME: root
           DB_PASSWORD: root
           DB_NAME: portfolio_test
-        run: yarn test
+        run: yarn test:cov
+
+      - name: Generate coverage badge (develop only)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+        run: yarn cov:badge
 
       # Auto-format and push only on develop (not on PRs)
-      - name: Apply formatting and push (develop only)
+      - name: Apply formatting, update badge, and push (develop only)
         if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -68,6 +72,6 @@ jobs:
           git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${REPO}"
           if [[ -n $(git status --porcelain) ]]; then
             git add .
-            git commit -m "chore: apply code formatting [ci skip]"
+            git commit -m "chore: apply code formatting and update coverage badge [ci skip]"
             git push
           fi

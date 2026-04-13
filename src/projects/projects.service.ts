@@ -10,6 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationUtil } from '@core/utils/pagination.util';
 import { BaseCrudService } from '@core/services/base-crud.service';
 import { CacheInvalidationService } from '@src/cache/cache-invalidation.service';
+import sanitizeHtml from 'sanitize-html';
 
 /**
  * Interface defining options for finding projects with pagination, search, and filtering
@@ -24,6 +25,32 @@ interface FindAllOptions {
   /** Optional flag to filter projects by featured status */
   isFeatured?: boolean | undefined;
 }
+
+/**
+ * Allowed HTML tags for content sanitization
+ */
+const ALLOWED_CONTENT_TAGS = [
+  'p',
+  'br',
+  'strong',
+  'em',
+  'u',
+  's',
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
+  'ul',
+  'ol',
+  'li',
+  'blockquote',
+  'pre',
+  'code',
+  'a',
+  'img',
+];
 
 /**
  * Service responsible for managing portfolio projects
@@ -45,6 +72,25 @@ export class ProjectsService extends BaseCrudService<
     private readonly cacheInvalidationService: CacheInvalidationService,
   ) {
     super();
+  }
+
+  /**
+   * Sanitizes HTML content to prevent XSS attacks
+   * @param content - Raw HTML/Markdown content
+   * @returns Sanitized content safe for storage and rendering
+   */
+  private sanitizeContent(content: string | undefined): string | undefined {
+    if (!content) {
+      return content;
+    }
+    return sanitizeHtml(content, {
+      allowedTags: ALLOWED_CONTENT_TAGS,
+      allowedAttributes: {
+        a: ['href', 'title', 'target'],
+        img: ['src', 'alt', 'title'],
+      },
+      allowedSchemes: ['http', 'https', 'mailto'],
+    });
   }
 
   protected get repository(): Repository<Project> {
@@ -89,7 +135,12 @@ export class ProjectsService extends BaseCrudService<
    * Creates a new project and invalidates cache
    */
   async create(createProjectDto: CreateProjectDto): Promise<Project> {
-    const result = await super.create(createProjectDto);
+    // Sanitize content before saving to prevent XSS
+    const sanitizedDto = {
+      ...createProjectDto,
+      content: this.sanitizeContent(createProjectDto.content),
+    };
+    const result = await super.create(sanitizedDto);
     // Safe: invalidateByPrefix never throws (has internal try/catch)
     await this.cacheInvalidationService.invalidateByPrefix('projects');
     return result;
@@ -102,7 +153,12 @@ export class ProjectsService extends BaseCrudService<
     id: number,
     updateProjectDto: UpdateProjectDto,
   ): Promise<Project> {
-    const result = await super.update(id, updateProjectDto);
+    // Sanitize content before saving to prevent XSS
+    const sanitizedDto = {
+      ...updateProjectDto,
+      content: this.sanitizeContent(updateProjectDto.content),
+    };
+    const result = await super.update(id, sanitizedDto);
     // Safe: invalidateByPrefix never throws (has internal try/catch)
     await this.cacheInvalidationService.invalidateByPrefix('projects');
     return result;

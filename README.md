@@ -1,15 +1,37 @@
-# Portfolio API
+<div align="center">
 
-[![Coverage](https://img.shields.io/badge/coverage-90.1%25-brightgreen)](https://github.com/cativo23/portfolio-api)
+```
+    ____             __  ____      ___          ___    ____  ____
+   / __ \____  _____/ /_/ __/___  / (_)___     /   |  / __ \/  _/
+  / /_/ / __ \/ ___/ __/ /_/ __ \/ / / __ \   / /| | / /_/ // /
+ / ____/ /_/ / /  / /_/ __/ /_/ / / / /_/ /  / ___ |/ ____// /
+/_/    \____/_/   \__/_/  \____/_/_/\____/  /_/  |_/_/   /___/
+```
+
+</div>
+
+<!-- istanbul-badges-readme-start -->
+[![Lines](https://img.shields.io/badge/lines-93.95%25-brightgreen.svg?style=flat)](https://github.com/cativo23/portfolio-api)
+[![Statements](https://img.shields.io/badge/statements-94.16%25-brightgreen.svg?style=flat)](https://github.com/cativo23/portfolio-api)
+[![Branches](https://img.shields.io/badge/branches-86.2%25-yellow.svg?style=flat)](https://github.com/cativo23/portfolio-api)
+[![Functions](https://img.shields.io/badge/functions-91.58%25-brightgreen.svg?style=flat)](https://github.com/cativo23/portfolio-api)
+<!-- istanbul-badges-readme-end -->
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Node Version](https://img.shields.io/badge/node-%3E%3D23.0.0-brightgreen.svg)](https://nodejs.org/)
 [![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](https://hub.docker.com/)
 
+## Overview
+
+**Production-ready NestJS REST API** demonstrating enterprise-grade backend development practices. This portfolio piece showcases authentication, rate limiting, comprehensive testing, CI/CD automation, and Docker deployment — all the patterns you'd expect from a mature production codebase.
+
+> **Why this exists:** This isn't just another tutorial API. It's a demonstration of professional backend engineering: extensive commit history, multiple releases, high test coverage, and production-hardened patterns like path aliases, standardized error handling, health checks, and Swagger documentation.
+
 ## Description
 
-Portfolio API is a RESTful API built with NestJS for managing portfolio projects. It provides endpoints for authentication, user management, and project management. The API is designed to be used as a backend for a portfolio website or application.
+Portfolio API is a RESTful API built with NestJS for managing portfolio projects. It provides endpoints for authentication, user management, and project management. The API is designed to be used as a backend for my portfolio website or application.
 
 Key features:
+
 - User authentication with JWT
 - Project management (CRUD operations)
 - Contact form submission (public endpoint)
@@ -122,7 +144,7 @@ The following environment variables are required for the application to run:
 
 3. **Create environment file**:
    Create a `.env` file in the project root with the required environment variables:
-   ```
+   ```text
    DB_HOST=localhost
    DB_PORT=3306
    DB_USERNAME=root

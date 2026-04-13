@@ -24,6 +24,8 @@
       "@users/*": ["src/users/*"],
       "@projects/*": ["src/projects/*"],
       "@contacts/*": ["src/contacts/*"],
+      "@profile/*": ["src/profile/*"],
+      "@email/*": ["src/email/*"],
       "@config/*": ["src/config/*"],
       "@database/*": ["src/database/*"],
       "@health/*": ["src/health/*"],

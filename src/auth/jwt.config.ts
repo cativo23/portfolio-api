@@ -12,10 +12,11 @@ import { ConfigService } from '@nestjs/config';
  * @throws Error if required environment variables are missing
  */
 export async function jwtConfigFactory(configService: ConfigService) {
+  const expiresIn = configService.getOrThrow<string>('JWT_EXPIRES_IN');
   return {
     secret: configService.get<string>('JWT_SECRET'),
     signOptions: {
-      expiresIn: configService.getOrThrow<string>('JWT_EXPIRES_IN') + 's',
+      expiresIn: Number(expiresIn),
     },
   };
 }

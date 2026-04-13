@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { Contact } from './entities/contact.entity';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { Logger } from '@nestjs/common';
+import { EmailService } from '@email/email.service';
 
 describe('ContactsService', () => {
   let service: ContactsService;
@@ -25,6 +26,10 @@ describe('ContactsService', () => {
         {
           provide: getRepositoryToken(Contact),
           useClass: Repository,
+        },
+        {
+          provide: EmailService,
+          useValue: { sendNewContactNotification: vi.fn() },
         },
       ],
     }).compile();
@@ -65,7 +70,7 @@ describe('ContactsService', () => {
         }),
       );
       expect(logSpy).toHaveBeenCalledWith(
-        `Contact created with ID ${contact.id}`,
+        `Created new contact: ${contact.name}`,
       );
     });
 

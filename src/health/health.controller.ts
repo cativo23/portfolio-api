@@ -44,7 +44,8 @@ export class HealthController {
   @SkipThrottle()
   @ApiOperation({
     summary: 'Get simplified health status',
-    description: 'Returns basic health status for all components (just up/down)',
+    description:
+      'Returns basic health status for all components (just up/down)',
   })
   @ApiResponse({
     status: 200,
@@ -141,9 +142,7 @@ export class HealthController {
     description: 'One or more dependencies are not ready',
   })
   async readiness(): Promise<HealthCheckResult> {
-    return this.healthCheckService.check([
-      () => this.db.pingCheck('database'),
-    ]);
+    return this.healthCheckService.check([() => this.db.pingCheck('database')]);
   }
 
   /**
