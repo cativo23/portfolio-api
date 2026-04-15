@@ -27,6 +27,8 @@ import {
 } from '@contacts/dto';
 import { ContactsService } from '@contacts/contacts.service';
 import { AuthGuard } from '@auth/auth.guard';
+import { RolesGuard } from '@auth/roles.guard';
+import { Roles } from '@auth/decorators/roles.decorator';
 import { DeleteResponseDto } from '@projects/dto/delete-response.dto';
 import { Public } from '@auth/decorators/public.decorator';
 import {
@@ -61,7 +63,8 @@ export class ContactsController {
   }
 
   @Get()
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('admin')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get all contacts (Admin only)' })
   @ApiGetPaginatedList(
@@ -93,7 +96,8 @@ export class ContactsController {
   }
 
   @Get(':id')
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('admin')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get a contact by ID (Admin only)' })
   @ApiParam({ name: 'id', type: Number, description: 'Contact ID' })
@@ -111,7 +115,8 @@ export class ContactsController {
   }
 
   @Patch(':id/read')
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('admin')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Mark a contact as read (Admin only)' })
   @ApiParam({ name: 'id', type: Number, description: 'Contact ID' })
@@ -128,7 +133,8 @@ export class ContactsController {
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('admin')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a contact by ID (Admin only)' })
   @ApiParam({ name: 'id', type: Number, description: 'Contact ID' })

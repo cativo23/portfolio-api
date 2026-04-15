@@ -11,9 +11,11 @@ import {
   SingleContactResponseDto,
 } from './dto';
 import { DeleteResponseDto } from '@projects/dto/delete-response.dto';
-import { NotFoundException } from '@core/exceptions';
+import { NotFoundException, CanActivate } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { AuthGuard } from '@auth/auth.guard';
+import { RolesGuard } from '@auth/roles.guard';
 
 describe('ContactsController', () => {
   let controller: ContactsController;
@@ -56,6 +58,9 @@ describe('ContactsController', () => {
     remove: jest.fn(),
   };
 
+  const mockAuthGuard: CanActivate = { canActivate: jest.fn(() => true) };
+  const mockRolesGuard: CanActivate = { canActivate: jest.fn(() => true) };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ContactsController],
@@ -76,7 +81,12 @@ describe('ContactsController', () => {
           },
         },
       ],
-    }).compile();
+    })
+      .overrideGuard(AuthGuard)
+      .useValue(mockAuthGuard)
+      .overrideGuard(RolesGuard)
+      .useValue(mockRolesGuard)
+      .compile();
 
     controller = module.get<ContactsController>(ContactsController);
     service = module.get<ContactsService>(ContactsService);
