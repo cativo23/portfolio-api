@@ -108,7 +108,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         code,
         message,
         details:
-          isHealthCheck &&
           typeof exceptionResponse === 'object' &&
           'message' in exceptionResponse &&
           Array.isArray(exceptionResponse.message)
