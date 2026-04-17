@@ -24,7 +24,7 @@ Request → AuthGuard → ProjectsCacheInterceptor → Controller → Service �
 
 ## Assumptions
 
-- All authenticated users see the same project data. There is no per-user filtering. Cache keys are URL-based only, shared across all requests.
+- All authenticated users see the same project data. There is no per-user filtering. Cache keys use the format `<prefix>:<url>` (e.g., `projects:/projects?page=1`). The prefix is arbitrary and configurable. The key does not include user identity, so all users share the same cached response.
 - If this changes in the future (per-user project visibility), the cache key strategy must be extended to include user context.
 
 ## Components
