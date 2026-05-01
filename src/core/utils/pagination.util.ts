@@ -67,6 +67,20 @@ export class PaginationUtil {
 
     const query = repository.createQueryBuilder(alias);
 
+    // TypeORM's QueryBuilder does not apply the soft-delete guard automatically
+    // (unlike repository.find). Without this, paginated list endpoints leak
+    // soft-deleted rows. The metadata getter throws on partially-initialised
+    // repositories (e.g. in unit-test mocks), so guard the access.
+    let deleteDateColumn: { propertyName: string } | undefined;
+    try {
+      deleteDateColumn = repository.metadata?.deleteDateColumn;
+    } catch {
+      deleteDateColumn = undefined;
+    }
+    if (deleteDateColumn) {
+      query.andWhere(`${alias}.${deleteDateColumn.propertyName} IS NULL`);
+    }
+
     // Apply search if provided
     if (search && searchFields.length > 0) {
       const searchConditions = searchFields
