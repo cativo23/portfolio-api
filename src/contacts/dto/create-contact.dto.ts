@@ -1,5 +1,9 @@
 import { Transform } from 'class-transformer';
-import { ApiProperty, ApiPropertyOptional, ApiHideProperty } from '@nestjs/swagger';
+import {
+  ApiProperty,
+  ApiPropertyOptional,
+  ApiHideProperty,
+} from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsOptional,

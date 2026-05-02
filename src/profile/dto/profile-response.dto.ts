@@ -18,7 +18,10 @@ export class ProfileSkillDto {
   @ApiProperty({ example: 'TypeScript' })
   name: string;
 
-  @ApiProperty({ example: 'advanced', enum: ['advanced', 'intermediate', 'basic'] })
+  @ApiProperty({
+    example: 'advanced',
+    enum: ['advanced', 'intermediate', 'basic'],
+  })
   level: string;
 }
 
@@ -43,7 +46,10 @@ export class ProfileResponseDto {
   @ApiProperty({ example: 'San Salvador, El Salvador' })
   location: string;
 
-  @ApiProperty({ example: 'Remote Tech Lead and Full-Stack Software Engineer with 9 years of experience building healthcare platforms, payment systems, and AI-powered products.' })
+  @ApiProperty({
+    example:
+      'Remote Tech Lead and Full-Stack Software Engineer with 9 years of experience building healthcare platforms, payment systems, and AI-powered products.',
+  })
   summary: string;
 
   @ApiProperty({ type: [ProfileExperienceDto] })

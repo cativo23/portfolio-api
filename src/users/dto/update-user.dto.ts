@@ -15,6 +15,8 @@ export class UpdateUserDto {
   @IsOptional()
   @IsString()
   @MinLength(6)
-  @ApiPropertyOptional({ description: 'New password (leave blank to keep current)' })
+  @ApiPropertyOptional({
+    description: 'New password (leave blank to keep current)',
+  })
   password?: string;
 }

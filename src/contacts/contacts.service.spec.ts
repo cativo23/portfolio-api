@@ -29,7 +29,7 @@ describe('ContactsService', () => {
         {
           provide: EmailService,
           useValue: {
-            sendNewContactNotification: jest.fn(),
+            sendNewContactNotification: jest.fn().mockResolvedValue(undefined),
           },
         },
       ],
