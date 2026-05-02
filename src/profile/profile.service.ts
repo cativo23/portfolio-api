@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import {
   ProfileResponseDto,
   ProfileExperienceDto,
-  ProfileSkillDto,
   ProfileSkillCategoryDto,
 } from './dto/profile-response.dto';
 
