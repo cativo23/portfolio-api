@@ -100,8 +100,18 @@ describe('UsersService', () => {
   describe('findAll', () => {
     it('should return all users ordered by createdAt DESC', async () => {
       const users: User[] = [
-        { id: 1, username: 'user1', email: 'a@b.com', password: 'hash' } as User,
-        { id: 2, username: 'user2', email: 'c@d.com', password: 'hash' } as User,
+        {
+          id: 1,
+          username: 'user1',
+          email: 'a@b.com',
+          password: 'hash',
+        } as User,
+        {
+          id: 2,
+          username: 'user2',
+          email: 'c@d.com',
+          password: 'hash',
+        } as User,
       ];
 
       jest.spyOn(repository, 'find').mockResolvedValue(users);
@@ -178,9 +188,9 @@ describe('UsersService', () => {
       const updateDto: UpdateUserDto = { password: 'NewStr0ng!Pass' };
 
       jest.spyOn(repository, 'findOneBy').mockResolvedValue(existingUser);
-      jest.spyOn(repository, 'save').mockImplementation((user) =>
-        Promise.resolve(user as User),
-      );
+      jest
+        .spyOn(repository, 'save')
+        .mockImplementation((user) => Promise.resolve(user as User));
 
       const result = await service.update(1, updateDto);
 

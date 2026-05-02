@@ -12,13 +12,16 @@ export interface MailConfig {
   to: string;
 }
 
-export default registerAs('mail', (): MailConfig => ({
-  enabled: process.env.MAIL_ENABLED === 'true',
-  host: trimEnvQuotes(process.env.MAIL_HOST) || 'localhost',
-  port: parseInt(trimEnvQuotes(process.env.MAIL_PORT) || '587', 10),
-  secure: trimEnvQuotes(process.env.MAIL_SECURE) === 'true',
-  user: trimEnvQuotes(process.env.MAIL_USER) || '',
-  password: trimEnvQuotes(process.env.MAIL_PASSWORD) || '',
-  from: trimEnvQuotes(process.env.MAIL_FROM) || 'portfolio@cativo.dev',
-  to: trimEnvQuotes(process.env.MAIL_TO) || 'cativo@cativo.dev',
-}));
+export default registerAs(
+  'mail',
+  (): MailConfig => ({
+    enabled: process.env.MAIL_ENABLED === 'true',
+    host: trimEnvQuotes(process.env.MAIL_HOST) || 'localhost',
+    port: parseInt(trimEnvQuotes(process.env.MAIL_PORT) || '587', 10),
+    secure: trimEnvQuotes(process.env.MAIL_SECURE) === 'true',
+    user: trimEnvQuotes(process.env.MAIL_USER) || '',
+    password: trimEnvQuotes(process.env.MAIL_PASSWORD) || '',
+    from: trimEnvQuotes(process.env.MAIL_FROM) || 'portfolio@cativo.dev',
+    to: trimEnvQuotes(process.env.MAIL_TO) || 'cativo@cativo.dev',
+  }),
+);

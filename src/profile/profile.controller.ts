@@ -13,7 +13,8 @@ export class ProfileController {
   @Public()
   @ApiOperation({
     summary: 'Get professional profile information',
-    description: 'Returns Carlos Cativo\'s professional profile including experience, skills, and differentiators.',
+    description:
+      "Returns Carlos Cativo's professional profile including experience, skills, and differentiators.",
   })
   @ApiResponse({
     status: 200,
