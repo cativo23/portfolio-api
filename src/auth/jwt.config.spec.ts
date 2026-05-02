@@ -1,4 +1,4 @@
-import { vi, type Mock, type SpyInstance, type Mocked } from 'vitest';
+import { vi, type Mocked } from 'vitest';
 import { ConfigService } from '@nestjs/config';
 import { jwtConfigFactory } from './jwt.config';
 

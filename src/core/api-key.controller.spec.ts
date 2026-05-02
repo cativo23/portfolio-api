@@ -1,4 +1,4 @@
-import { vi, type Mock, type SpyInstance, type Mocked } from 'vitest';
+import { vi, type Mock } from 'vitest';
 import { ApiKeyController } from './api-key.controller';
 import { ApiKeyService } from './api-key.service';
 

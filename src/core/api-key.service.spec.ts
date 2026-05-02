@@ -1,4 +1,4 @@
-import { vi, type Mock, type SpyInstance, type Mocked } from 'vitest';
+import { vi } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ApiKeyService } from './api-key.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -44,9 +44,10 @@ describe('ApiKeyService', () => {
   describe('create', () => {
     it('should create an API key and return plainKey + entity', async () => {
       vi.spyOn(repo, 'create').mockImplementation((data: any) => data as any);
-      vi
-    .spyOn(repo, 'save')
-        .mockImplementation(async (entity: any) => ({ id: 1, ...entity }));
+      vi.spyOn(repo, 'save').mockImplementation(async (entity: any) => ({
+        id: 1,
+        ...entity,
+      }));
 
       const result = await service.create('desc');
 

@@ -1,4 +1,4 @@
-import { vi, type Mock, type SpyInstance, type Mocked } from 'vitest';
+import { vi, type Mocked } from 'vitest';
 import { Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { BaseCrudService } from './base-crud.service';

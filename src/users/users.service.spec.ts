@@ -1,4 +1,4 @@
-import { vi, type Mock, type SpyInstance, type Mocked } from 'vitest';
+import { vi } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
 import { Repository } from 'typeorm';
@@ -101,8 +101,18 @@ describe('UsersService', () => {
   describe('findAll', () => {
     it('should return all users ordered by createdAt DESC', async () => {
       const users: User[] = [
-        { id: 1, username: 'user1', email: 'a@b.com', password: 'hash' } as User,
-        { id: 2, username: 'user2', email: 'c@d.com', password: 'hash' } as User,
+        {
+          id: 1,
+          username: 'user1',
+          email: 'a@b.com',
+          password: 'hash',
+        } as User,
+        {
+          id: 2,
+          username: 'user2',
+          email: 'c@d.com',
+          password: 'hash',
+        } as User,
       ];
 
       vi.spyOn(repository, 'find').mockResolvedValue(users);

@@ -1,4 +1,4 @@
-import { vi, type Mock, type SpyInstance, type Mocked } from 'vitest';
+import { vi, type Mock, type Mocked } from 'vitest';
 import { DataSource } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { ConnectionRetryService } from './connection-retry.service';

@@ -1,4 +1,4 @@
-import { vi, type Mock, type SpyInstance, type Mocked } from 'vitest';
+import { vi } from 'vitest';
 import { JwtOrApiKeyGuard } from './jwt-or-api-key.guard';
 import { ExecutionContext } from '@nestjs/common';
 

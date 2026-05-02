@@ -1,4 +1,4 @@
-import { vi, type Mock, type SpyInstance, type Mocked } from 'vitest';
+import { vi } from 'vitest';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmLoggerService } from './typeorm-logger.service';
 
@@ -258,11 +258,9 @@ describe('TypeOrmLoggerService', () => {
       const service = new TypeOrmLoggerService(configService);
 
       // Spy on stringifyParameter to make it throw
-      vi
-    .spyOn(service as any, 'stringifyParameter')
-        .mockImplementation(() => {
-          throw new Error('Cannot stringify');
-        });
+      vi.spyOn(service as any, 'stringifyParameter').mockImplementation(() => {
+        throw new Error('Cannot stringify');
+      });
 
       const result = (service as any).buildSqlString('SELECT * FROM users', [
         { complex: 'object' },

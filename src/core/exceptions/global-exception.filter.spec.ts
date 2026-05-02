@@ -21,7 +21,7 @@ describe('GlobalExceptionFilter', () => {
 
   beforeEach(async () => {
     loggerErrorSpy = vi
-    .spyOn(Logger.prototype, 'error')
+      .spyOn(Logger.prototype, 'error')
       .mockImplementation(vi.fn());
 
     const module: TestingModule = await Test.createTestingModule({

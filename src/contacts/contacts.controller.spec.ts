@@ -1,4 +1,4 @@
-import { vi, type Mock, type SpyInstance, type Mocked } from 'vitest';
+import { vi } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ContactsController } from './contacts.controller';
 import { ContactsService } from './contacts.service';
@@ -12,9 +12,11 @@ import {
   SingleContactResponseDto,
 } from './dto';
 import { DeleteResponseDto } from '@projects/dto/delete-response.dto';
-import { NotFoundException } from '@core/exceptions';
+import { NotFoundException, CanActivate } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { AuthGuard } from '@auth/auth.guard';
+import { RolesGuard } from '@auth/roles.guard';
 
 describe('ContactsController', () => {
   let controller: ContactsController;
@@ -57,6 +59,9 @@ describe('ContactsController', () => {
     remove: vi.fn(),
   };
 
+  const mockAuthGuard: CanActivate = { canActivate: vi.fn(() => true) };
+  const mockRolesGuard: CanActivate = { canActivate: vi.fn(() => true) };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ContactsController],
@@ -77,7 +82,12 @@ describe('ContactsController', () => {
           },
         },
       ],
-    }).compile();
+    })
+      .overrideGuard(AuthGuard)
+      .useValue(mockAuthGuard)
+      .overrideGuard(RolesGuard)
+      .useValue(mockRolesGuard)
+      .compile();
 
     controller = module.get<ContactsController>(ContactsController);
     service = module.get<ContactsService>(ContactsService);

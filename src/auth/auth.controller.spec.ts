@@ -1,10 +1,10 @@
-import { vi, type Mock, type SpyInstance, type Mocked } from 'vitest';
+import { vi } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '@users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
-import { User } from '@users/entities/user.entity';
+import { User, ROLES } from '@users/entities/user.entity';
 import { BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -18,6 +18,7 @@ describe('AuthController', () => {
     username: 'john_doe',
     email: 'john@example.com',
     password: 'hashedPassword',
+    roles: [ROLES.USER],
     createdAt: new Date(),
     updatedAt: new Date(),
     deletedAt: null,

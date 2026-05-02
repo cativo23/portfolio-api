@@ -1,4 +1,4 @@
-import { vi, type Mock, type SpyInstance, type Mocked } from 'vitest';
+import { vi, type SpyInstance } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProjectsService } from './projects.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -22,9 +22,7 @@ describe('ProjectsService', () => {
   beforeEach(async () => {
     // Mock Logger methods
     logSpy = vi.spyOn(Logger.prototype, 'log').mockImplementation(vi.fn());
-    warnSpy = vi
-    .spyOn(Logger.prototype, 'warn')
-      .mockImplementation(vi.fn());
+    warnSpy = vi.spyOn(Logger.prototype, 'warn').mockImplementation(vi.fn());
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -352,9 +350,7 @@ describe('ProjectsService', () => {
         ...updateProjectDto,
       };
 
-      vi
-    .spyOn(repository, 'findOne')
-        .mockResolvedValue(existingProject as any);
+      vi.spyOn(repository, 'findOne').mockResolvedValue(existingProject as any);
       vi.spyOn(repository, 'merge').mockReturnValue(updatedProject as any);
       vi.spyOn(repository, 'save').mockResolvedValue(updatedProject as any);
 
@@ -396,9 +392,9 @@ describe('ProjectsService', () => {
       };
       const updatedProject = { id: 1, ...updateProjectDto };
 
-      vi
-    .spyOn(repository, 'findOne')
-        .mockResolvedValueOnce(existingProject as any);
+      vi.spyOn(repository, 'findOne').mockResolvedValueOnce(
+        existingProject as any,
+      );
       vi.spyOn(repository, 'merge').mockReturnValue(updatedProject as any);
       vi.spyOn(repository, 'save').mockResolvedValue(updatedProject as any);
 
@@ -446,9 +442,7 @@ describe('ProjectsService', () => {
       const error = new Error('Database error');
       error.stack = 'Error stack';
 
-      vi
-    .spyOn(repository, 'findOne')
-        .mockResolvedValue(existingProject as any);
+      vi.spyOn(repository, 'findOne').mockResolvedValue(existingProject as any);
       vi.spyOn(repository, 'merge').mockReturnValue(existingProject as any);
       vi.spyOn(repository, 'save').mockRejectedValue(error);
 
@@ -478,12 +472,10 @@ describe('ProjectsService', () => {
         description: 'Test Description',
       };
 
-      vi
-    .spyOn(repository, 'findOne')
-        .mockResolvedValue(existingProject as any);
-      vi
-    .spyOn(repository, 'softRemove')
-        .mockResolvedValue(existingProject as any);
+      vi.spyOn(repository, 'findOne').mockResolvedValue(existingProject as any);
+      vi.spyOn(repository, 'softRemove').mockResolvedValue(
+        existingProject as any,
+      );
 
       const result = await service.remove(1);
 
@@ -495,12 +487,10 @@ describe('ProjectsService', () => {
     it('should invalidate cache after removing a project', async () => {
       const existingProject = { id: 1, title: 'Test', description: 'Test' };
 
-      vi
-    .spyOn(repository, 'findOne')
-        .mockResolvedValue(existingProject as any);
-      vi
-    .spyOn(repository, 'softRemove')
-        .mockResolvedValue(existingProject as any);
+      vi.spyOn(repository, 'findOne').mockResolvedValue(existingProject as any);
+      vi.spyOn(repository, 'softRemove').mockResolvedValue(
+        existingProject as any,
+      );
 
       await service.remove(1);
 
@@ -529,9 +519,7 @@ describe('ProjectsService', () => {
       const error = new Error('Database error');
       error.stack = 'Error stack';
 
-      vi
-    .spyOn(repository, 'findOne')
-        .mockResolvedValue(existingProject as any);
+      vi.spyOn(repository, 'findOne').mockResolvedValue(existingProject as any);
       vi.spyOn(repository, 'softRemove').mockRejectedValue(error);
 
       // Errors should bubble up naturally - let global exception filter handle them

@@ -1,4 +1,4 @@
-import { vi, type Mock, type SpyInstance, type Mocked } from 'vitest';
+import { vi, type SpyInstance } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ContactsService } from './contacts.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -16,9 +16,7 @@ describe('ContactsService', () => {
 
   beforeEach(async () => {
     logSpy = vi.spyOn(Logger.prototype, 'log').mockImplementation(vi.fn());
-    warnSpy = vi
-    .spyOn(Logger.prototype, 'warn')
-      .mockImplementation(vi.fn());
+    warnSpy = vi.spyOn(Logger.prototype, 'warn').mockImplementation(vi.fn());
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -29,7 +27,9 @@ describe('ContactsService', () => {
         },
         {
           provide: EmailService,
-          useValue: { sendNewContactNotification: vi.fn() },
+          useValue: {
+            sendNewContactNotification: vi.fn().mockResolvedValue(undefined),
+          },
         },
       ],
     }).compile();
@@ -244,9 +244,7 @@ describe('ContactsService', () => {
         readAt: new Date(),
       };
 
-      vi
-    .spyOn(repository, 'findOne')
-        .mockResolvedValue(existingContact as any);
+      vi.spyOn(repository, 'findOne').mockResolvedValue(existingContact as any);
       vi.spyOn(repository, 'merge').mockReturnValue(updatedContact as any);
       vi.spyOn(repository, 'save').mockResolvedValue(updatedContact as any);
 
@@ -276,12 +274,10 @@ describe('ContactsService', () => {
         message: 'Hello',
       };
 
-      vi
-    .spyOn(repository, 'findOne')
-        .mockResolvedValue(existingContact as any);
-      vi
-    .spyOn(repository, 'softRemove')
-        .mockResolvedValue(existingContact as any);
+      vi.spyOn(repository, 'findOne').mockResolvedValue(existingContact as any);
+      vi.spyOn(repository, 'softRemove').mockResolvedValue(
+        existingContact as any,
+      );
 
       const result = await service.remove(1);
 

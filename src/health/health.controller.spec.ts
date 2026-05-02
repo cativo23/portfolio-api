@@ -1,4 +1,4 @@
-import { vi, type Mock, type SpyInstance, type Mocked } from 'vitest';
+import { vi } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import {
   HealthCheckService,
@@ -11,11 +11,7 @@ import { HealthService } from './health.service';
 
 describe('HealthController', () => {
   let controller: HealthController;
-  let healthCheckService: HealthCheckService;
   let healthService: HealthService;
-  let httpHealthIndicator: HttpHealthIndicator;
-  let diskHealthIndicator: DiskHealthIndicator;
-  let typeOrmHealthIndicator: TypeOrmHealthIndicator;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -55,13 +51,7 @@ describe('HealthController', () => {
     }).compile();
 
     controller = module.get<HealthController>(HealthController);
-    healthCheckService = module.get<HealthCheckService>(HealthCheckService);
     healthService = module.get<HealthService>(HealthService);
-    httpHealthIndicator = module.get<HttpHealthIndicator>(HttpHealthIndicator);
-    diskHealthIndicator = module.get<DiskHealthIndicator>(DiskHealthIndicator);
-    typeOrmHealthIndicator = module.get<TypeOrmHealthIndicator>(
-      TypeOrmHealthIndicator,
-    );
   });
 
   it('should be defined', () => {
