@@ -11,7 +11,13 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiParam,
+  ApiBody,
+} from '@nestjs/swagger';
 import { UsersService } from '@users/users.service';
 import { AuthGuard } from '@auth/auth.guard';
 import { UserResponseDto } from '@users/dto/user-response.dto';
@@ -35,7 +41,9 @@ export class UsersController {
   @Get(':id')
   @ApiOperation({ summary: 'Get a user by ID' })
   @ApiParam({ name: 'id', type: Number, description: 'User ID' })
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<UserResponseDto> {
+  async findOne(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<UserResponseDto> {
     const user = await this.usersService.findOne(id);
     return UserResponseDto.fromEntity(user);
   }
@@ -64,7 +72,9 @@ export class UsersController {
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a user by ID' })
   @ApiParam({ name: 'id', type: Number, description: 'User ID' })
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<{ deleted: number }> {
+  async remove(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<{ deleted: number }> {
     await this.usersService.remove(id);
     return { deleted: id };
   }

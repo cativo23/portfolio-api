@@ -99,10 +99,14 @@ export class EmailService implements OnModuleInit {
       <div class="value"><a href="mailto:${this.escapeHtml(email)}" style="color: #7dcfff;">${this.escapeHtml(email)}</a></div>
     </div>
 
-    ${subject ? `<div class="field">
+    ${
+      subject
+        ? `<div class="field">
       <div class="label">Subject</div>
       <div class="value">${this.escapeHtml(subject)}</div>
-    </div>` : ''}
+    </div>`
+        : ''
+    }
 
     <div class="field">
       <div class="label">Message</div>
