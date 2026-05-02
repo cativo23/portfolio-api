@@ -1,3 +1,4 @@
+import { type Mock } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ResponseTransformInterceptor } from './response-transform.interceptor';
 import { RequestContextService } from '@core/context/request-context.service';

@@ -1,3 +1,4 @@
+import { type Mock } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { RequestIdMiddleware } from './request-id.middleware';
 import { ClsService } from 'nestjs-cls';

@@ -1,4 +1,4 @@
-import { vi, type SpyInstance } from 'vitest';
+import { vi, type MockInstance } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ContactsService } from './contacts.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -11,8 +11,8 @@ import { EmailService } from '@email/email.service';
 describe('ContactsService', () => {
   let service: ContactsService;
   let repository: Repository<Contact>;
-  let logSpy: SpyInstance;
-  let warnSpy: SpyInstance;
+  let logSpy: MockInstance;
+  let warnSpy: MockInstance;
 
   beforeEach(async () => {
     logSpy = vi.spyOn(Logger.prototype, 'log').mockImplementation(vi.fn());

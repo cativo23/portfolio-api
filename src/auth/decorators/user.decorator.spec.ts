@@ -1,3 +1,4 @@
+import { type Mock } from 'vitest';
 import { ExecutionContext } from '@nestjs/common';
 import { extractUser, User } from './user.decorator';
 

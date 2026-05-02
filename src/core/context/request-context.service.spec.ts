@@ -1,3 +1,4 @@
+import { type Mock } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { RequestContextService } from './request-context.service';
 import { ClsService } from 'nestjs-cls';

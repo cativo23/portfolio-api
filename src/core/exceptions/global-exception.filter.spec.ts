@@ -1,3 +1,4 @@
+import { type Mock, type MockInstance } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { GlobalExceptionFilter } from './global-exception.filter';
 import { RequestContextService } from '@core/context/request-context.service';
@@ -17,7 +18,7 @@ describe('GlobalExceptionFilter', () => {
   let mockResponse: Partial<Response>;
   let mockRequest: Partial<Request>;
   let mockHost: ArgumentsHost;
-  let loggerErrorSpy: SpyInstance;
+  let loggerErrorSpy: MockInstance;
 
   beforeEach(async () => {
     loggerErrorSpy = vi
