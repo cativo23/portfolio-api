@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import {
   ApiProperty,
   ApiPropertyOptional,
@@ -12,11 +13,22 @@ import {
   MaxLength,
   IsEmpty,
 } from 'class-validator';
+import * as sanitizeHtml from 'sanitize-html';
+
+const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
+  allowedTags: [],
+  allowedAttributes: {},
+};
+
+function sanitize(value: string): string {
+  return sanitizeHtml(value, SANITIZE_OPTIONS);
+}
 
 /**
  * DTO for creating a contact form submission
  */
 export class CreateContactDto {
+  @Transform(({ value }) => sanitize(value))
   @IsNotEmpty()
   @IsString()
   @MinLength(2)
@@ -37,6 +49,7 @@ export class CreateContactDto {
   })
   email: string;
 
+  @Transform(({ value }) => sanitize(value))
   @IsNotEmpty()
   @IsString()
   @MinLength(10)
@@ -49,6 +62,7 @@ export class CreateContactDto {
   })
   message: string;
 
+  @Transform(({ value }) => sanitize(value))
   @IsOptional()
   @IsString()
   @MaxLength(200)
