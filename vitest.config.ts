@@ -36,6 +36,14 @@ export default defineConfig({
         'database/seeder*',
         'config/typeorm.config*',
       ],
+      // Regression baseline. AGENTS.md target is 90% across the board;
+      // branches/functions are currently below — ramp these up over time.
+      thresholds: {
+        lines: 90,
+        statements: 90,
+        branches: 89,
+        functions: 89,
+      },
     },
   },
 });

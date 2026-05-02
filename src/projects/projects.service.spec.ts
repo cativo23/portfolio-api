@@ -1,4 +1,4 @@
-import { vi, type SpyInstance } from 'vitest';
+import { vi, type MockInstance } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProjectsService } from './projects.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -16,8 +16,8 @@ describe('ProjectsService', () => {
   let repository: Repository<Project>;
   // Logger spy variables
   let cacheInvalidationService: CacheInvalidationService;
-  let logSpy: SpyInstance;
-  let warnSpy: SpyInstance;
+  let logSpy: MockInstance;
+  let warnSpy: MockInstance;
 
   beforeEach(async () => {
     // Mock Logger methods

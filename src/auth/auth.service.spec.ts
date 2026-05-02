@@ -28,7 +28,7 @@ describe('AuthService', () => {
       create: vi.fn(),
     };
 
-    const mockJwtService: Partial<Mocked<JwtService>> = {
+    const mockJwtService = {
       signAsync: vi.fn(),
     };
 
