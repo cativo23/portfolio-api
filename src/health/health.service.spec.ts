@@ -139,28 +139,30 @@ describe('HealthService', () => {
 
     it('should return status down when memory usage is above 90%', async () => {
       const originalMemoryUsage = process.memoryUsage;
-      vi.spyOn(process, 'memoryUsage').mockReturnValue({
-        rss: 950,
-        heapTotal: 1000,
-        heapUsed: 950,
-        external: 100,
-        arrayBuffers: 0,
-      });
+      try {
+        vi.spyOn(process, 'memoryUsage').mockReturnValue({
+          rss: 950,
+          heapTotal: 1000,
+          heapUsed: 950,
+          external: 100,
+          arrayBuffers: 0,
+        });
 
-      // Mock cgroups v2 to return 1000 bytes limit
-      const mockFs = {
-        readFile: vi.fn().mockResolvedValue('1000'),
-      };
-      vi.doMock('fs/promises', () => mockFs);
+        // Mock cgroups v2 to return 1000 bytes limit
+        const mockFs = {
+          readFile: vi.fn().mockResolvedValue('1000'),
+        };
+        vi.doMock('fs/promises', () => mockFs);
 
-      const result = await service.checkMemory();
+        const result = await service.checkMemory();
 
-      expect(result.status).toBe('down');
-      expect(result.message).toContain('Memory usage critical');
-
-      vi.doUnmock('fs/promises');
-      vi.restoreAllMocks();
-      process.memoryUsage = originalMemoryUsage;
+        expect(result.status).toBe('down');
+        expect(result.message).toContain('Memory usage critical');
+      } finally {
+        vi.doUnmock('fs/promises');
+        vi.restoreAllMocks();
+        process.memoryUsage = originalMemoryUsage;
+      }
     });
   });
 
@@ -188,31 +190,33 @@ describe('HealthService', () => {
 
     it('should return status up with message when disk stats unavailable', async () => {
       const originalMemoryUsage = process.memoryUsage;
-      vi.spyOn(process, 'memoryUsage').mockReturnValue({
-        rss: 100,
-        heapTotal: 1000,
-        heapUsed: 50,
-        external: 10,
-        arrayBuffers: 0,
-      });
+      try {
+        vi.spyOn(process, 'memoryUsage').mockReturnValue({
+          rss: 100,
+          heapTotal: 1000,
+          heapUsed: 50,
+          external: 10,
+          arrayBuffers: 0,
+        });
 
-      // Use vi.doMock to replace fs/promises just for the dynamic import
-      // inside service.checkDisk(). Direct assignment to real fs/promises
-      // fails because statfs is non-configurable on the real module.
-      vi.doMock('fs/promises', () => ({
-        statfs: vi.fn().mockRejectedValue(new Error('Not available')),
-      }));
+        // Use vi.doMock to replace fs/promises just for the dynamic import
+        // inside service.checkDisk(). Direct assignment to real fs/promises
+        // fails because statfs is non-configurable on the real module.
+        vi.doMock('fs/promises', () => ({
+          statfs: vi.fn().mockRejectedValue(new Error('Not available')),
+        }));
 
-      const result = await service.checkDisk();
+        const result = await service.checkDisk();
 
-      expect(result.status).toBe('up');
-      expect(result.message).toBe(
-        'Disk stats unavailable (running in container?)',
-      );
-
-      vi.doUnmock('fs/promises');
-      vi.restoreAllMocks();
-      process.memoryUsage = originalMemoryUsage;
+        expect(result.status).toBe('up');
+        expect(result.message).toBe(
+          'Disk stats unavailable (running in container?)',
+        );
+      } finally {
+        vi.doUnmock('fs/promises');
+        vi.restoreAllMocks();
+        process.memoryUsage = originalMemoryUsage;
+      }
     });
   });
 
@@ -259,38 +263,40 @@ describe('HealthService', () => {
 
       // Mock memoryUsage to return >90% usage (down status)
       const originalMemoryUsage = process.memoryUsage;
-      vi.spyOn(process, 'memoryUsage').mockReturnValue({
-        rss: 950,
-        heapTotal: 1000,
-        heapUsed: 950,
-        external: 100,
-        arrayBuffers: 0,
-      });
-
-      // Mock cgroups v2 to return 1000 bytes limit (so 950/1000 = 95% > 90%)
-      const mockFs = {
-        readFile: vi.fn().mockResolvedValue('1000'),
-      };
-      vi.doMock('fs/promises', () => mockFs);
-
-      // Mock checkDisk to return down status
       const originalCheckDisk = service.checkDisk;
-      service.checkDisk = vi.fn().mockResolvedValue({
-        status: 'down',
-        used: 0,
-        total: 0,
-        usagePercent: 0,
-        message: 'Disk unavailable',
-      });
+      try {
+        vi.spyOn(process, 'memoryUsage').mockReturnValue({
+          rss: 950,
+          heapTotal: 1000,
+          heapUsed: 950,
+          external: 100,
+          arrayBuffers: 0,
+        });
 
-      const result = await service.getFullHealth();
+        // Mock cgroups v2 to return 1000 bytes limit (so 950/1000 = 95% > 90%)
+        const mockFs = {
+          readFile: vi.fn().mockResolvedValue('1000'),
+        };
+        vi.doMock('fs/promises', () => mockFs);
 
-      expect(result.status).toBe('error');
+        // Mock checkDisk to return down status
+        service.checkDisk = vi.fn().mockResolvedValue({
+          status: 'down',
+          used: 0,
+          total: 0,
+          usagePercent: 0,
+          message: 'Disk unavailable',
+        });
 
-      vi.doUnmock('fs/promises');
-      service.checkDisk = originalCheckDisk;
-      vi.restoreAllMocks();
-      process.memoryUsage = originalMemoryUsage;
+        const result = await service.getFullHealth();
+
+        expect(result.status).toBe('error');
+      } finally {
+        vi.doUnmock('fs/promises');
+        service.checkDisk = originalCheckDisk;
+        vi.restoreAllMocks();
+        process.memoryUsage = originalMemoryUsage;
+      }
     });
   });
 

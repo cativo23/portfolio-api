@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, type Mocked } from 'vitest';
 import { ApiKeyGuard } from './api-key.guard';
 import { ApiKeyService } from './api-key.service';
 import { ExecutionContext } from '@nestjs/common';

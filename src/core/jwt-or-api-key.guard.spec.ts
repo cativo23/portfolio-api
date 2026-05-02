@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, type Mocked } from 'vitest';
 import { JwtOrApiKeyGuard } from './jwt-or-api-key.guard';
 import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@auth/auth.guard';
