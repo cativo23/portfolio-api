@@ -81,7 +81,10 @@ describe('RolesGuard', () => {
     });
 
     it('should return true when user has one of multiple required roles', async () => {
-      reflector.getAllAndOverride.mockReturnValue(['admin' as Role, 'user' as Role]);
+      reflector.getAllAndOverride.mockReturnValue([
+        'admin' as Role,
+        'user' as Role,
+      ]);
       mockRequest.user = { sub: 1, roles: ['user'] };
 
       const result = guard.canActivate(mockContext);
