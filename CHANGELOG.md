@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.6.0] - 2026-05-02
+
+### Added
+
+- **Users CRUD module**: full REST endpoints (`GET /users`, `GET /users/:id`, `POST /users`, `PATCH /users/:id`, `DELETE /users/:id`) with `UserResponseDto`, `CreateUserDto`, `UpdateUserDto`, and unit + integration tests (#104)
+- **Profile endpoint**: `GET /api/v1/profile` returns the authenticated user's profile via `ProfileResponseDto`; honeypot field added to the contact form to deter bots (#104)
+- **Email notifications for new contact submissions**: `EmailService` sends an admin alert via Nodemailer when a contact is created; templated with Handlebars, configurable via env (#104)
+- **RBAC infrastructure**: `RolesGuard`, `@Roles()` decorator, `roles` column on the `User` entity, and migration `AddUserRoles1775900000000`. All `/contacts` admin endpoints (list, get, mark read, delete) now require admin role (was: any authenticated user) (#107)
+- **XSS sanitization on contact form**: `name`, `message`, and `subject` are stripped of HTML via `sanitize-html` at the DTO level using `class-transformer` `@Transform` (#107)
+
+### Fixed
+
+- **Docker dev build on Node 24**: upgraded Yarn `4.9.2` → `4.14.1` to dodge the Node 24.15+ PnP loader bug (`EBADF: bad file descriptor, fstat`); added `python3` + `build-essential` to the dev image so native modules (bcrypt) have a toolchain when no prebuilt is available; `yarn install` now uses `--immutable --inline-builds` so postinstall failures surface (refs yarnpkg/berry#7065) (#108)
+- **Soft-delete leak in paginated list endpoints**: `PaginationUtil.paginate` now adds the `DeleteDateColumn IS NULL` guard automatically by reading TypeORM metadata (uses `propertyName`, not a hardcoded `"deletedAt"`). `GET /projects` and `GET /contacts` no longer return soft-deleted rows. Backed by 3 unit tests (positive, negative, custom column name) (#108)
+- **Cache-manager v7 compatibility**: `CacheInvalidationService` adapted to the new Keyv-store interface introduced upstream (#104)
+- **Contacts service test breakage**: provided `EmailService` mock in the spec's `TestingModule` and realigned the `create()` log assertion to match the renamed log message (#110)
+- **Prettier drift on develop**: applied `yarn format` to 8 files that had drifted after recent merges (#109)
+
+### Changed
+
+- **No-op `enableScripts: true` and wildcard `approvedGitRepositories: "**"` removed** from `.yarnrc.yml`. Both were auto-added by `yarn set version 4.14.1`; neither is needed (no git-protocol deps in this repo) and the wildcard auto-approves any future git URL (#108)
+
+### Database Migrations
+
+- `WidenProjectDescription1774900000000` — widens `projects.description` from `VARCHAR(255)` to `TEXT` (entity declared `text` but the original create-table used `VARCHAR(255)`; this drift caused `Data too long for column 'description'` errors in production on long overviews). Strictly widening, no data loss (#108)
+- `AddUserRoles1775900000000` — adds a `roles` column to `user` with a default-empty array, supporting the new RBAC model (#107)
+
 ## [2.5.2] - 2026-03-26
 
 ### Fixed

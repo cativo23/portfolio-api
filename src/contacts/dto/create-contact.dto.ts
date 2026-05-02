@@ -1,4 +1,9 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
+import {
+  ApiProperty,
+  ApiPropertyOptional,
+  ApiHideProperty,
+} from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsOptional,
@@ -6,12 +11,24 @@ import {
   IsEmail,
   MinLength,
   MaxLength,
+  IsEmpty,
 } from 'class-validator';
+import * as sanitizeHtml from 'sanitize-html';
+
+const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
+  allowedTags: [],
+  allowedAttributes: {},
+};
+
+function sanitize(value: string): string {
+  return sanitizeHtml(value, SANITIZE_OPTIONS);
+}
 
 /**
  * DTO for creating a contact form submission
  */
 export class CreateContactDto {
+  @Transform(({ value }) => sanitize(value))
   @IsNotEmpty()
   @IsString()
   @MinLength(2)
@@ -32,6 +49,7 @@ export class CreateContactDto {
   })
   email: string;
 
+  @Transform(({ value }) => sanitize(value))
   @IsNotEmpty()
   @IsString()
   @MinLength(10)
@@ -44,6 +62,7 @@ export class CreateContactDto {
   })
   message: string;
 
+  @Transform(({ value }) => sanitize(value))
   @IsOptional()
   @IsString()
   @MaxLength(200)
@@ -53,4 +72,9 @@ export class CreateContactDto {
     maxLength: 200,
   })
   subject?: string;
+
+  @IsOptional()
+  @IsEmpty({ message: 'If this field is filled, the request will be rejected' })
+  @ApiHideProperty()
+  website?: string;
 }

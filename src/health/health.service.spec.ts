@@ -124,8 +124,8 @@ describe('HealthService', () => {
   });
 
   describe('checkMemory', () => {
-    it('should return memory stats with status up when usage is below 90%', () => {
-      const result = service.checkMemory();
+    it('should return memory stats with status up when usage is below 90%', async () => {
+      const result = await service.checkMemory();
 
       expect(result).toHaveProperty('status');
       expect(result).toHaveProperty('used');
@@ -136,21 +136,28 @@ describe('HealthService', () => {
       expect(result.usagePercent).toBeLessThanOrEqual(100);
     });
 
-    it('should return status down when memory usage is above 90%', () => {
+    it('should return status down when memory usage is above 90%', async () => {
       const originalMemoryUsage = process.memoryUsage;
       jest.spyOn(process, 'memoryUsage').mockReturnValue({
-        rss: 1000,
+        rss: 950,
         heapTotal: 1000,
         heapUsed: 950,
         external: 100,
         arrayBuffers: 0,
       });
 
-      const result = service.checkMemory();
+      // Mock cgroups v2 to return 1000 bytes limit
+      const mockFs = {
+        readFile: jest.fn().mockResolvedValue('1000'),
+      };
+      jest.doMock('fs/promises', () => mockFs);
+
+      const result = await service.checkMemory();
 
       expect(result.status).toBe('down');
       expect(result.message).toContain('Memory usage critical');
 
+      jest.dontMock('fs/promises');
       jest.restoreAllMocks();
       process.memoryUsage = originalMemoryUsage;
     });
@@ -249,12 +256,18 @@ describe('HealthService', () => {
       // Mock memoryUsage to return >90% usage (down status)
       const originalMemoryUsage = process.memoryUsage;
       jest.spyOn(process, 'memoryUsage').mockReturnValue({
-        rss: 1000,
+        rss: 950,
         heapTotal: 1000,
         heapUsed: 950,
         external: 100,
         arrayBuffers: 0,
       });
+
+      // Mock cgroups v2 to return 1000 bytes limit (so 950/1000 = 95% > 90%)
+      const mockFs = {
+        readFile: jest.fn().mockResolvedValue('1000'),
+      };
+      jest.doMock('fs/promises', () => mockFs);
 
       // Mock checkDisk to return down status
       const originalCheckDisk = service.checkDisk;
@@ -270,6 +283,7 @@ describe('HealthService', () => {
 
       expect(result.status).toBe('error');
 
+      jest.dontMock('fs/promises');
       service.checkDisk = originalCheckDisk;
       jest.restoreAllMocks();
       process.memoryUsage = originalMemoryUsage;

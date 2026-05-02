@@ -8,9 +8,11 @@ LABEL org.opencontainers.image.authors="cativo23.kt@gmail.com"
 # Set environment variables
 ENV NODE_ENV=development
 
-# Install dependencies
+# Install dependencies (sudo + native build toolchain for bcrypt et al.)
 RUN apt-get update && apt-get install -y \
     sudo \
+    python3 \
+    build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 # Ensure that the user exists and matches the host's UID and GID
@@ -30,7 +32,7 @@ COPY --chown=node:node package.json ./
 COPY --chown=node:node yarn.lock ./
 
 # Install dependencies
-RUN yarn install --immutable
+RUN yarn install --immutable --inline-builds
 RUN yarn dlx @nestjs/cli
 
 # Add yarn global bin to the PATH
