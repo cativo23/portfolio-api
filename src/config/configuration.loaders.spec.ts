@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import {
   loadAppConfig,
   loadDatabaseConfig,
@@ -9,7 +10,7 @@ describe('configuration.loaders', () => {
   const originalEnv = process.env;
 
   beforeEach(() => {
-    jest.resetModules();
+    vi.resetModules();
     process.env = { ...originalEnv };
   });
 

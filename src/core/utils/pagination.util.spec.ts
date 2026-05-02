@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { Repository } from 'typeorm';
 import { PaginationUtil } from '@core/utils/pagination.util';
 
@@ -7,31 +8,31 @@ import { PaginationUtil } from '@core/utils/pagination.util';
  */
 function makeQueryBuilderMock(): {
   andWhereCalls: Array<{ sql: string; params?: Record<string, unknown> }>;
-  qb: Record<string, jest.Mock>;
+  qb: Record<string, ReturnType<typeof vi.fn>>;
 } {
   const andWhereCalls: Array<{
     sql: string;
     params?: Record<string, unknown>;
   }> = [];
-  const qb: Record<string, jest.Mock> = {
-    andWhere: jest.fn((sql: string, params?: Record<string, unknown>) => {
+  const qb: Record<string, ReturnType<typeof vi.fn>> = {
+    andWhere: vi.fn((sql: string, params?: Record<string, unknown>) => {
       andWhereCalls.push({ sql, params });
       return qb;
     }),
-    orderBy: jest.fn().mockReturnThis(),
-    skip: jest.fn().mockReturnThis(),
-    take: jest.fn().mockReturnThis(),
-    getManyAndCount: jest.fn().mockResolvedValue([[], 0]),
+    orderBy: vi.fn().mockReturnThis(),
+    skip: vi.fn().mockReturnThis(),
+    take: vi.fn().mockReturnThis(),
+    getManyAndCount: vi.fn().mockResolvedValue([[], 0]),
   };
   return { andWhereCalls, qb };
 }
 
 function makeRepoMock(opts: {
-  qb: Record<string, jest.Mock>;
+  qb: Record<string, ReturnType<typeof vi.fn>>;
   withDeleteDateColumn: boolean;
 }): Repository<unknown> {
   return {
-    createQueryBuilder: jest.fn(() => opts.qb),
+    createQueryBuilder: vi.fn(() => opts.qb),
     metadata: {
       deleteDateColumn: opts.withDeleteDateColumn
         ? { propertyName: 'deletedAt' }
@@ -82,7 +83,7 @@ describe('PaginationUtil', () => {
     it('uses the entity-defined property name (not a hardcoded "deletedAt")', async () => {
       const { andWhereCalls, qb } = makeQueryBuilderMock();
       const repo = {
-        createQueryBuilder: jest.fn(() => qb),
+        createQueryBuilder: vi.fn(() => qb),
         metadata: { deleteDateColumn: { propertyName: 'removedAt' } },
       } as unknown as Repository<unknown>;
 

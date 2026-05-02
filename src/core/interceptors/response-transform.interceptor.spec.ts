@@ -1,8 +1,9 @@
+import { type Mock } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ResponseTransformInterceptor } from './response-transform.interceptor';
 import { RequestContextService } from '@core/context/request-context.service';
 import { ExecutionContext, CallHandler } from '@nestjs/common';
-import { of } from 'rxjs';
+import { of, firstValueFrom } from 'rxjs';
 import { SuccessResponseDto } from '@core/dto';
 
 describe('ResponseTransformInterceptor', () => {
@@ -18,7 +19,7 @@ describe('ResponseTransformInterceptor', () => {
         {
           provide: RequestContextService,
           useValue: {
-            getRequestId: jest.fn().mockReturnValue('req_123456789abc'),
+            getRequestId: vi.fn().mockReturnValue('req_123456789abc'),
           },
         },
       ],
@@ -32,11 +33,11 @@ describe('ResponseTransformInterceptor', () => {
     );
 
     mockContext = {
-      switchToHttp: jest.fn(),
+      switchToHttp: vi.fn(),
     } as unknown as ExecutionContext;
 
     mockHandler = {
-      handle: jest.fn(),
+      handle: vi.fn(),
     } as unknown as CallHandler;
   });
 
@@ -45,69 +46,74 @@ describe('ResponseTransformInterceptor', () => {
   });
 
   describe('intercept', () => {
-    it('should wrap plain data in SuccessResponseDto', (done) => {
+    it('should wrap plain data in SuccessResponseDto', async () => {
       const plainData = { id: 1, name: 'Test' };
-      (mockHandler.handle as jest.Mock).mockReturnValue(of(plainData));
+      (mockHandler.handle as Mock).mockReturnValue(of(plainData));
 
-      interceptor.intercept(mockContext, mockHandler).subscribe((result) => {
-        expect(result).toBeInstanceOf(SuccessResponseDto);
-        expect(result.status).toBe('success');
-        expect(result.data).toEqual(plainData);
-        expect(result.request_id).toBe('req_123456789abc');
-        expect(requestContextService.getRequestId).toHaveBeenCalled();
-        done();
-      });
+      const result = await firstValueFrom(
+        interceptor.intercept(mockContext, mockHandler),
+      );
+
+      expect(result).toBeInstanceOf(SuccessResponseDto);
+      expect(result.status).toBe('success');
+      expect(result.data).toEqual(plainData);
+      expect(result.request_id).toBe('req_123456789abc');
+      expect(requestContextService.getRequestId).toHaveBeenCalled();
     });
 
-    it('should preserve existing SuccessResponseDto and add request_id if missing', (done) => {
+    it('should preserve existing SuccessResponseDto and add request_id if missing', async () => {
       const existingResponse = new SuccessResponseDto({ id: 1 });
       (existingResponse as any).request_id = undefined;
-      (mockHandler.handle as jest.Mock).mockReturnValue(of(existingResponse));
+      (mockHandler.handle as Mock).mockReturnValue(of(existingResponse));
 
-      interceptor.intercept(mockContext, mockHandler).subscribe((result) => {
-        expect(result).toBe(existingResponse);
-        expect(result.request_id).toBe('req_123456789abc');
-        done();
-      });
+      const result = await firstValueFrom(
+        interceptor.intercept(mockContext, mockHandler),
+      );
+
+      expect(result).toBe(existingResponse);
+      expect(result.request_id).toBe('req_123456789abc');
     });
 
-    it('should preserve existing SuccessResponseDto with request_id unchanged', (done) => {
+    it('should preserve existing SuccessResponseDto with request_id unchanged', async () => {
       const existingResponse = new SuccessResponseDto({ id: 1 });
       (existingResponse as any).request_id = 'req_existing';
-      (mockHandler.handle as jest.Mock).mockReturnValue(of(existingResponse));
+      (mockHandler.handle as Mock).mockReturnValue(of(existingResponse));
 
-      interceptor.intercept(mockContext, mockHandler).subscribe((result) => {
-        expect(result).toBe(existingResponse);
-        expect(result.request_id).toBe('req_existing');
-        done();
-      });
+      const result = await firstValueFrom(
+        interceptor.intercept(mockContext, mockHandler),
+      );
+
+      expect(result).toBe(existingResponse);
+      expect(result.request_id).toBe('req_existing');
     });
 
-    it('should handle error response DTOs', (done) => {
+    it('should handle error response DTOs', async () => {
       const errorResponse = {
         status: 'error',
         error: { code: 'TEST_ERROR', message: 'Test error' },
       };
       (errorResponse as any).request_id = undefined;
-      (mockHandler.handle as jest.Mock).mockReturnValue(of(errorResponse));
+      (mockHandler.handle as Mock).mockReturnValue(of(errorResponse));
 
-      interceptor.intercept(mockContext, mockHandler).subscribe((result) => {
-        expect(result).toBe(errorResponse);
-        expect((result as any).request_id).toBe('req_123456789abc');
-        done();
-      });
+      const result = await firstValueFrom(
+        interceptor.intercept(mockContext, mockHandler),
+      );
+
+      expect(result).toBe(errorResponse);
+      expect((result as any).request_id).toBe('req_123456789abc');
     });
 
-    it('should handle null data', (done) => {
-      (mockHandler.handle as jest.Mock).mockReturnValue(of(null));
+    it('should handle null data', async () => {
+      (mockHandler.handle as Mock).mockReturnValue(of(null));
 
-      interceptor.intercept(mockContext, mockHandler).subscribe((result) => {
-        expect(result).toBeInstanceOf(SuccessResponseDto);
-        expect(result.status).toBe('success');
-        expect(result.data).toBeNull();
-        expect(result.request_id).toBe('req_123456789abc');
-        done();
-      });
+      const result = await firstValueFrom(
+        interceptor.intercept(mockContext, mockHandler),
+      );
+
+      expect(result).toBeInstanceOf(SuccessResponseDto);
+      expect(result.status).toBe('success');
+      expect(result.data).toBeNull();
+      expect(result.request_id).toBe('req_123456789abc');
     });
   });
 });

@@ -1,3 +1,4 @@
+import { vi, type MockInstance } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ContactsService } from './contacts.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -10,14 +11,12 @@ import { EmailService } from '@email/email.service';
 describe('ContactsService', () => {
   let service: ContactsService;
   let repository: Repository<Contact>;
-  let logSpy: jest.SpyInstance;
-  let warnSpy: jest.SpyInstance;
+  let logSpy: MockInstance;
+  let warnSpy: MockInstance;
 
   beforeEach(async () => {
-    logSpy = jest.spyOn(Logger.prototype, 'log').mockImplementation(jest.fn());
-    warnSpy = jest
-      .spyOn(Logger.prototype, 'warn')
-      .mockImplementation(jest.fn());
+    logSpy = vi.spyOn(Logger.prototype, 'log').mockImplementation(vi.fn());
+    warnSpy = vi.spyOn(Logger.prototype, 'warn').mockImplementation(vi.fn());
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -29,7 +28,7 @@ describe('ContactsService', () => {
         {
           provide: EmailService,
           useValue: {
-            sendNewContactNotification: jest.fn().mockResolvedValue(undefined),
+            sendNewContactNotification: vi.fn().mockResolvedValue(undefined),
           },
         },
       ],
@@ -40,7 +39,7 @@ describe('ContactsService', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should be defined', () => {
@@ -57,8 +56,8 @@ describe('ContactsService', () => {
       };
       const contact = { id: 1, ...createContactDto, isRead: false };
 
-      jest.spyOn(repository, 'create').mockReturnValue(contact as any);
-      jest.spyOn(repository, 'save').mockResolvedValue(contact as any);
+      vi.spyOn(repository, 'create').mockReturnValue(contact as any);
+      vi.spyOn(repository, 'save').mockResolvedValue(contact as any);
 
       const result = await service.create(createContactDto);
 
@@ -83,8 +82,8 @@ describe('ContactsService', () => {
       };
       const contact = { id: 1, ...createContactDto, isRead: false };
 
-      jest.spyOn(repository, 'create').mockReturnValue(contact as any);
-      jest.spyOn(repository, 'save').mockResolvedValue(contact as any);
+      vi.spyOn(repository, 'create').mockReturnValue(contact as any);
+      vi.spyOn(repository, 'save').mockResolvedValue(contact as any);
 
       const result = await service.create(createContactDto);
 
@@ -110,14 +109,14 @@ describe('ContactsService', () => {
       ];
       const total = 1;
 
-      jest.spyOn(repository, 'createQueryBuilder').mockImplementation(
+      vi.spyOn(repository, 'createQueryBuilder').mockImplementation(
         () =>
           ({
-            andWhere: jest.fn().mockReturnThis(),
-            orderBy: jest.fn().mockReturnThis(),
-            skip: jest.fn().mockReturnThis(),
-            take: jest.fn().mockReturnThis(),
-            getManyAndCount: jest.fn().mockResolvedValue([contacts, total]),
+            andWhere: vi.fn().mockReturnThis(),
+            orderBy: vi.fn().mockReturnThis(),
+            skip: vi.fn().mockReturnThis(),
+            take: vi.fn().mockReturnThis(),
+            getManyAndCount: vi.fn().mockResolvedValue([contacts, total]),
           }) as any,
       );
 
@@ -139,16 +138,16 @@ describe('ContactsService', () => {
       };
       const contacts = [{ id: 1, name: 'John Doe', email: 'john@example.com' }];
       const total = 1;
-      const andWhereMock = jest.fn().mockReturnThis();
+      const andWhereMock = vi.fn().mockReturnThis();
 
-      jest.spyOn(repository, 'createQueryBuilder').mockImplementation(
+      vi.spyOn(repository, 'createQueryBuilder').mockImplementation(
         () =>
           ({
             andWhere: andWhereMock,
-            orderBy: jest.fn().mockReturnThis(),
-            skip: jest.fn().mockReturnThis(),
-            take: jest.fn().mockReturnThis(),
-            getManyAndCount: jest.fn().mockResolvedValue([contacts, total]),
+            orderBy: vi.fn().mockReturnThis(),
+            skip: vi.fn().mockReturnThis(),
+            take: vi.fn().mockReturnThis(),
+            getManyAndCount: vi.fn().mockResolvedValue([contacts, total]),
           }) as any,
       );
 
@@ -176,16 +175,16 @@ describe('ContactsService', () => {
         },
       ];
       const total = 1;
-      const andWhereMock = jest.fn().mockReturnThis();
+      const andWhereMock = vi.fn().mockReturnThis();
 
-      jest.spyOn(repository, 'createQueryBuilder').mockImplementation(
+      vi.spyOn(repository, 'createQueryBuilder').mockImplementation(
         () =>
           ({
             andWhere: andWhereMock,
-            orderBy: jest.fn().mockReturnThis(),
-            skip: jest.fn().mockReturnThis(),
-            take: jest.fn().mockReturnThis(),
-            getManyAndCount: jest.fn().mockResolvedValue([contacts, total]),
+            orderBy: vi.fn().mockReturnThis(),
+            skip: vi.fn().mockReturnThis(),
+            take: vi.fn().mockReturnThis(),
+            getManyAndCount: vi.fn().mockResolvedValue([contacts, total]),
           }) as any,
       );
 
@@ -206,7 +205,7 @@ describe('ContactsService', () => {
         message: 'Hello',
       };
 
-      jest.spyOn(repository, 'findOne').mockResolvedValue(contact as any);
+      vi.spyOn(repository, 'findOne').mockResolvedValue(contact as any);
 
       const result = await service.findOne(1);
 
@@ -220,7 +219,7 @@ describe('ContactsService', () => {
     });
 
     it('should throw NotFoundException if contact not found', async () => {
-      jest.spyOn(repository, 'findOne').mockResolvedValue(undefined);
+      vi.spyOn(repository, 'findOne').mockResolvedValue(undefined);
 
       await expect(service.findOne(1)).rejects.toThrow(
         `Contact with ID 1 not found`,
@@ -245,11 +244,9 @@ describe('ContactsService', () => {
         readAt: new Date(),
       };
 
-      jest
-        .spyOn(repository, 'findOne')
-        .mockResolvedValue(existingContact as any);
-      jest.spyOn(repository, 'merge').mockReturnValue(updatedContact as any);
-      jest.spyOn(repository, 'save').mockResolvedValue(updatedContact as any);
+      vi.spyOn(repository, 'findOne').mockResolvedValue(existingContact as any);
+      vi.spyOn(repository, 'merge').mockReturnValue(updatedContact as any);
+      vi.spyOn(repository, 'save').mockResolvedValue(updatedContact as any);
 
       const result = await service.markAsRead(1);
 
@@ -259,7 +256,7 @@ describe('ContactsService', () => {
     });
 
     it('should throw NotFoundException if contact not found', async () => {
-      jest.spyOn(repository, 'findOne').mockResolvedValue(undefined);
+      vi.spyOn(repository, 'findOne').mockResolvedValue(undefined);
 
       await expect(service.markAsRead(1)).rejects.toThrow(
         `Contact with ID 1 not found`,
@@ -277,12 +274,10 @@ describe('ContactsService', () => {
         message: 'Hello',
       };
 
-      jest
-        .spyOn(repository, 'findOne')
-        .mockResolvedValue(existingContact as any);
-      jest
-        .spyOn(repository, 'softRemove')
-        .mockResolvedValue(existingContact as any);
+      vi.spyOn(repository, 'findOne').mockResolvedValue(existingContact as any);
+      vi.spyOn(repository, 'softRemove').mockResolvedValue(
+        existingContact as any,
+      );
 
       const result = await service.remove(1);
 
@@ -291,7 +286,7 @@ describe('ContactsService', () => {
     });
 
     it('should throw NotFoundException if contact not found', async () => {
-      jest.spyOn(repository, 'findOne').mockResolvedValue(undefined);
+      vi.spyOn(repository, 'findOne').mockResolvedValue(undefined);
 
       await expect(service.remove(1)).rejects.toThrow(
         `Contact with ID 1 not found`,

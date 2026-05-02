@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ApiKeyService } from './api-key.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -23,7 +24,7 @@ describe('ApiKeyService', () => {
         {
           provide: ConfigService,
           useValue: {
-            getOrThrow: jest.fn((key: string) => {
+            getOrThrow: vi.fn((key: string) => {
               if (key === 'apiKey') return { secret: TEST_SECRET };
               throw new Error(`Unknown config: ${key}`);
             }),
@@ -42,10 +43,11 @@ describe('ApiKeyService', () => {
 
   describe('create', () => {
     it('should create an API key and return plainKey + entity', async () => {
-      jest.spyOn(repo, 'create').mockImplementation((data: any) => data as any);
-      jest
-        .spyOn(repo, 'save')
-        .mockImplementation(async (entity: any) => ({ id: 1, ...entity }));
+      vi.spyOn(repo, 'create').mockImplementation((data: any) => data as any);
+      vi.spyOn(repo, 'save').mockImplementation(async (entity: any) => ({
+        id: 1,
+        ...entity,
+      }));
 
       const result = await service.create('desc');
 
@@ -58,8 +60,8 @@ describe('ApiKeyService', () => {
 
     it('should hash the key with HMAC-SHA256 using the secret', async () => {
       let savedHashedKey: string;
-      jest.spyOn(repo, 'create').mockImplementation((data: any) => data as any);
-      jest.spyOn(repo, 'save').mockImplementation(async (entity: any) => {
+      vi.spyOn(repo, 'create').mockImplementation((data: any) => data as any);
+      vi.spyOn(repo, 'save').mockImplementation(async (entity: any) => {
         savedHashedKey = entity.hashedKey;
         return { id: 1, ...entity };
       });
@@ -82,7 +84,7 @@ describe('ApiKeyService', () => {
         .update(plainKey)
         .digest('hex');
 
-      jest.spyOn(repo, 'findOne').mockResolvedValue({
+      vi.spyOn(repo, 'findOne').mockResolvedValue({
         hashedKey,
         isActive: true,
       } as any);
@@ -96,7 +98,7 @@ describe('ApiKeyService', () => {
     });
 
     it('should return false for invalid key', async () => {
-      jest.spyOn(repo, 'findOne').mockResolvedValue(undefined);
+      vi.spyOn(repo, 'findOne').mockResolvedValue(undefined);
       const valid = await service.validate('badkey');
       expect(valid).toBe(false);
     });
@@ -104,7 +106,7 @@ describe('ApiKeyService', () => {
 
   describe('revokeById', () => {
     it('should deactivate an API key by id', async () => {
-      const updateSpy = jest.spyOn(repo, 'update').mockResolvedValue({} as any);
+      const updateSpy = vi.spyOn(repo, 'update').mockResolvedValue({} as any);
       await service.revokeById(1);
       expect(updateSpy).toHaveBeenCalledWith({ id: 1 }, { isActive: false });
     });

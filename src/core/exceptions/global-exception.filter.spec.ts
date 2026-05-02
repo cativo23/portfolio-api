@@ -1,3 +1,4 @@
+import { type Mock, type MockInstance } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { GlobalExceptionFilter } from './global-exception.filter';
 import { RequestContextService } from '@core/context/request-context.service';
@@ -17,12 +18,12 @@ describe('GlobalExceptionFilter', () => {
   let mockResponse: Partial<Response>;
   let mockRequest: Partial<Request>;
   let mockHost: ArgumentsHost;
-  let loggerErrorSpy: jest.SpyInstance;
+  let loggerErrorSpy: MockInstance;
 
   beforeEach(async () => {
-    loggerErrorSpy = jest
+    loggerErrorSpy = vi
       .spyOn(Logger.prototype, 'error')
-      .mockImplementation(jest.fn());
+      .mockImplementation(vi.fn());
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -30,9 +31,9 @@ describe('GlobalExceptionFilter', () => {
         {
           provide: RequestContextService,
           useValue: {
-            getRequestId: jest.fn().mockReturnValue('req_123'),
-            getPath: jest.fn().mockReturnValue('/test'),
-            getTimestamp: jest.fn().mockReturnValue('2023-01-01T00:00:00Z'),
+            getRequestId: vi.fn().mockReturnValue('req_123'),
+            getPath: vi.fn().mockReturnValue('/test'),
+            getTimestamp: vi.fn().mockReturnValue('2023-01-01T00:00:00Z'),
           },
         },
       ],
@@ -44,8 +45,8 @@ describe('GlobalExceptionFilter', () => {
     );
 
     mockResponse = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn(),
+      status: vi.fn().mockReturnThis(),
+      json: vi.fn(),
     };
 
     mockRequest = {
@@ -55,15 +56,15 @@ describe('GlobalExceptionFilter', () => {
     };
 
     mockHost = {
-      switchToHttp: jest.fn().mockReturnValue({
-        getResponse: jest.fn().mockReturnValue(mockResponse),
-        getRequest: jest.fn().mockReturnValue(mockRequest),
+      switchToHttp: vi.fn().mockReturnValue({
+        getResponse: vi.fn().mockReturnValue(mockResponse),
+        getRequest: vi.fn().mockReturnValue(mockRequest),
       }),
     } as unknown as ArgumentsHost;
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should be defined', () => {
@@ -231,7 +232,7 @@ describe('GlobalExceptionFilter', () => {
     });
 
     it('should use request.url as fallback path when context path is empty', () => {
-      (requestContextService.getPath as jest.Mock).mockReturnValue('');
+      (requestContextService.getPath as Mock).mockReturnValue('');
       const exception = new HttpException('Test', HttpStatus.BAD_REQUEST);
 
       filter.catch(exception, mockHost);

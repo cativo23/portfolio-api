@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
@@ -5,15 +6,15 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { HealthService } from './health.service';
 
 const mockDataSource = {
-  query: jest.fn(),
+  query: vi.fn(),
 };
 
 const mockCacheManager = {
-  get: jest.fn(),
+  get: vi.fn(),
 };
 
 const mockConfigService = {
-  get: jest.fn(),
+  get: vi.fn(),
 };
 
 describe('HealthService', () => {
@@ -42,7 +43,7 @@ describe('HealthService', () => {
     service = module.get<HealthService>(HealthService);
     configService = module.get<ConfigService>(ConfigService);
 
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should be defined', () => {
@@ -138,42 +139,44 @@ describe('HealthService', () => {
 
     it('should return status down when memory usage is above 90%', async () => {
       const originalMemoryUsage = process.memoryUsage;
-      jest.spyOn(process, 'memoryUsage').mockReturnValue({
-        rss: 950,
-        heapTotal: 1000,
-        heapUsed: 950,
-        external: 100,
-        arrayBuffers: 0,
-      });
+      try {
+        vi.spyOn(process, 'memoryUsage').mockReturnValue({
+          rss: 950,
+          heapTotal: 1000,
+          heapUsed: 950,
+          external: 100,
+          arrayBuffers: 0,
+        });
 
-      // Mock cgroups v2 to return 1000 bytes limit
-      const mockFs = {
-        readFile: jest.fn().mockResolvedValue('1000'),
-      };
-      jest.doMock('fs/promises', () => mockFs);
+        // Mock cgroups v2 to return 1000 bytes limit
+        const mockFs = {
+          readFile: vi.fn().mockResolvedValue('1000'),
+        };
+        vi.doMock('fs/promises', () => mockFs);
 
-      const result = await service.checkMemory();
+        const result = await service.checkMemory();
 
-      expect(result.status).toBe('down');
-      expect(result.message).toContain('Memory usage critical');
-
-      jest.dontMock('fs/promises');
-      jest.restoreAllMocks();
-      process.memoryUsage = originalMemoryUsage;
+        expect(result.status).toBe('down');
+        expect(result.message).toContain('Memory usage critical');
+      } finally {
+        vi.doUnmock('fs/promises');
+        vi.restoreAllMocks();
+        process.memoryUsage = originalMemoryUsage;
+      }
     });
   });
 
   describe('checkDisk', () => {
     it('should return disk stats with status up when usage is below 85%', async () => {
       const mockFs = {
-        statfs: jest.fn().mockResolvedValue({
+        statfs: vi.fn().mockResolvedValue({
           bsize: 4096,
           blocks: 1000000,
           bfree: 200000,
         }),
       };
 
-      jest.doMock('fs/promises', () => mockFs);
+      vi.doMock('fs/promises', () => mockFs);
 
       const result = await service.checkDisk();
 
@@ -182,33 +185,38 @@ describe('HealthService', () => {
       expect(result).toHaveProperty('total');
       expect(result).toHaveProperty('usagePercent');
 
-      jest.dontMock('fs/promises');
+      vi.doUnmock('fs/promises');
     });
 
     it('should return status up with message when disk stats unavailable', async () => {
       const originalMemoryUsage = process.memoryUsage;
-      jest.spyOn(process, 'memoryUsage').mockReturnValue({
-        rss: 100,
-        heapTotal: 1000,
-        heapUsed: 50,
-        external: 10,
-        arrayBuffers: 0,
-      });
+      try {
+        vi.spyOn(process, 'memoryUsage').mockReturnValue({
+          rss: 100,
+          heapTotal: 1000,
+          heapUsed: 50,
+          external: 10,
+          arrayBuffers: 0,
+        });
 
-      const mockFs = await import('fs/promises');
-      const originalStatfs = mockFs.statfs;
-      mockFs.statfs = jest.fn().mockRejectedValue(new Error('Not available'));
+        // Use vi.doMock to replace fs/promises just for the dynamic import
+        // inside service.checkDisk(). Direct assignment to real fs/promises
+        // fails because statfs is non-configurable on the real module.
+        vi.doMock('fs/promises', () => ({
+          statfs: vi.fn().mockRejectedValue(new Error('Not available')),
+        }));
 
-      const result = await service.checkDisk();
+        const result = await service.checkDisk();
 
-      expect(result.status).toBe('up');
-      expect(result.message).toBe(
-        'Disk stats unavailable (running in container?)',
-      );
-
-      mockFs.statfs = originalStatfs;
-      jest.restoreAllMocks();
-      process.memoryUsage = originalMemoryUsage;
+        expect(result.status).toBe('up');
+        expect(result.message).toBe(
+          'Disk stats unavailable (running in container?)',
+        );
+      } finally {
+        vi.doUnmock('fs/promises');
+        vi.restoreAllMocks();
+        process.memoryUsage = originalMemoryUsage;
+      }
     });
   });
 
@@ -216,7 +224,7 @@ describe('HealthService', () => {
     beforeEach(() => {
       mockDataSource.query.mockResolvedValue([{ '1': 1 }]);
       mockCacheManager.get.mockResolvedValue(null);
-      jest.spyOn(configService, 'get').mockReturnValue('test');
+      vi.spyOn(configService, 'get').mockReturnValue('test');
     });
 
     it('should return full health status with all components', async () => {
@@ -255,38 +263,40 @@ describe('HealthService', () => {
 
       // Mock memoryUsage to return >90% usage (down status)
       const originalMemoryUsage = process.memoryUsage;
-      jest.spyOn(process, 'memoryUsage').mockReturnValue({
-        rss: 950,
-        heapTotal: 1000,
-        heapUsed: 950,
-        external: 100,
-        arrayBuffers: 0,
-      });
-
-      // Mock cgroups v2 to return 1000 bytes limit (so 950/1000 = 95% > 90%)
-      const mockFs = {
-        readFile: jest.fn().mockResolvedValue('1000'),
-      };
-      jest.doMock('fs/promises', () => mockFs);
-
-      // Mock checkDisk to return down status
       const originalCheckDisk = service.checkDisk;
-      service.checkDisk = jest.fn().mockResolvedValue({
-        status: 'down',
-        used: 0,
-        total: 0,
-        usagePercent: 0,
-        message: 'Disk unavailable',
-      });
+      try {
+        vi.spyOn(process, 'memoryUsage').mockReturnValue({
+          rss: 950,
+          heapTotal: 1000,
+          heapUsed: 950,
+          external: 100,
+          arrayBuffers: 0,
+        });
 
-      const result = await service.getFullHealth();
+        // Mock cgroups v2 to return 1000 bytes limit (so 950/1000 = 95% > 90%)
+        const mockFs = {
+          readFile: vi.fn().mockResolvedValue('1000'),
+        };
+        vi.doMock('fs/promises', () => mockFs);
 
-      expect(result.status).toBe('error');
+        // Mock checkDisk to return down status
+        service.checkDisk = vi.fn().mockResolvedValue({
+          status: 'down',
+          used: 0,
+          total: 0,
+          usagePercent: 0,
+          message: 'Disk unavailable',
+        });
 
-      jest.dontMock('fs/promises');
-      service.checkDisk = originalCheckDisk;
-      jest.restoreAllMocks();
-      process.memoryUsage = originalMemoryUsage;
+        const result = await service.getFullHealth();
+
+        expect(result.status).toBe('error');
+      } finally {
+        vi.doUnmock('fs/promises');
+        service.checkDisk = originalCheckDisk;
+        vi.restoreAllMocks();
+        process.memoryUsage = originalMemoryUsage;
+      }
     });
   });
 

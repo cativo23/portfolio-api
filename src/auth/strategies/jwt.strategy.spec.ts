@@ -1,3 +1,4 @@
+import { vi, type Mocked } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './jwt.strategy';
@@ -5,12 +6,12 @@ import { AccessTokenPayload } from '@auth/types/AccessTokenPayload';
 
 describe('JwtStrategy', () => {
   let strategy: JwtStrategy;
-  let configService: jest.Mocked<ConfigService>;
+  let configService: Mocked<ConfigService>;
 
   beforeEach(async () => {
     // Mock the ConfigService
     const mockConfigService = {
-      get: jest.fn((key: string) => {
+      get: vi.fn((key: string) => {
         if (key === 'JWT_SECRET') return 'test_jwt_secret';
         return undefined;
       }),
@@ -27,7 +28,7 @@ describe('JwtStrategy', () => {
     }).compile();
 
     strategy = module.get<JwtStrategy>(JwtStrategy);
-    configService = module.get(ConfigService) as jest.Mocked<ConfigService>;
+    configService = module.get(ConfigService) as Mocked<ConfigService>;
   });
 
   it('should be defined', () => {

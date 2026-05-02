@@ -1,3 +1,4 @@
+import { vi, type Mocked } from 'vitest';
 import { ApiKeyGuard } from './api-key.guard';
 import { ApiKeyService } from './api-key.service';
 import { ExecutionContext } from '@nestjs/common';
@@ -5,13 +6,13 @@ import { AuthenticationException } from '@core/exceptions';
 
 describe('ApiKeyGuard', () => {
   let guard: ApiKeyGuard;
-  let apiKeyService: jest.Mocked<ApiKeyService>;
+  let apiKeyService: Mocked<ApiKeyService>;
   let mockContext: ExecutionContext;
   let mockRequest: any;
 
   beforeEach(() => {
     apiKeyService = {
-      validate: jest.fn(),
+      validate: vi.fn(),
     } as any;
 
     guard = new ApiKeyGuard(apiKeyService);
@@ -21,14 +22,14 @@ describe('ApiKeyGuard', () => {
     };
 
     mockContext = {
-      switchToHttp: jest.fn().mockReturnValue({
-        getRequest: jest.fn().mockReturnValue(mockRequest),
+      switchToHttp: vi.fn().mockReturnValue({
+        getRequest: vi.fn().mockReturnValue(mockRequest),
       }),
     } as any;
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should be defined', () => {

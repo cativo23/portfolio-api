@@ -1,14 +1,15 @@
+import { vi, type Mocked } from 'vitest';
 import { ConfigService } from '@nestjs/config';
 import { jwtConfigFactory } from './jwt.config';
 
 describe('jwtConfigFactory', () => {
-  let mockConfigService: jest.Mocked<ConfigService>;
+  let mockConfigService: Mocked<ConfigService>;
 
   beforeEach(() => {
     mockConfigService = {
-      get: jest.fn(),
-      getOrThrow: jest.fn(),
-    } as unknown as jest.Mocked<ConfigService>;
+      get: vi.fn(),
+      getOrThrow: vi.fn(),
+    } as unknown as Mocked<ConfigService>;
   });
 
   it('should return correct JWT config', async () => {

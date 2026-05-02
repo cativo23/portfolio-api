@@ -1,3 +1,4 @@
+import { vi, type MockInstance } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProjectsService } from './projects.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -15,15 +16,13 @@ describe('ProjectsService', () => {
   let repository: Repository<Project>;
   // Logger spy variables
   let cacheInvalidationService: CacheInvalidationService;
-  let logSpy: jest.SpyInstance;
-  let warnSpy: jest.SpyInstance;
+  let logSpy: MockInstance;
+  let warnSpy: MockInstance;
 
   beforeEach(async () => {
     // Mock Logger methods
-    logSpy = jest.spyOn(Logger.prototype, 'log').mockImplementation(jest.fn());
-    warnSpy = jest
-      .spyOn(Logger.prototype, 'warn')
-      .mockImplementation(jest.fn());
+    logSpy = vi.spyOn(Logger.prototype, 'log').mockImplementation(vi.fn());
+    warnSpy = vi.spyOn(Logger.prototype, 'warn').mockImplementation(vi.fn());
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -35,7 +34,7 @@ describe('ProjectsService', () => {
         {
           provide: CacheInvalidationService,
           useValue: {
-            invalidateByPrefix: jest.fn().mockResolvedValue(undefined),
+            invalidateByPrefix: vi.fn().mockResolvedValue(undefined),
           },
         },
       ],
@@ -49,7 +48,7 @@ describe('ProjectsService', () => {
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('should be defined', () => {
@@ -70,8 +69,8 @@ describe('ProjectsService', () => {
       };
       const project = { id: 1, ...createProjectDto };
 
-      jest.spyOn(repository, 'create').mockReturnValue(project as any);
-      jest.spyOn(repository, 'save').mockResolvedValue(project as any);
+      vi.spyOn(repository, 'create').mockReturnValue(project as any);
+      vi.spyOn(repository, 'save').mockResolvedValue(project as any);
 
       const result = await service.create(createProjectDto);
 
@@ -104,8 +103,8 @@ describe('ProjectsService', () => {
       };
       const project = { id: 1, ...createProjectDto };
 
-      jest.spyOn(repository, 'create').mockReturnValue(project as any);
-      jest.spyOn(repository, 'save').mockResolvedValue(project as any);
+      vi.spyOn(repository, 'create').mockReturnValue(project as any);
+      vi.spyOn(repository, 'save').mockResolvedValue(project as any);
 
       await service.create(createProjectDto);
 
@@ -128,8 +127,8 @@ describe('ProjectsService', () => {
       const project = { id: 1, ...createProjectDto };
       const error = new Error('Database error');
 
-      jest.spyOn(repository, 'create').mockReturnValue(project as any);
-      jest.spyOn(repository, 'save').mockRejectedValue(error);
+      vi.spyOn(repository, 'create').mockReturnValue(project as any);
+      vi.spyOn(repository, 'save').mockRejectedValue(error);
 
       // Errors should bubble up naturally - let global exception filter handle them
       await expect(service.create(createProjectDto)).rejects.toThrow(error);
@@ -149,14 +148,14 @@ describe('ProjectsService', () => {
       ];
       const total = 1;
 
-      jest.spyOn(repository, 'createQueryBuilder').mockImplementation(
+      vi.spyOn(repository, 'createQueryBuilder').mockImplementation(
         () =>
           ({
-            andWhere: jest.fn().mockReturnThis(),
-            orderBy: jest.fn().mockReturnThis(),
-            skip: jest.fn().mockReturnThis(),
-            take: jest.fn().mockReturnThis(),
-            getManyAndCount: jest.fn().mockResolvedValue([projects, total]),
+            andWhere: vi.fn().mockReturnThis(),
+            orderBy: vi.fn().mockReturnThis(),
+            skip: vi.fn().mockReturnThis(),
+            take: vi.fn().mockReturnThis(),
+            getManyAndCount: vi.fn().mockResolvedValue([projects, total]),
           }) as any,
       );
 
@@ -180,16 +179,16 @@ describe('ProjectsService', () => {
         { id: 1, title: 'Test Project', description: 'Test Description' },
       ];
       const total = 1;
-      const andWhereMock = jest.fn().mockReturnThis();
+      const andWhereMock = vi.fn().mockReturnThis();
 
-      jest.spyOn(repository, 'createQueryBuilder').mockImplementation(
+      vi.spyOn(repository, 'createQueryBuilder').mockImplementation(
         () =>
           ({
             andWhere: andWhereMock,
-            orderBy: jest.fn().mockReturnThis(),
-            skip: jest.fn().mockReturnThis(),
-            take: jest.fn().mockReturnThis(),
-            getManyAndCount: jest.fn().mockResolvedValue([projects, total]),
+            orderBy: vi.fn().mockReturnThis(),
+            skip: vi.fn().mockReturnThis(),
+            take: vi.fn().mockReturnThis(),
+            getManyAndCount: vi.fn().mockResolvedValue([projects, total]),
           }) as any,
       );
 
@@ -217,16 +216,16 @@ describe('ProjectsService', () => {
         },
       ];
       const total = 1;
-      const andWhereMock = jest.fn().mockReturnThis();
+      const andWhereMock = vi.fn().mockReturnThis();
 
-      jest.spyOn(repository, 'createQueryBuilder').mockImplementation(
+      vi.spyOn(repository, 'createQueryBuilder').mockImplementation(
         () =>
           ({
             andWhere: andWhereMock,
-            orderBy: jest.fn().mockReturnThis(),
-            skip: jest.fn().mockReturnThis(),
-            take: jest.fn().mockReturnThis(),
-            getManyAndCount: jest.fn().mockResolvedValue([projects, total]),
+            orderBy: vi.fn().mockReturnThis(),
+            skip: vi.fn().mockReturnThis(),
+            take: vi.fn().mockReturnThis(),
+            getManyAndCount: vi.fn().mockResolvedValue([projects, total]),
           }) as any,
       );
 
@@ -247,14 +246,14 @@ describe('ProjectsService', () => {
       };
       const error = new Error('Database error');
 
-      jest.spyOn(repository, 'createQueryBuilder').mockImplementation(
+      vi.spyOn(repository, 'createQueryBuilder').mockImplementation(
         () =>
           ({
-            andWhere: jest.fn().mockReturnThis(),
-            orderBy: jest.fn().mockReturnThis(),
-            skip: jest.fn().mockReturnThis(),
-            take: jest.fn().mockReturnThis(),
-            getManyAndCount: jest.fn().mockRejectedValue(error),
+            andWhere: vi.fn().mockReturnThis(),
+            orderBy: vi.fn().mockReturnThis(),
+            skip: vi.fn().mockReturnThis(),
+            take: vi.fn().mockReturnThis(),
+            getManyAndCount: vi.fn().mockRejectedValue(error),
           }) as any,
       );
 
@@ -277,7 +276,7 @@ describe('ProjectsService', () => {
         status: ProjectStatus.COMPLETED,
       };
 
-      jest.spyOn(repository, 'findOne').mockResolvedValue(project as any);
+      vi.spyOn(repository, 'findOne').mockResolvedValue(project as any);
 
       const result = await service.findOne(1);
 
@@ -296,7 +295,7 @@ describe('ProjectsService', () => {
     });
 
     it('should throw NotFoundException if project not found', async () => {
-      jest.spyOn(repository, 'findOne').mockResolvedValue(undefined);
+      vi.spyOn(repository, 'findOne').mockResolvedValue(undefined);
 
       await expect(service.findOne(1)).rejects.toThrow(
         `Project with ID 1 not found`,
@@ -308,7 +307,7 @@ describe('ProjectsService', () => {
       const error = new Error('Database error');
       error.stack = 'Error stack';
 
-      jest.spyOn(repository, 'findOne').mockRejectedValue(error);
+      vi.spyOn(repository, 'findOne').mockRejectedValue(error);
 
       // Errors should bubble up naturally - let global exception filter handle them
       await expect(service.findOne(1)).rejects.toThrow(error);
@@ -317,7 +316,7 @@ describe('ProjectsService', () => {
     it('should let NotFoundException bubble up when repository.findOne throws it', async () => {
       const error = new NotFoundException(`Project with ID 1 not found`);
 
-      jest.spyOn(repository, 'findOne').mockRejectedValue(error);
+      vi.spyOn(repository, 'findOne').mockRejectedValue(error);
 
       // NotFoundException should bubble up naturally
       await expect(service.findOne(1)).rejects.toThrow(error);
@@ -351,11 +350,9 @@ describe('ProjectsService', () => {
         ...updateProjectDto,
       };
 
-      jest
-        .spyOn(repository, 'findOne')
-        .mockResolvedValue(existingProject as any);
-      jest.spyOn(repository, 'merge').mockReturnValue(updatedProject as any);
-      jest.spyOn(repository, 'save').mockResolvedValue(updatedProject as any);
+      vi.spyOn(repository, 'findOne').mockResolvedValue(existingProject as any);
+      vi.spyOn(repository, 'merge').mockReturnValue(updatedProject as any);
+      vi.spyOn(repository, 'save').mockResolvedValue(updatedProject as any);
 
       const result = await service.update(1, updateProjectDto);
 
@@ -395,11 +392,11 @@ describe('ProjectsService', () => {
       };
       const updatedProject = { id: 1, ...updateProjectDto };
 
-      jest
-        .spyOn(repository, 'findOne')
-        .mockResolvedValueOnce(existingProject as any);
-      jest.spyOn(repository, 'merge').mockReturnValue(updatedProject as any);
-      jest.spyOn(repository, 'save').mockResolvedValue(updatedProject as any);
+      vi.spyOn(repository, 'findOne').mockResolvedValueOnce(
+        existingProject as any,
+      );
+      vi.spyOn(repository, 'merge').mockReturnValue(updatedProject as any);
+      vi.spyOn(repository, 'save').mockResolvedValue(updatedProject as any);
 
       await service.update(1, updateProjectDto);
 
@@ -414,9 +411,9 @@ describe('ProjectsService', () => {
         description: 'Updated Description',
       };
 
-      jest.spyOn(repository, 'findOne').mockResolvedValue(undefined);
-      const mergeSpy = jest.spyOn(repository, 'merge');
-      const saveSpy = jest.spyOn(repository, 'save');
+      vi.spyOn(repository, 'findOne').mockResolvedValue(undefined);
+      const mergeSpy = vi.spyOn(repository, 'merge');
+      const saveSpy = vi.spyOn(repository, 'save');
 
       await expect(service.update(1, updateProjectDto)).rejects.toThrow(
         `Project with ID 1 not found`,
@@ -445,11 +442,9 @@ describe('ProjectsService', () => {
       const error = new Error('Database error');
       error.stack = 'Error stack';
 
-      jest
-        .spyOn(repository, 'findOne')
-        .mockResolvedValue(existingProject as any);
-      jest.spyOn(repository, 'merge').mockReturnValue(existingProject as any);
-      jest.spyOn(repository, 'save').mockRejectedValue(error);
+      vi.spyOn(repository, 'findOne').mockResolvedValue(existingProject as any);
+      vi.spyOn(repository, 'merge').mockReturnValue(existingProject as any);
+      vi.spyOn(repository, 'save').mockRejectedValue(error);
 
       // Errors should bubble up naturally - let global exception filter handle them
       await expect(service.update(1, updateProjectDto)).rejects.toThrow(error);
@@ -462,7 +457,7 @@ describe('ProjectsService', () => {
       };
       const error = new NotFoundException(`Project with ID 1 not found`);
 
-      jest.spyOn(repository, 'findOne').mockRejectedValue(error);
+      vi.spyOn(repository, 'findOne').mockRejectedValue(error);
 
       // NotFoundException should bubble up naturally
       await expect(service.update(1, updateProjectDto)).rejects.toThrow(error);
@@ -477,12 +472,10 @@ describe('ProjectsService', () => {
         description: 'Test Description',
       };
 
-      jest
-        .spyOn(repository, 'findOne')
-        .mockResolvedValue(existingProject as any);
-      jest
-        .spyOn(repository, 'softRemove')
-        .mockResolvedValue(existingProject as any);
+      vi.spyOn(repository, 'findOne').mockResolvedValue(existingProject as any);
+      vi.spyOn(repository, 'softRemove').mockResolvedValue(
+        existingProject as any,
+      );
 
       const result = await service.remove(1);
 
@@ -494,12 +487,10 @@ describe('ProjectsService', () => {
     it('should invalidate cache after removing a project', async () => {
       const existingProject = { id: 1, title: 'Test', description: 'Test' };
 
-      jest
-        .spyOn(repository, 'findOne')
-        .mockResolvedValue(existingProject as any);
-      jest
-        .spyOn(repository, 'softRemove')
-        .mockResolvedValue(existingProject as any);
+      vi.spyOn(repository, 'findOne').mockResolvedValue(existingProject as any);
+      vi.spyOn(repository, 'softRemove').mockResolvedValue(
+        existingProject as any,
+      );
 
       await service.remove(1);
 
@@ -509,8 +500,8 @@ describe('ProjectsService', () => {
     });
 
     it('should throw NotFoundException if project not found during initial check', async () => {
-      jest.spyOn(repository, 'findOne').mockResolvedValue(undefined);
-      const softRemoveSpy = jest.spyOn(repository, 'softRemove');
+      vi.spyOn(repository, 'findOne').mockResolvedValue(undefined);
+      const softRemoveSpy = vi.spyOn(repository, 'softRemove');
 
       await expect(service.remove(1)).rejects.toThrow(
         `Project with ID 1 not found`,
@@ -528,10 +519,8 @@ describe('ProjectsService', () => {
       const error = new Error('Database error');
       error.stack = 'Error stack';
 
-      jest
-        .spyOn(repository, 'findOne')
-        .mockResolvedValue(existingProject as any);
-      jest.spyOn(repository, 'softRemove').mockRejectedValue(error);
+      vi.spyOn(repository, 'findOne').mockResolvedValue(existingProject as any);
+      vi.spyOn(repository, 'softRemove').mockRejectedValue(error);
 
       // Errors should bubble up naturally - let global exception filter handle them
       await expect(service.remove(1)).rejects.toThrow(error);
@@ -540,7 +529,7 @@ describe('ProjectsService', () => {
     it('should let NotFoundException bubble up when repository.findOne throws it', async () => {
       const error = new NotFoundException(`Project with ID 1 not found`);
 
-      jest.spyOn(repository, 'findOne').mockRejectedValue(error);
+      vi.spyOn(repository, 'findOne').mockRejectedValue(error);
 
       // NotFoundException should bubble up naturally
       await expect(service.remove(1)).rejects.toThrow(error);

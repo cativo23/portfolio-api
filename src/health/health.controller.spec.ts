@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import {
   HealthCheckService,
@@ -20,19 +21,19 @@ describe('HealthController', () => {
         {
           provide: HealthCheckService,
           useValue: {
-            check: jest.fn(),
+            check: vi.fn(),
           },
         },
         {
           provide: TypeOrmHealthIndicator,
           useValue: {
-            pingCheck: jest.fn(),
+            pingCheck: vi.fn(),
           },
         },
         {
           provide: HealthService,
           useValue: {
-            getFullHealth: jest.fn(),
+            getFullHealth: vi.fn(),
           },
         },
       ],
@@ -51,7 +52,7 @@ describe('HealthController', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('health (GET /health)', () => {
@@ -73,9 +74,9 @@ describe('HealthController', () => {
           disk: { status: 'up' as const, used: 0, total: 0, usagePercent: 0 },
         },
       };
-      jest
-        .spyOn(healthService, 'getFullHealth')
-        .mockResolvedValue(mockFullHealth);
+      vi.spyOn(healthService, 'getFullHealth').mockResolvedValue(
+        mockFullHealth,
+      );
 
       const result = await controller.health();
 
@@ -109,9 +110,9 @@ describe('HealthController', () => {
           disk: { status: 'up' as const, used: 0, total: 0, usagePercent: 0 },
         },
       };
-      jest
-        .spyOn(healthService, 'getFullHealth')
-        .mockResolvedValue(mockFullHealth);
+      vi.spyOn(healthService, 'getFullHealth').mockResolvedValue(
+        mockFullHealth,
+      );
 
       const result = await controller.health();
 
@@ -139,9 +140,9 @@ describe('HealthController', () => {
           disk: { status: 'up' as const, used: 0, total: 0, usagePercent: 0 },
         },
       };
-      jest
-        .spyOn(healthService, 'getFullHealth')
-        .mockResolvedValue(mockFullHealth);
+      vi.spyOn(healthService, 'getFullHealth').mockResolvedValue(
+        mockFullHealth,
+      );
 
       const result = await controller.detailed();
 
@@ -157,7 +158,7 @@ describe('HealthController', () => {
         error: {},
         details: {},
       };
-      jest.spyOn(healthCheckService, 'check').mockResolvedValue(mockLiveness);
+      vi.spyOn(healthCheckService, 'check').mockResolvedValue(mockLiveness);
 
       const result = await controller.liveness();
 
@@ -174,10 +175,10 @@ describe('HealthController', () => {
         error: {},
         details: { database: { status: 'up' } },
       };
-      jest
-        .spyOn(typeOrmHealthIndicator, 'pingCheck')
-        .mockResolvedValue({ database: { status: 'up' } });
-      jest.spyOn(healthCheckService, 'check').mockResolvedValue(mockReadiness);
+      vi.spyOn(typeOrmHealthIndicator, 'pingCheck').mockResolvedValue({
+        database: { status: 'up' },
+      });
+      vi.spyOn(healthCheckService, 'check').mockResolvedValue(mockReadiness);
 
       const result = await controller.readiness();
 
@@ -191,10 +192,10 @@ describe('HealthController', () => {
         error: { database: { status: 'down' } },
         details: { database: { status: 'down' } },
       };
-      jest
-        .spyOn(typeOrmHealthIndicator, 'pingCheck')
-        .mockResolvedValue({ database: { status: 'down' } });
-      jest.spyOn(healthCheckService, 'check').mockResolvedValue(mockReadiness);
+      vi.spyOn(typeOrmHealthIndicator, 'pingCheck').mockResolvedValue({
+        database: { status: 'down' },
+      });
+      vi.spyOn(healthCheckService, 'check').mockResolvedValue(mockReadiness);
 
       const result = await controller.readiness();
 
@@ -221,9 +222,9 @@ describe('HealthController', () => {
           disk: { status: 'up' as const, used: 0, total: 0, usagePercent: 0 },
         },
       };
-      jest
-        .spyOn(healthService, 'getFullHealth')
-        .mockResolvedValue(mockFullHealth);
+      vi.spyOn(healthService, 'getFullHealth').mockResolvedValue(
+        mockFullHealth,
+      );
 
       const result = await controller.check();
 

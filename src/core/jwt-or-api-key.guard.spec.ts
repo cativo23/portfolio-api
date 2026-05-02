@@ -1,3 +1,4 @@
+import { vi, type Mocked } from 'vitest';
 import { JwtOrApiKeyGuard } from './jwt-or-api-key.guard';
 import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@auth/auth.guard';
@@ -7,21 +8,21 @@ import { AuthenticationException } from '@core/exceptions';
 
 describe('JwtOrApiKeyGuard', () => {
   let guard: JwtOrApiKeyGuard;
-  let moduleRef: jest.Mocked<ModuleRef>;
-  let authGuard: jest.Mocked<AuthGuard>;
-  let apiKeyGuard: jest.Mocked<ApiKeyGuard>;
+  let moduleRef: Mocked<ModuleRef>;
+  let authGuard: Mocked<AuthGuard>;
+  let apiKeyGuard: Mocked<ApiKeyGuard>;
 
   beforeEach(() => {
     authGuard = {
-      canActivate: jest.fn(),
+      canActivate: vi.fn(),
     } as any;
 
     apiKeyGuard = {
-      canActivate: jest.fn(),
+      canActivate: vi.fn(),
     } as any;
 
     moduleRef = {
-      get: jest.fn((token) => {
+      get: vi.fn((token) => {
         if ((token as any).name === 'AuthGuard') return authGuard;
         if ((token as any).name === 'ApiKeyGuard') return apiKeyGuard;
         return undefined;
@@ -32,7 +33,7 @@ describe('JwtOrApiKeyGuard', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should be defined', () => {
@@ -121,7 +122,7 @@ describe('JwtOrApiKeyGuard', () => {
     });
 
     it('should return false if AuthGuard is not available but ApiKeyGuard succeeds', async () => {
-      moduleRef.get = jest
+      moduleRef.get = vi
         .fn()
         .mockReturnValueOnce(undefined)
         .mockReturnValueOnce(apiKeyGuard);
@@ -133,7 +134,7 @@ describe('JwtOrApiKeyGuard', () => {
     });
 
     it('should return false if ApiKeyGuard is not available and AuthGuard fails', async () => {
-      moduleRef.get = jest
+      moduleRef.get = vi
         .fn()
         .mockReturnValueOnce(authGuard)
         .mockReturnValueOnce(undefined);
@@ -147,7 +148,7 @@ describe('JwtOrApiKeyGuard', () => {
     });
 
     it('should return false if neither guard is available', async () => {
-      moduleRef.get = jest.fn().mockReturnValue(undefined);
+      moduleRef.get = vi.fn().mockReturnValue(undefined);
 
       const result = await guard.canActivate(mockContext);
 

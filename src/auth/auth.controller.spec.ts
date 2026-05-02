@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -24,8 +25,8 @@ describe('AuthController', () => {
   };
 
   const mockAuthService = {
-    login: jest.fn(),
-    register: jest.fn(),
+    login: vi.fn(),
+    register: vi.fn(),
   };
 
   beforeEach(async () => {
@@ -39,14 +40,14 @@ describe('AuthController', () => {
         {
           provide: JwtService,
           useValue: {
-            sign: jest.fn(),
-            verify: jest.fn(),
+            sign: vi.fn(),
+            verify: vi.fn(),
           },
         },
         {
           provide: ConfigService,
           useValue: {
-            get: jest.fn().mockImplementation((key: string) => {
+            get: vi.fn().mockImplementation((key: string) => {
               const config = {
                 JWT_SECRET: 'test-secret',
               };
@@ -62,7 +63,7 @@ describe('AuthController', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('login', () => {

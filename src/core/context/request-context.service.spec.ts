@@ -1,3 +1,4 @@
+import { type Mock } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { RequestContextService } from './request-context.service';
 import { ClsService } from 'nestjs-cls';
@@ -22,7 +23,7 @@ describe('RequestContextService', () => {
         {
           provide: ClsService,
           useValue: {
-            get: jest.fn().mockReturnValue(mockContext),
+            get: vi.fn().mockReturnValue(mockContext),
           },
         },
       ],
@@ -45,7 +46,7 @@ describe('RequestContextService', () => {
     });
 
     it('should return undefined when context is not available', () => {
-      (clsService.get as jest.Mock).mockReturnValue(undefined);
+      (clsService.get as Mock).mockReturnValue(undefined);
 
       const result = service.getContext();
 
@@ -61,7 +62,7 @@ describe('RequestContextService', () => {
     });
 
     it('should return "unknown" when context is not available', () => {
-      (clsService.get as jest.Mock).mockReturnValue(undefined);
+      (clsService.get as Mock).mockReturnValue(undefined);
 
       const result = service.getRequestId();
 
@@ -69,7 +70,7 @@ describe('RequestContextService', () => {
     });
 
     it('should return "unknown" when requestId is not in context', () => {
-      (clsService.get as jest.Mock).mockReturnValue({});
+      (clsService.get as Mock).mockReturnValue({});
 
       const result = service.getRequestId();
 
@@ -85,7 +86,7 @@ describe('RequestContextService', () => {
     });
 
     it('should return empty string when context is not available', () => {
-      (clsService.get as jest.Mock).mockReturnValue(undefined);
+      (clsService.get as Mock).mockReturnValue(undefined);
 
       const result = service.getPath();
 
@@ -93,7 +94,7 @@ describe('RequestContextService', () => {
     });
 
     it('should return empty string when path is not in context', () => {
-      (clsService.get as jest.Mock).mockReturnValue({});
+      (clsService.get as Mock).mockReturnValue({});
 
       const result = service.getPath();
 
@@ -109,7 +110,7 @@ describe('RequestContextService', () => {
     });
 
     it('should return empty string when context is not available', () => {
-      (clsService.get as jest.Mock).mockReturnValue(undefined);
+      (clsService.get as Mock).mockReturnValue(undefined);
 
       const result = service.getMethod();
 
@@ -125,7 +126,7 @@ describe('RequestContextService', () => {
     });
 
     it('should return empty string when context is not available', () => {
-      (clsService.get as jest.Mock).mockReturnValue(undefined);
+      (clsService.get as Mock).mockReturnValue(undefined);
 
       const result = service.getIp();
 
@@ -141,7 +142,7 @@ describe('RequestContextService', () => {
     });
 
     it('should return current ISO timestamp when context is not available', () => {
-      (clsService.get as jest.Mock).mockReturnValue(undefined);
+      (clsService.get as Mock).mockReturnValue(undefined);
 
       const before = Date.now();
       const result = service.getTimestamp();
@@ -153,7 +154,7 @@ describe('RequestContextService', () => {
     });
 
     it('should return current ISO timestamp when timestamp is not in context', () => {
-      (clsService.get as jest.Mock).mockReturnValue({});
+      (clsService.get as Mock).mockReturnValue({});
 
       const before = Date.now();
       const result = service.getTimestamp();

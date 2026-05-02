@@ -1,9 +1,10 @@
+import { vi } from 'vitest';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmLoggerService } from './typeorm-logger.service';
 
 const createMockConfigService = (logLevels: string[]) => {
   return {
-    getOrThrow: jest.fn().mockReturnValue({ logLevels }),
+    getOrThrow: vi.fn().mockReturnValue({ logLevels }),
   } as unknown as ConfigService;
 };
 
@@ -257,11 +258,9 @@ describe('TypeOrmLoggerService', () => {
       const service = new TypeOrmLoggerService(configService);
 
       // Spy on stringifyParameter to make it throw
-      jest
-        .spyOn(service as any, 'stringifyParameter')
-        .mockImplementation(() => {
-          throw new Error('Cannot stringify');
-        });
+      vi.spyOn(service as any, 'stringifyParameter').mockImplementation(() => {
+        throw new Error('Cannot stringify');
+      });
 
       const result = (service as any).buildSqlString('SELECT * FROM users', [
         { complex: 'object' },

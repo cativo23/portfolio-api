@@ -10,7 +10,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationUtil } from '@core/utils/pagination.util';
 import { BaseCrudService } from '@core/services/base-crud.service';
 import { CacheInvalidationService } from '@src/cache/cache-invalidation.service';
-import * as sanitizeHtml from 'sanitize-html';
+// CommonJS-style import: sanitize-html uses `export = sanitize`. The default
+// import compiles to `.default` access without esModuleInterop and fails at
+// runtime under tsc. `import = require` works under both tsc and vitest.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+import sanitizeHtml = require('sanitize-html');
 
 /**
  * Interface defining options for finding projects with pagination, search, and filtering
