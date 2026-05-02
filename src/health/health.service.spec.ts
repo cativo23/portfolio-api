@@ -158,7 +158,7 @@ describe('HealthService', () => {
       expect(result.status).toBe('down');
       expect(result.message).toContain('Memory usage critical');
 
-      vi.unmock('fs/promises');
+      vi.doUnmock('fs/promises');
       vi.restoreAllMocks();
       process.memoryUsage = originalMemoryUsage;
     });
@@ -183,7 +183,7 @@ describe('HealthService', () => {
       expect(result).toHaveProperty('total');
       expect(result).toHaveProperty('usagePercent');
 
-      vi.unmock('fs/promises');
+      vi.doUnmock('fs/promises');
     });
 
     it('should return status up with message when disk stats unavailable', async () => {
@@ -196,9 +196,12 @@ describe('HealthService', () => {
         arrayBuffers: 0,
       });
 
-      const mockFs = await import('fs/promises');
-      const originalStatfs = mockFs.statfs;
-      mockFs.statfs = vi.fn().mockRejectedValue(new Error('Not available'));
+      // Use vi.doMock to replace fs/promises just for the dynamic import
+      // inside service.checkDisk(). Direct assignment to real fs/promises
+      // fails because statfs is non-configurable on the real module.
+      vi.doMock('fs/promises', () => ({
+        statfs: vi.fn().mockRejectedValue(new Error('Not available')),
+      }));
 
       const result = await service.checkDisk();
 
@@ -207,7 +210,7 @@ describe('HealthService', () => {
         'Disk stats unavailable (running in container?)',
       );
 
-      mockFs.statfs = originalStatfs;
+      vi.doUnmock('fs/promises');
       vi.restoreAllMocks();
       process.memoryUsage = originalMemoryUsage;
     });
@@ -284,7 +287,7 @@ describe('HealthService', () => {
 
       expect(result.status).toBe('error');
 
-      vi.unmock('fs/promises');
+      vi.doUnmock('fs/promises');
       service.checkDisk = originalCheckDisk;
       vi.restoreAllMocks();
       process.memoryUsage = originalMemoryUsage;

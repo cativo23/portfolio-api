@@ -13,7 +13,12 @@ import {
   MaxLength,
   IsEmpty,
 } from 'class-validator';
-import sanitizeHtml from 'sanitize-html';
+// CommonJS-style import: sanitize-html exports via `export = sanitize`.
+// Default-import (`import x from`) compiles to `.default` access without
+// esModuleInterop in tsconfig, which fails at runtime under tsc. The
+// `import = require` form works under both tsc and vitest's Vite ESM transform.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+import sanitizeHtml = require('sanitize-html');
 
 const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
   allowedTags: [],
