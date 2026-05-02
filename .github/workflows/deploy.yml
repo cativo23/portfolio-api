@@ -60,10 +60,10 @@ jobs:
       - name: Copy compose file to server
         uses: appleboy/scp-action@v1
         with:
-          host: 186.32.90.71
+          host: ${{ vars.DEPLOY_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 52222
+          port: ${{ vars.DEPLOY_PORT }}
           source: "compose.prod.yml"
           target: "/home/cativo23/deploy/portfolio-api-deploy"
           debug: true
@@ -75,10 +75,10 @@ jobs:
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: 186.32.90.71
+          host: ${{ vars.DEPLOY_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 52222
+          port: ${{ vars.DEPLOY_PORT }}
           envs: DOCKER_USERNAME,DB_USERNAME,DB_PASSWORD,DB_NAME,MYSQL_ROOT_PASSWORD,JWT_SECRET,JWT_EXPIRES_IN,CORS_ORIGINS,API_KEY_SECRET,REDIS_PASSWORD,REDIS_TTL,THROTTLE_TTL,THROTTLE_LIMIT,THROTTLE_PUBLIC_LIMIT,THROTTLE_STRICT_LIMIT
           script: |
             # Docker and database credentials
