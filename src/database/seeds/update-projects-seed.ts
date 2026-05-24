@@ -169,12 +169,13 @@ Event-driven restaurant review platform demonstrating modern microservices archi
 };
 
 async function updateProjects() {
-  try {
-    const dataSource = await AppDataSource.initialize();
-    const projectRepo = dataSource.getRepository(Project);
+  const dataSource = await AppDataSource.initialize();
+  const queryRunner = dataSource.createQueryRunner();
+  await queryRunner.connect();
+  await queryRunner.startTransaction();
 
-    // Get all existing projects
-    const projects = await projectRepo.find();
+  try {
+    const projects = await queryRunner.manager.find(Project);
     console.log(`Found ${projects.length} projects`);
 
     let updatedCount = 0;
@@ -190,7 +191,7 @@ async function updateProjects() {
           project.features == null ||
           project.status == null)
       ) {
-        await projectRepo.update(project.id, {
+        await queryRunner.manager.update(Project, project.id, {
           content: project.content ?? updateData.content,
           heroImage: project.heroImage ?? updateData.heroImage,
           features: project.features ?? updateData.features,
@@ -201,13 +202,21 @@ async function updateProjects() {
       }
     }
 
+    await queryRunner.commitTransaction();
     console.log(`\nUpdate complete: ${updatedCount} projects updated`);
-    await dataSource.destroy();
-    process.exit(0);
   } catch (error) {
-    console.error('Update error:', error);
-    process.exit(1);
+    await queryRunner.rollbackTransaction();
+    console.error('Update failed, rolled back:', error);
+    throw error;
+  } finally {
+    await queryRunner.release();
+    await dataSource.destroy();
   }
 }
 
-updateProjects();
+updateProjects()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error('Update error:', error);
+    process.exit(1);
+  });
