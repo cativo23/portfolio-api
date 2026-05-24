@@ -295,7 +295,7 @@ describe('ProjectsService', () => {
     });
 
     it('should throw NotFoundException if project not found', async () => {
-      vi.spyOn(repository, 'findOne').mockResolvedValue(undefined);
+      vi.spyOn(repository, 'findOne').mockResolvedValue(null);
 
       await expect(service.findOne(1)).rejects.toThrow(
         `Project with ID 1 not found`,
@@ -345,7 +345,6 @@ describe('ProjectsService', () => {
         status: ProjectStatus.COMPLETED,
       };
       const updatedProject = {
-        id: 1,
         ...existingProject,
         ...updateProjectDto,
       };
@@ -411,7 +410,7 @@ describe('ProjectsService', () => {
         description: 'Updated Description',
       };
 
-      vi.spyOn(repository, 'findOne').mockResolvedValue(undefined);
+      vi.spyOn(repository, 'findOne').mockResolvedValue(null);
       const mergeSpy = vi.spyOn(repository, 'merge');
       const saveSpy = vi.spyOn(repository, 'save');
 
@@ -500,7 +499,7 @@ describe('ProjectsService', () => {
     });
 
     it('should throw NotFoundException if project not found during initial check', async () => {
-      vi.spyOn(repository, 'findOne').mockResolvedValue(undefined);
+      vi.spyOn(repository, 'findOne').mockResolvedValue(null);
       const softRemoveSpy = vi.spyOn(repository, 'softRemove');
 
       await expect(service.remove(1)).rejects.toThrow(

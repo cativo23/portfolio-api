@@ -4,6 +4,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Logger } from '@nestjs/common';
 import { ValidationPipe } from '@core';
 import { loadAppConfig } from '@config/configuration.loaders';
+import { buildCorsAllowlist, isOriginAllowed } from '@config/cors.utils';
 import { ClsMiddleware } from 'nestjs-cls';
 import helmet from 'helmet';
 
@@ -30,22 +31,20 @@ async function bootstrap() {
     }),
   );
 
-  app.enableCors({
-    origin: (origin, callback) => {
-      if (!origin) {
-        return callback(null, true);
-      }
+  const corsAllowlist = buildCorsAllowlist(appConfig);
 
-      if (
-        appConfig.corsOrigins.includes(origin) ||
-        appConfig.nodeEnv === 'development'
-      ) {
+  app.enableCors({
+    origin: (
+      origin: string | undefined,
+      callback: (err: Error | null, allow?: boolean) => void,
+    ) => {
+      if (isOriginAllowed(origin, corsAllowlist)) {
         callback(null, true);
       } else {
-        callback(new Error('Not allowed by CORS'));
+        Logger.warn(`CORS blocked origin: ${origin}`, 'Bootstrap');
+        callback(null, false);
       }
     },
-    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
     exposedHeaders: ['Content-Range', 'X-Content-Range'],

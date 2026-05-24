@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { ObjectLiteral, Repository } from 'typeorm';
 
 /**
  * Options for pagination utility
@@ -51,7 +51,7 @@ export class PaginationUtil {
    * @param options - Pagination, search, and filtering options
    * @returns Promise resolving to paginated results with metadata
    */
-  static async paginate<TEntity>(
+  static async paginate<TEntity extends ObjectLiteral>(
     repository: Repository<TEntity>,
     options: PaginationOptions,
   ): Promise<PaginationResult<TEntity>> {

@@ -11,10 +11,10 @@
 </div>
 
 <!-- istanbul-badges-readme-start -->
-[![Lines](https://img.shields.io/badge/lines-96.65%25-brightgreen.svg?style=flat)](https://github.com/cativo23/portfolio-api)
-[![Statements](https://img.shields.io/badge/statements-96.4%25-brightgreen.svg?style=flat)](https://github.com/cativo23/portfolio-api)
+[![Lines](https://img.shields.io/badge/lines-96.58%25-brightgreen.svg?style=flat)](https://github.com/cativo23/portfolio-api)
+[![Statements](https://img.shields.io/badge/statements-96.34%25-brightgreen.svg?style=flat)](https://github.com/cativo23/portfolio-api)
 [![Branches](https://img.shields.io/badge/branches-92.3%25-brightgreen.svg?style=flat)](https://github.com/cativo23/portfolio-api)
-[![Functions](https://img.shields.io/badge/functions-92.59%25-brightgreen.svg?style=flat)](https://github.com/cativo23/portfolio-api)
+[![Functions](https://img.shields.io/badge/functions-92.66%25-brightgreen.svg?style=flat)](https://github.com/cativo23/portfolio-api)
 <!-- istanbul-badges-readme-end -->
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Node Version](https://img.shields.io/badge/node-%3E%3D23.0.0-brightgreen.svg)](https://nodejs.org/)

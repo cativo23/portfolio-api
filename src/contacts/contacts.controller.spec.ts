@@ -29,7 +29,7 @@ describe('ContactsController', () => {
     message: 'Hello, I would like to get in touch...',
     subject: 'Project Inquiry',
     isRead: false,
-    readAt: null,
+    readAt: undefined,
     createdAt: new Date('2023-01-01T00:00:00Z'),
     updatedAt: new Date('2023-01-01T00:00:00Z'),
     deletedAt: null,

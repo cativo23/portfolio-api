@@ -219,7 +219,7 @@ describe('ContactsService', () => {
     });
 
     it('should throw NotFoundException if contact not found', async () => {
-      vi.spyOn(repository, 'findOne').mockResolvedValue(undefined);
+      vi.spyOn(repository, 'findOne').mockResolvedValue(null);
 
       await expect(service.findOne(1)).rejects.toThrow(
         `Contact with ID 1 not found`,
@@ -256,7 +256,7 @@ describe('ContactsService', () => {
     });
 
     it('should throw NotFoundException if contact not found', async () => {
-      vi.spyOn(repository, 'findOne').mockResolvedValue(undefined);
+      vi.spyOn(repository, 'findOne').mockResolvedValue(null);
 
       await expect(service.markAsRead(1)).rejects.toThrow(
         `Contact with ID 1 not found`,
@@ -286,7 +286,7 @@ describe('ContactsService', () => {
     });
 
     it('should throw NotFoundException if contact not found', async () => {
-      vi.spyOn(repository, 'findOne').mockResolvedValue(undefined);
+      vi.spyOn(repository, 'findOne').mockResolvedValue(null);
 
       await expect(service.remove(1)).rejects.toThrow(
         `Contact with ID 1 not found`,
