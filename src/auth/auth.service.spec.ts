@@ -1,9 +1,9 @@
 import { vi, type Mocked } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
+import { InternalServerErrorException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersService } from '@users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { RegisterDto } from './dto/register.dto';
 import { User } from '@users/entities/user.entity';
@@ -37,21 +37,6 @@ describe('AuthService', () => {
         AuthService,
         { provide: UsersService, useValue: mockUsersService },
         { provide: JwtService, useValue: mockJwtService },
-        {
-          provide: ConfigService,
-          useValue: {
-            get: vi.fn(),
-            getOrThrow: vi.fn().mockImplementation((key: string) => {
-              const config: Record<string, string | number> = {
-                JWT_SECRET: 'test-secret',
-                JWT_EXPIRES_IN: 3600,
-              };
-              if (!(key in config))
-                throw new Error(`Config key ${key} not found`);
-              return config[key];
-            }),
-          },
-        },
       ],
     }).compile();
 
@@ -174,6 +159,7 @@ describe('AuthService', () => {
 
       const result = await service.login(user.email, password);
 
+      expect(jwtService.decode).toHaveBeenCalledWith('fake-jwt-token');
       expect(result).toEqual({
         access_token: 'fake-jwt-token',
         expires_at: new Date(decodedExp * 1000),
@@ -183,6 +169,23 @@ describe('AuthService', () => {
           email: user.email,
         },
       });
+    });
+
+    it('should throw InternalServerErrorException when JWT has no exp claim', async () => {
+      const user = {
+        id: 1,
+        email: 'test@mail.com',
+        username: 'test',
+        password: hashedPassword,
+      } as User;
+
+      usersService.findOneByEmail.mockResolvedValue(user);
+      jwtService.signAsync.mockResolvedValue('fake-jwt-token');
+      jwtService.decode.mockReturnValue(null);
+
+      await expect(service.login(user.email, password)).rejects.toThrow(
+        InternalServerErrorException,
+      );
     });
 
     it('should throw if credentials are invalid', async () => {

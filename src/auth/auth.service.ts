@@ -1,9 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '@users/users.service';
 import { RegisterDto } from '@auth/dto/register.dto';
-import { ConfigService } from '@nestjs/config';
 import { User } from '@users/entities/user.entity';
 import { ConflictException, AuthenticationException } from '@core/exceptions';
 
@@ -17,7 +16,6 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
-    private configService: ConfigService,
   ) {}
 
   /**
@@ -64,12 +62,21 @@ export class AuthService {
     const payload = { sub: user.id, email: user.email, roles: user.roles };
 
     const access_token = await this.jwtService.signAsync(payload);
-    const decoded = this.jwtService.decode(access_token) as { exp: number };
+    const decoded = this.jwtService.decode(access_token);
 
-    // Return token, its actual expiration derived from the JWT exp claim, and user info
+    if (
+      !decoded ||
+      typeof decoded === 'string' ||
+      typeof decoded['exp'] !== 'number'
+    ) {
+      throw new InternalServerErrorException(
+        'JWT issued without exp claim — check JWT_EXPIRES_IN configuration',
+      );
+    }
+
     return {
       access_token,
-      expires_at: new Date(decoded.exp * 1000),
+      expires_at: new Date(decoded['exp'] * 1000),
       user: {
         id: user.id,
         username: user.username,
