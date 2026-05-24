@@ -13,7 +13,6 @@ describe('AuthService', () => {
   let service: AuthService;
   let usersService: Mocked<UsersService>;
   let jwtService: Mocked<JwtService>;
-  let configService: Mocked<ConfigService>;
 
   const password = '123456';
   let hashedPassword: string;
@@ -30,6 +29,7 @@ describe('AuthService', () => {
 
     const mockJwtService = {
       signAsync: vi.fn(),
+      decode: vi.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -58,7 +58,6 @@ describe('AuthService', () => {
     service = module.get<AuthService>(AuthService);
     usersService = module.get(UsersService) as Mocked<UsersService>;
     jwtService = module.get(JwtService) as Mocked<JwtService>;
-    configService = module.get(ConfigService) as Mocked<ConfigService>;
   });
 
   it('should be defined', () => {
@@ -167,15 +166,17 @@ describe('AuthService', () => {
         password: hashedPassword,
       } as User;
 
+      const decodedExp = Math.floor((fixedNow + 3600 * 1000) / 1000);
+
       usersService.findOneByEmail.mockResolvedValue(user);
       jwtService.signAsync.mockResolvedValue('fake-jwt-token');
-      configService.getOrThrow.mockReturnValue(3600); // 1 hour
+      jwtService.decode.mockReturnValue({ exp: decodedExp });
 
       const result = await service.login(user.email, password);
 
       expect(result).toEqual({
         access_token: 'fake-jwt-token',
-        expires_at: new Date(fixedNow + 3600 * 1000),
+        expires_at: new Date(decodedExp * 1000),
         user: {
           id: user.id,
           username: user.username,

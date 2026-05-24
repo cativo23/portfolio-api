@@ -64,14 +64,12 @@ export class AuthService {
     const payload = { sub: user.id, email: user.email, roles: user.roles };
 
     const access_token = await this.jwtService.signAsync(payload);
+    const decoded = this.jwtService.decode(access_token) as { exp: number };
 
-    // Return token, until when its valid the toke and user info
+    // Return token, its actual expiration derived from the JWT exp claim, and user info
     return {
-      access_token: access_token,
-      expires_at: new Date(
-        Date.now() +
-          this.configService.getOrThrow<number>('JWT_EXPIRES_IN') * 1000,
-      ),
+      access_token,
+      expires_at: new Date(decoded.exp * 1000),
       user: {
         id: user.id,
         username: user.username,
