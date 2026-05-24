@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.7.0] - 2026-05-24
+
+### Changed
+
+- **TypeScript strict mode enabled**: all 5 previously-disabled flags are now active (`strictNullChecks`, `noImplicitAny`, `strictBindCallApply`, `forceConsistentCasingInFileNames`, `noFallthroughCasesInSwitch`). 15 production type errors resolved; `@types/bcrypt` and `@types/passport-local` installed. Entity types corrected (`deletedAt: Date | null`, `liveUrl: string | null`) to reflect TypeORM nullable columns (#114)
+- **JWT `expires_at` now matches actual token expiry**: `AuthService.login()` decodes the signed JWT and reads the `exp` claim instead of computing `Date.now() + JWT_EXPIRES_IN`. Eliminates clock-skew between the response field and the token's real expiration. Guard added for missing `exp` claim (#115)
+- **CORS hardened in development**: replaced wildcard dev-mode bypass with an explicit allowlist of common localhost dev-server ports (3000, 3001, 4173, 4200, 5173, 5174, 8080). `credentials: true` removed — API uses Bearer JWT and `x-api-key`, not cookies. Origin-decision logic extracted to `cors.utils.ts` with 9 unit tests. Rejected origins now logged at warn level (#116)
+
+### Fixed
+
+- `AuthService.login()` parameters were untyped (`email`, `password` implicitly `any`); now explicitly `string` (#114)
+- `CreateUserDto.username` was incorrectly marked optional (`?`) despite `@IsNotEmpty()` validator; now required (#114)
+- `ConfigService` was still injected in `AuthService` after its only use was removed; dead injection cleaned up (#115)
+
 ## [2.6.1] - 2026-05-24
 
 ### Changed
