@@ -17,7 +17,6 @@ const mockConfigService = {
 
 describe('EmailService', () => {
   let service: EmailService;
-  let configService: ConfigService;
   let loggerSpy: {
     log: ReturnType<typeof vi.spyOn>;
     error: ReturnType<typeof vi.spyOn>;
@@ -38,7 +37,6 @@ describe('EmailService', () => {
     }).compile();
 
     service = module.get<EmailService>(EmailService);
-    configService = module.get<ConfigService>(ConfigService);
 
     loggerSpy = {
       log: vi.spyOn(Logger.prototype, 'log').mockReturnValue(undefined),
