@@ -1,8 +1,8 @@
 import { SetMetadata } from '@nestjs/common';
 import { Public } from './public.decorator';
 
-jest.mock('@nestjs/common', () => ({
-  SetMetadata: jest.fn(),
+vi.mock('@nestjs/common', () => ({
+  SetMetadata: vi.fn(),
 }));
 
 describe('Public Decorator', () => {
