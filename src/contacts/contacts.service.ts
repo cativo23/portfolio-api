@@ -1,7 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, MethodNotAllowedException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Contact } from '@contacts/entities/contact.entity';
-import { CreateContactDto } from '@contacts/dto';
+import { CreateContactDto, UpdateContactDto } from '@contacts/dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationUtil } from '@core/utils/pagination.util';
 import { BaseCrudService } from '@core/services/base-crud.service';
@@ -21,12 +21,6 @@ interface FindAllOptions {
   /** Optional flag to filter contacts by read status */
   isRead?: boolean | undefined;
 }
-
-/**
- * Placeholder type for UpdateContactDto
- * Contacts don't have a general update operation, only markAsRead
- */
-type UpdateContactDto = never;
 
 /**
  * Service responsible for managing contact form submissions
@@ -56,6 +50,12 @@ export class ContactsService extends BaseCrudService<
 
   protected getEntityName(): string {
     return 'Contact';
+  }
+
+  override async update(_id: number, _dto: UpdateContactDto): Promise<Contact> {
+    throw new MethodNotAllowedException(
+      'Contacts do not support direct updates. Use markAsRead instead.',
+    );
   }
 
   /**
