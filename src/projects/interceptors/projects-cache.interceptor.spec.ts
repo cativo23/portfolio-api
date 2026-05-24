@@ -36,9 +36,7 @@ describe('ProjectsCacheInterceptor', () => {
   it('should use "anonymous" in key when request has no authenticated user', () => {
     const context = createMockContext('GET', '/projects?page=1&per_page=10');
     const result = (interceptor as any).trackBy(context);
-    expect(result).toBe(
-      'projects:GET:/projects?page=1&per_page=10:anonymous',
-    );
+    expect(result).toBe('projects:GET:/projects?page=1&per_page=10:anonymous');
   });
 
   it('should return undefined for non-GET requests', () => {
