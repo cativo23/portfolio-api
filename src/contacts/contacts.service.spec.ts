@@ -5,7 +5,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Contact } from './entities/contact.entity';
 import { CreateContactDto } from './dto/create-contact.dto';
-import { Logger } from '@nestjs/common';
+import { Logger, MethodNotAllowedException } from '@nestjs/common';
 import { EmailService } from '@email/email.service';
 
 describe('ContactsService', () => {
@@ -88,6 +88,14 @@ describe('ContactsService', () => {
       const result = await service.create(createContactDto);
 
       expect(result).toEqual(expect.objectContaining({ id: contact.id }));
+    });
+  });
+
+  describe('update', () => {
+    it('should throw MethodNotAllowedException', async () => {
+      await expect(service.update(1, {})).rejects.toThrow(
+        MethodNotAllowedException,
+      );
     });
   });
 
