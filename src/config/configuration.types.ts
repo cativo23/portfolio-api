@@ -47,8 +47,4 @@ export interface ThrottlerConfig {
   ttl: number;
   /** Max requests per window for authenticated endpoints */
   limit: number;
-  /** Max requests per window for public endpoints (e.g. contact form) */
-  publicLimit: number;
-  /** Max requests per window for strict endpoints (e.g. login, register) */
-  strictLimit: number;
 }

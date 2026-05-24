@@ -90,7 +90,5 @@ export function loadThrottlerConfig(): ThrottlerConfig {
   return {
     ttl: parseEnvInt(process.env.THROTTLE_TTL, 60), // seconds (NestJS throttler v6+ uses seconds)
     limit: parseEnvInt(process.env.THROTTLE_LIMIT, 100),
-    publicLimit: parseEnvInt(process.env.THROTTLE_PUBLIC_LIMIT, 10),
-    strictLimit: parseEnvInt(process.env.THROTTLE_STRICT_LIMIT, 5),
   };
 }
