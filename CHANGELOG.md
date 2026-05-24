@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.7.1] - 2026-05-24
+
+### Fixed
+
+- **`Project.liveUrl` column type explicit `varchar`**: TypeORM's reflect-metadata inferred `Object` instead of `String` when `liveUrl` was typed as `string | null` under strict mode, causing a `DataTypeNotSupportedError` at startup. Adding `type: 'varchar'` to the column decorator resolves the crash (#118)
+
 ## [2.7.0] - 2026-05-24
 
 ### Changed
