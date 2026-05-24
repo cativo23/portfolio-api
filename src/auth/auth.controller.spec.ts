@@ -147,7 +147,10 @@ describe('AuthController', () => {
     it('should handle missing user decorator gracefully', () => {
       const mockRequest = { user: mockUser };
 
-      const result = controller.profile(mockRequest as any, undefined as unknown as User);
+      const result = controller.profile(
+        mockRequest as any,
+        undefined as unknown as User,
+      );
 
       expect(result).toEqual({
         user: undefined,

@@ -46,7 +46,8 @@ describe('AuthService', () => {
                 JWT_SECRET: 'test-secret',
                 JWT_EXPIRES_IN: 3600,
               };
-              if (!(key in config)) throw new Error(`Config key ${key} not found`);
+              if (!(key in config))
+                throw new Error(`Config key ${key} not found`);
               return config[key];
             }),
           },
