@@ -35,14 +35,23 @@ async function bootstrap() {
       origin: string | undefined,
       callback: (err: Error | null, allow?: boolean) => void,
     ) => {
+      // Allow server-to-server requests with no Origin header (curl, internal services)
       if (!origin) {
         return callback(null, true);
       }
 
-      if (
-        appConfig.corsOrigins.includes(origin) ||
+      const allowedOrigins =
         appConfig.nodeEnv === 'development'
-      ) {
+          ? [
+              ...appConfig.corsOrigins,
+              'http://localhost',
+              'http://localhost:3000',
+              'http://localhost:4200',
+              'http://localhost:5173',
+            ]
+          : appConfig.corsOrigins;
+
+      if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
