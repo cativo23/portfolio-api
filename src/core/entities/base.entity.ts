@@ -37,5 +37,5 @@ export class BaseEntity {
    * This field is set when the entity is deleted using soft delete
    */
   @DeleteDateColumn({ type: 'timestamp' })
-  deletedAt!: Date;
+  deletedAt: Date | null;
 }

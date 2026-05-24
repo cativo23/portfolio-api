@@ -66,7 +66,7 @@ export class ProjectResponseDto {
     dto.title = project.title;
     dto.description = project.description;
     dto.shortDescription = project.shortDescription;
-    dto.liveUrl = project.liveUrl;
+    dto.liveUrl = project.liveUrl ?? undefined;
     dto.repoUrl = project.repoUrl;
     dto.isFeatured = project.isFeatured;
     dto.techStack = project.techStack ?? [];

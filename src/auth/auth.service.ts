@@ -52,8 +52,8 @@ export class AuthService {
    * @throws AuthenticationException if the password is incorrect
    */
   async login(
-    email,
-    password,
+    email: string,
+    password: string,
   ): Promise<{
     access_token: string;
     expires_at: Date;
@@ -69,7 +69,7 @@ export class AuthService {
     return {
       access_token: access_token,
       expires_at: new Date(
-        Date.now() + this.configService.get<number>('JWT_EXPIRES_IN') * 1000,
+        Date.now() + this.configService.get<number>('JWT_EXPIRES_IN')! * 1000,
       ),
       user: {
         id: user.id,
@@ -89,7 +89,7 @@ export class AuthService {
    * @throws AuthenticationException if the password is incorrect
    */
   async validateUser(email: string, password: string): Promise<User> {
-    const user: User = await this.usersService.findOneByEmail(email);
+    const user = await this.usersService.findOneByEmail(email);
     if (!user) {
       // Same error message as invalid password to prevent user enumeration
       throw new AuthenticationException('Invalid email or password');

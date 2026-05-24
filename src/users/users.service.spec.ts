@@ -87,7 +87,7 @@ describe('UsersService', () => {
 
     it('should return undefined and log when user is not found', async () => {
       const email = 'notfound@email.com';
-      vi.spyOn(repository, 'findOneBy').mockResolvedValue(undefined);
+      vi.spyOn(repository, 'findOneBy').mockResolvedValue(null);
 
       const result = await service.findOneByEmail(email);
       expect(result).toBeUndefined();

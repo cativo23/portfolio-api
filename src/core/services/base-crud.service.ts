@@ -162,6 +162,6 @@ export abstract class BaseCrudService<
     this.logger.log(
       `Restored ${this.getEntityName().toLowerCase()} with ID ${id}`,
     );
-    return entity;
+    return entity!;
   }
 }

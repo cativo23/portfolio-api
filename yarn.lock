@@ -1355,6 +1355,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/bcrypt@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "@types/bcrypt@npm:6.0.0"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 10c0/48b66408838f5eb59791da5a77260cef59a5291ce0945f2caa3b5a6158c44b321b684b4aa7dce771852c63271c766cadd587374273451b300377a17015c1d51d
+  languageName: node
+  linkType: hard
+
 "@types/body-parser@npm:*":
   version: 1.19.6
   resolution: "@types/body-parser@npm:1.19.6"
@@ -1527,6 +1536,17 @@ __metadata:
     "@types/jsonwebtoken": "npm:*"
     "@types/passport-strategy": "npm:*"
   checksum: 10c0/0ced0eaa7bb379d674821108d9bc6758223f1a5f2b9790ec78d3eaaccce6a58a424cf8ed22b53d813740ec53d929e21d92cf794ef0fb30c732866750763c0d7a
+  languageName: node
+  linkType: hard
+
+"@types/passport-local@npm:^1.0.38":
+  version: 1.0.38
+  resolution: "@types/passport-local@npm:1.0.38"
+  dependencies:
+    "@types/express": "npm:*"
+    "@types/passport": "npm:*"
+    "@types/passport-strategy": "npm:*"
+  checksum: 10c0/a8464df03f073a4bb9aef7fa7cc9e76a355f149a1148330da88346d0e9c600f845601e99ed40949a13287eacae0a7ad01cd0eb5ca00d8b81da263b1dfc3aee60
   languageName: node
   linkType: hard
 
@@ -5446,10 +5466,12 @@ __metadata:
     "@nestjs/testing": "npm:^11"
     "@nestjs/throttler": "npm:^6"
     "@nestjs/typeorm": "npm:^11"
+    "@types/bcrypt": "npm:^6.0.0"
     "@types/express": "npm:^5"
     "@types/node": "npm:^24"
     "@types/nodemailer": "npm:^6"
     "@types/passport-jwt": "npm:^4.0.1"
+    "@types/passport-local": "npm:^1.0.38"
     "@types/sanitize-html": "npm:^2"
     "@types/supertest": "npm:^6"
     "@typescript-eslint/eslint-plugin": "npm:^8"

@@ -41,7 +41,7 @@ describe('AuthService', () => {
           provide: ConfigService,
           useValue: {
             get: vi.fn().mockImplementation((key: string) => {
-              const config = {
+              const config: Record<string, string> = {
                 JWT_SECRET: 'test-secret',
               };
               return config[key];

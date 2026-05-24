@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-import { Repository } from 'typeorm';
+import { ObjectLiteral, Repository } from 'typeorm';
 import { PaginationUtil } from '@core/utils/pagination.util';
 
 /**
@@ -30,7 +30,7 @@ function makeQueryBuilderMock(): {
 function makeRepoMock(opts: {
   qb: Record<string, ReturnType<typeof vi.fn>>;
   withDeleteDateColumn: boolean;
-}): Repository<unknown> {
+}): Repository<ObjectLiteral> {
   return {
     createQueryBuilder: vi.fn(() => opts.qb),
     metadata: {
@@ -38,7 +38,7 @@ function makeRepoMock(opts: {
         ? { propertyName: 'deletedAt' }
         : undefined,
     },
-  } as unknown as Repository<unknown>;
+  } as unknown as Repository<ObjectLiteral>;
 }
 
 describe('PaginationUtil', () => {
@@ -85,7 +85,7 @@ describe('PaginationUtil', () => {
       const repo = {
         createQueryBuilder: vi.fn(() => qb),
         metadata: { deleteDateColumn: { propertyName: 'removedAt' } },
-      } as unknown as Repository<unknown>;
+      } as unknown as Repository<ObjectLiteral>;
 
       await PaginationUtil.paginate(repo, {
         page: 1,
