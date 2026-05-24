@@ -38,7 +38,7 @@ describe('ConnectionRetryService', () => {
 
   describe('connect', () => {
     it('should connect successfully on first attempt', async () => {
-      mockDataSource.initialize.mockResolvedValueOnce(undefined);
+      mockDataSource.initialize.mockResolvedValueOnce(mockDataSource);
 
       const result = await service.connect();
 
@@ -59,7 +59,7 @@ describe('ConnectionRetryService', () => {
       mockDataSource.initialize
         .mockRejectedValueOnce(new Error('Connection failed'))
         .mockRejectedValueOnce(new Error('Connection failed'))
-        .mockResolvedValueOnce(undefined);
+        .mockResolvedValueOnce(mockDataSource);
 
       const result = await service.connect();
 

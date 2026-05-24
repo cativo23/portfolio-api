@@ -48,7 +48,7 @@ describe('AuthController', () => {
           provide: ConfigService,
           useValue: {
             get: vi.fn().mockImplementation((key: string) => {
-              const config = {
+              const config: Record<string, string> = {
                 JWT_SECRET: 'test-secret',
               };
               return config[key];
@@ -147,7 +147,7 @@ describe('AuthController', () => {
     it('should handle missing user decorator gracefully', () => {
       const mockRequest = { user: mockUser };
 
-      const result = controller.profile(mockRequest as any, undefined);
+      const result = controller.profile(mockRequest as any, undefined as unknown as User);
 
       expect(result).toEqual({
         user: undefined,

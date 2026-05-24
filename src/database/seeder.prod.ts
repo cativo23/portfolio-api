@@ -19,7 +19,11 @@ async function seed() {
     await userRepo.clear();
 
     // Users
-    const password = await bcrypt.hash(process.env.DEFAULT_USER_PASSWORD, 10);
+    const rawPassword = process.env.DEFAULT_USER_PASSWORD;
+    if (!rawPassword) {
+      throw new Error('DEFAULT_USER_PASSWORD env var is required for seeding');
+    }
+    const password = await bcrypt.hash(rawPassword, 10);
     const users = [
       userRepo.create({
         username: 'admin',
@@ -107,7 +111,7 @@ A RESTful API for managing portfolio projects and contacts.
         description:
           'An API providing information about myths and legends from El Salvador using python and FastAPI',
         shortDescription: 'API for myths and legends',
-        liveUrl: null,
+        liveUrl: undefined,
         repoUrl: 'https://github.com/cativo23/myths-and-legends-api',
         isFeatured: false,
         techStack: ['Python', 'FastAPI', 'PostgreSQL'],

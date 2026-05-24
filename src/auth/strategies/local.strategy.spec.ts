@@ -36,7 +36,7 @@ describe('LocalStrategy', () => {
   describe('validate', () => {
     it('should throw UnauthorizedException when user validation fails', async () => {
       // Mock the AuthService to return null (validation failed)
-      authService.validateUser.mockResolvedValue(null);
+      authService.validateUser.mockResolvedValue(null as unknown as User);
 
       // Call the validate method and expect it to throw
       await expect(
@@ -72,7 +72,7 @@ describe('LocalStrategy', () => {
 
     it('should handle empty credentials', async () => {
       // Mock the AuthService to return null (validation failed)
-      authService.validateUser.mockResolvedValue(null);
+      authService.validateUser.mockResolvedValue(null as unknown as User);
 
       // Call the validate method with empty credentials and expect it to throw
       await expect(strategy.validate('', '')).rejects.toThrow(

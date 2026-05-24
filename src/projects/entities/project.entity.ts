@@ -16,7 +16,7 @@ export class Project extends BaseEntity {
   shortDescription: string;
 
   @Column({ nullable: true })
-  liveUrl: string;
+  liveUrl: string | null;
 
   @Column()
   repoUrl: string;

@@ -59,7 +59,7 @@ describe('ApiKeyService', () => {
     });
 
     it('should hash the key with HMAC-SHA256 using the secret', async () => {
-      let savedHashedKey: string;
+      let savedHashedKey!: string;
       vi.spyOn(repo, 'create').mockImplementation((data: any) => data as any);
       vi.spyOn(repo, 'save').mockImplementation(async (entity: any) => {
         savedHashedKey = entity.hashedKey;
@@ -98,7 +98,7 @@ describe('ApiKeyService', () => {
     });
 
     it('should return false for invalid key', async () => {
-      vi.spyOn(repo, 'findOne').mockResolvedValue(undefined);
+      vi.spyOn(repo, 'findOne').mockResolvedValue(null);
       const valid = await service.validate('badkey');
       expect(valid).toBe(false);
     });

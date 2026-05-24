@@ -159,6 +159,12 @@ export abstract class BaseCrudService<
       where: { id } as FindOptionsWhere<TEntity>,
     });
 
+    if (!entity) {
+      throw new NotFoundException(
+        `${this.getEntityName()} with ID ${id} not found after restore`,
+      );
+    }
+
     this.logger.log(
       `Restored ${this.getEntityName().toLowerCase()} with ID ${id}`,
     );

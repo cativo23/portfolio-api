@@ -58,7 +58,7 @@ describe('ProjectsListResponseDto', () => {
         50,
       );
 
-      expect(response.meta.pagination.total_pages).toBe(5);
+      expect(response.meta!.pagination!.total_pages).toBe(5);
     });
 
     it('should round up total_pages for fractional pages', () => {
@@ -72,7 +72,7 @@ describe('ProjectsListResponseDto', () => {
         45,
       );
 
-      expect(response.meta.pagination.total_pages).toBe(5);
+      expect(response.meta!.pagination!.total_pages).toBe(5);
     });
 
     it('should set correct pagination page', () => {
@@ -85,7 +85,7 @@ describe('ProjectsListResponseDto', () => {
         100,
       );
 
-      expect(response.meta.pagination.page).toBe(3);
+      expect(response.meta!.pagination!.page).toBe(3);
     });
 
     it('should set correct pagination limit', () => {
@@ -98,7 +98,7 @@ describe('ProjectsListResponseDto', () => {
         100,
       );
 
-      expect(response.meta.pagination.limit).toBe(20);
+      expect(response.meta!.pagination!.limit).toBe(20);
     });
 
     it('should set correct total_items', () => {
@@ -111,7 +111,7 @@ describe('ProjectsListResponseDto', () => {
         123,
       );
 
-      expect(response.meta.pagination.total_items).toBe(123);
+      expect(response.meta!.pagination!.total_items).toBe(123);
     });
 
     it('should handle single page of results', () => {
@@ -138,8 +138,8 @@ describe('ProjectsListResponseDto', () => {
         5,
       );
 
-      expect(response.meta.pagination.total_pages).toBe(1);
-      expect(response.meta.pagination.page).toBe(1);
+      expect(response.meta!.pagination!.total_pages).toBe(1);
+      expect(response.meta!.pagination!.page).toBe(1);
     });
 
     it('should handle empty results', () => {
@@ -153,8 +153,8 @@ describe('ProjectsListResponseDto', () => {
       );
 
       expect(response.data).toEqual([]);
-      expect(response.meta.pagination.total_items).toBe(0);
-      expect(response.meta.pagination.total_pages).toBe(0);
+      expect(response.meta!.pagination!.total_items).toBe(0);
+      expect(response.meta!.pagination!.total_pages).toBe(0);
     });
 
     it('should handle last page with partial results', () => {
@@ -195,8 +195,8 @@ describe('ProjectsListResponseDto', () => {
         25,
       );
 
-      expect(response.meta.pagination.page).toBe(3);
-      expect(response.meta.pagination.total_pages).toBe(3);
+      expect(response.meta!.pagination!.page).toBe(3);
+      expect(response.meta!.pagination!.total_pages).toBe(3);
       expect(response.data).toHaveLength(2);
     });
   });
@@ -248,10 +248,10 @@ describe('ProjectsListResponseDto', () => {
       const response = new ProjectsListResponseDto(mockProjects, meta);
 
       expect(response.meta).toEqual(meta);
-      expect(response.meta.pagination.page).toBe(2);
-      expect(response.meta.pagination.limit).toBe(15);
-      expect(response.meta.pagination.total_items).toBe(50);
-      expect(response.meta.pagination.total_pages).toBe(4);
+      expect(response.meta!.pagination!.page).toBe(2);
+      expect(response.meta!.pagination!.limit).toBe(15);
+      expect(response.meta!.pagination!.total_items).toBe(50);
+      expect(response.meta!.pagination!.total_pages).toBe(4);
     });
 
     it('should set status to success', () => {
