@@ -1,21 +1,22 @@
+import { vi } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { DataSource, EntityManager } from 'typeorm';
 import { TransactionService } from './transaction.service';
 
 const mockQueryRunner = {
-  connect: jest.fn(),
-  startTransaction: jest.fn(),
-  commitTransaction: jest.fn(),
-  rollbackTransaction: jest.fn(),
-  release: jest.fn(),
+  connect: vi.fn(),
+  startTransaction: vi.fn(),
+  commitTransaction: vi.fn(),
+  rollbackTransaction: vi.fn(),
+  release: vi.fn(),
   manager: {
-    findOne: jest.fn(),
-    save: jest.fn(),
+    findOne: vi.fn(),
+    save: vi.fn(),
   } as unknown as EntityManager,
 };
 
 const mockDataSource = {
-  createQueryRunner: jest.fn(),
+  createQueryRunner: vi.fn(),
   manager: {} as EntityManager,
 };
 
@@ -37,7 +38,7 @@ describe('TransactionService', () => {
     service = module.get<TransactionService>(TransactionService);
     dataSource = module.get<DataSource>(DataSource);
 
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockDataSource.createQueryRunner.mockReturnValue(mockQueryRunner);
   });
 
@@ -54,7 +55,7 @@ describe('TransactionService', () => {
     });
 
     it('should execute callback in transaction and commit', async () => {
-      const mockCallback = jest.fn().mockResolvedValue('result');
+      const mockCallback = vi.fn().mockResolvedValue('result');
 
       const result = await service.executeInTransaction(mockCallback);
 
@@ -68,7 +69,7 @@ describe('TransactionService', () => {
 
     it('should rollback transaction on error', async () => {
       const mockError = new Error('Transaction failed');
-      const mockCallback = jest.fn().mockRejectedValue(mockError);
+      const mockCallback = vi.fn().mockRejectedValue(mockError);
 
       await expect(service.executeInTransaction(mockCallback)).rejects.toThrow(
         'Transaction failed',
@@ -79,7 +80,7 @@ describe('TransactionService', () => {
     });
 
     it('should release query runner even on error', async () => {
-      const mockCallback = jest.fn().mockRejectedValue(new Error('Fail'));
+      const mockCallback = vi.fn().mockRejectedValue(new Error('Fail'));
 
       try {
         await service.executeInTransaction(mockCallback);
@@ -92,7 +93,7 @@ describe('TransactionService', () => {
 
     it('should return callback result', async () => {
       const mockResult = { id: 1, name: 'test' };
-      const mockCallback = jest.fn().mockResolvedValue(mockResult);
+      const mockCallback = vi.fn().mockResolvedValue(mockResult);
 
       const result = await service.executeInTransaction(mockCallback);
 
@@ -107,7 +108,7 @@ describe('TransactionService', () => {
     });
 
     it('should execute callback with query runner', async () => {
-      const mockCallback = jest.fn().mockResolvedValue('result');
+      const mockCallback = vi.fn().mockResolvedValue('result');
 
       const result = await service.executeWithQueryRunner(mockCallback);
 
@@ -118,7 +119,7 @@ describe('TransactionService', () => {
     });
 
     it('should release query runner on error', async () => {
-      const mockCallback = jest.fn().mockRejectedValue(new Error('Fail'));
+      const mockCallback = vi.fn().mockRejectedValue(new Error('Fail'));
 
       try {
         await service.executeWithQueryRunner(mockCallback);
@@ -131,7 +132,7 @@ describe('TransactionService', () => {
 
     it('should return callback result', async () => {
       const mockResult = { id: 1 };
-      const mockCallback = jest.fn().mockResolvedValue(mockResult);
+      const mockCallback = vi.fn().mockResolvedValue(mockResult);
 
       const result = await service.executeWithQueryRunner(mockCallback);
 

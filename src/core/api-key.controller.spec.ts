@@ -1,3 +1,4 @@
+import { vi, type Mock } from 'vitest';
 import { ApiKeyController } from './api-key.controller';
 import { ApiKeyService } from './api-key.service';
 
@@ -7,15 +8,15 @@ describe('ApiKeyController (unit)', () => {
 
   beforeEach(() => {
     service = {
-      create: jest.fn(),
-      findAll: jest.fn(),
-      revokeById: jest.fn(),
+      create: vi.fn(),
+      findAll: vi.fn(),
+      revokeById: vi.fn(),
     } as any;
     controller = new ApiKeyController(service);
   });
 
   it('should create an API key', async () => {
-    (service.create as jest.Mock).mockResolvedValue({
+    (service.create as Mock).mockResolvedValue({
       apiKey: { id: 1, hashedKey: 'hashed', description: 'desc' },
       plainKey: 'plain-key-abc',
     });
@@ -26,7 +27,7 @@ describe('ApiKeyController (unit)', () => {
   });
 
   it('should list API keys', async () => {
-    (service.findAll as jest.Mock).mockResolvedValue([
+    (service.findAll as Mock).mockResolvedValue([
       { id: 1, description: 'desc' },
     ]);
     const result = await controller.findAll();
@@ -35,7 +36,7 @@ describe('ApiKeyController (unit)', () => {
   });
 
   it('should revoke an API key', async () => {
-    (service.revokeById as jest.Mock).mockResolvedValue(undefined);
+    (service.revokeById as Mock).mockResolvedValue(undefined);
     const result = await controller.revoke(1);
     expect(result.status).toBe('success');
     expect(result.data.id).toBe(1);

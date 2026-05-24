@@ -1,3 +1,4 @@
+import { Mocked, vi } from 'vitest';
 import { Reflector } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ExecutionContext } from '@nestjs/common';
@@ -7,7 +8,7 @@ import { Role } from '@users/entities/user.entity';
 
 describe('RolesGuard', () => {
   let guard: RolesGuard;
-  let reflector: jest.Mocked<Reflector>;
+  let reflector: Mocked<Reflector>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -16,14 +17,14 @@ describe('RolesGuard', () => {
         {
           provide: Reflector,
           useValue: {
-            getAllAndOverride: jest.fn(),
+            getAllAndOverride: vi.fn(),
           },
         },
       ],
     }).compile();
 
     guard = module.get<RolesGuard>(RolesGuard);
-    reflector = module.get(Reflector) as jest.Mocked<Reflector>;
+    reflector = module.get(Reflector) as Mocked<Reflector>;
   });
 
   it('should be defined', () => {
@@ -37,11 +38,11 @@ describe('RolesGuard', () => {
     beforeEach(() => {
       mockRequest = { user: {} };
       mockContext = {
-        switchToHttp: jest.fn().mockReturnValue({
-          getRequest: jest.fn().mockReturnValue(mockRequest),
+        switchToHttp: vi.fn().mockReturnValue({
+          getRequest: vi.fn().mockReturnValue(mockRequest),
         }),
-        getHandler: jest.fn(),
-        getClass: jest.fn(),
+        getHandler: vi.fn(),
+        getClass: vi.fn(),
       } as unknown as ExecutionContext;
     });
 

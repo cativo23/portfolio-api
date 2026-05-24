@@ -7,7 +7,7 @@ on:
   push:
     branches: [develop]
   pull_request:
-    branches: [main]
+    branches: [develop, main]
 
 jobs:
   build:
@@ -40,6 +40,9 @@ jobs:
 
       - name: Run linter
         run: yarn lint
+
+      - name: Typecheck
+        run: yarn typecheck
 
       - name: Run tests and coverage
         env:
