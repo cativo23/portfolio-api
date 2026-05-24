@@ -1,6 +1,9 @@
 import { Module, Global } from '@nestjs/common';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { loadThrottlerConfig } from '@config/configuration.loaders';
+
+const throttlerConfig = loadThrottlerConfig();
 
 /**
  * Global throttler module for rate limiting
@@ -15,11 +18,14 @@ import { APP_GUARD } from '@nestjs/core';
  * The @Throttle decorator overrides the global default for specific routes.
  *
  * Rate limiting configuration (global default):
- * - Default: 100 requests per minute (for authenticated endpoints)
+ * - Default: 100 requests per 60 seconds (for authenticated endpoints)
+ *
+ * NOTE: NestJS throttler v6+ uses seconds for ttl, not milliseconds.
+ * THROTTLE_TTL env var must be set in seconds (default: 60).
  *
  * For specific limits, use @Throttle decorator on controllers:
- * - Public endpoints: @Throttle({ default: { limit: 10, ttl: 60 } })
- * - Auth endpoints: @Throttle({ default: { limit: 5, ttl: 60 } })
+ * - Public endpoints: @Throttle({ default: { limit: publicLimit, ttl: 60 } })
+ * - Auth endpoints:   @Throttle({ default: { limit: strictLimit, ttl: 60 } })
  */
 @Global()
 @Module({
@@ -27,8 +33,8 @@ import { APP_GUARD } from '@nestjs/core';
     ThrottlerModule.forRoot({
       throttlers: [
         {
-          ttl: parseInt(process.env.THROTTLE_TTL || '60000', 10), // 1 minute in milliseconds
-          limit: parseInt(process.env.THROTTLE_LIMIT || '100', 10), // 100 requests per minute
+          ttl: throttlerConfig.ttl, // seconds
+          limit: throttlerConfig.limit,
         },
       ],
     }),

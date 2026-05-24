@@ -5,6 +5,7 @@ import type {
   DatabaseConfig,
   JwtConfig,
   RedisConfig,
+  ThrottlerConfig,
 } from '@config/configuration.types';
 
 const DEFAULT_CORS = [
@@ -82,5 +83,14 @@ export function loadJwtConfig(): JwtConfig {
   return {
     secret,
     expiresInSeconds: parseEnvInt(process.env.JWT_EXPIRES_IN, 3600),
+  };
+}
+
+export function loadThrottlerConfig(): ThrottlerConfig {
+  return {
+    ttl: parseEnvInt(process.env.THROTTLE_TTL, 60), // seconds (NestJS throttler v6+ uses seconds)
+    limit: parseEnvInt(process.env.THROTTLE_LIMIT, 100),
+    publicLimit: parseEnvInt(process.env.THROTTLE_PUBLIC_LIMIT, 10),
+    strictLimit: parseEnvInt(process.env.THROTTLE_STRICT_LIMIT, 5),
   };
 }
