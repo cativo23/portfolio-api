@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.6.1] - 2026-05-24
+
+### Changed
+
+- **Test runner migrated from Jest to Vitest 4.1**: replaced `jest.config.ts` with `vitest.config.ts`; all 47 spec files updated to Vitest APIs (`vi.*`, `import { vi } from 'vitest'`). Added `tsconfig.spec.json` to isolate Vitest globals from the production typecheck pass (#106)
+- **Dependencies updated**: removed Jest and all `@types/jest` / `ts-jest` packages; added `vitest`, `@vitest/coverage-v8`, and aligned remaining deps to their latest compatible versions (#106)
+- **Coverage reporter**: added `json-summary` to `vitest.config.ts` so `yarn cov:badge` can regenerate README shields from live numbers (#106)
+- **Coverage badges updated**: README shields now reflect actual measured values (96%+ lines, 92%+ statements/branches) (#106)
+
+### Added
+
+- **New test suites** (4 new spec files, +72 tests, coverage up to 92%+ statements):
+  - `email.service.spec.ts` — 18 tests covering `onModuleInit` (enabled/disabled/no-auth/error), `sendNewContactNotification` (all branches, subject variants, error swallowing, HTML escaping via `escapeHtml`), and both template builders; nodemailer dynamic import mocked via `vi.mock` (#106)
+  - `create-project.dto.spec.ts` — 27 tests exercising all class-validator constraints (required fields, URL protocol enforcement, enum, MaxLength per field, array element validation) via `plainToClass` + `validate` (#106)
+  - `projects-list-response.dto.spec.ts` — 13 tests covering `fromEntities` static factory, constructor, and pagination meta calculation (#106)
+  - `create-user.dto.spec.ts` — 14 tests for email format, password MinLength, and required field validation (#106)
+
 ## [2.6.0] - 2026-05-02
 
 ### Added
