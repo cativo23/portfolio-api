@@ -11,9 +11,10 @@ describe('JwtStrategy', () => {
   beforeEach(async () => {
     // Mock the ConfigService
     const mockConfigService = {
-      get: vi.fn((key: string) => {
+      get: vi.fn(),
+      getOrThrow: vi.fn((key: string) => {
         if (key === 'JWT_SECRET') return 'test_jwt_secret';
-        return undefined;
+        throw new Error(`Config key ${key} not found`);
       }),
     };
 
@@ -39,7 +40,7 @@ describe('JwtStrategy', () => {
     it('should configure the strategy with correct options', () => {
       // This test verifies that the strategy is configured correctly
       // We can't directly test the super() call, but we can test that the ConfigService was called
-      expect(configService.get).toHaveBeenCalledWith('JWT_SECRET');
+      expect(configService.getOrThrow).toHaveBeenCalledWith('JWT_SECRET');
     });
   });
 

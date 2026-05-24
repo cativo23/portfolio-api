@@ -19,7 +19,11 @@ async function seed() {
     await userRepo.clear();
 
     // Users
-    const password = await bcrypt.hash(process.env.DEFAULT_USER_PASSWORD!, 10);
+    const rawPassword = process.env.DEFAULT_USER_PASSWORD;
+    if (!rawPassword) {
+      throw new Error('DEFAULT_USER_PASSWORD env var is required for seeding');
+    }
+    const password = await bcrypt.hash(rawPassword, 10);
     const users = [
       userRepo.create({
         username: 'admin',

@@ -40,10 +40,13 @@ describe('AuthService', () => {
         {
           provide: ConfigService,
           useValue: {
-            get: vi.fn().mockImplementation((key: string) => {
-              const config: Record<string, string> = {
+            get: vi.fn(),
+            getOrThrow: vi.fn().mockImplementation((key: string) => {
+              const config: Record<string, string | number> = {
                 JWT_SECRET: 'test-secret',
+                JWT_EXPIRES_IN: 3600,
               };
+              if (!(key in config)) throw new Error(`Config key ${key} not found`);
               return config[key];
             }),
           },
@@ -165,7 +168,7 @@ describe('AuthService', () => {
 
       usersService.findOneByEmail.mockResolvedValue(user);
       jwtService.signAsync.mockResolvedValue('fake-jwt-token');
-      configService.get.mockReturnValue(3600); // 1 hour
+      configService.getOrThrow.mockReturnValue(3600); // 1 hour
 
       const result = await service.login(user.email, password);
 

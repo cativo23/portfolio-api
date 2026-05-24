@@ -69,7 +69,7 @@ export class AuthService {
     return {
       access_token: access_token,
       expires_at: new Date(
-        Date.now() + this.configService.get<number>('JWT_EXPIRES_IN')! * 1000,
+        Date.now() + this.configService.getOrThrow<number>('JWT_EXPIRES_IN') * 1000,
       ),
       user: {
         id: user.id,
