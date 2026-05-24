@@ -15,7 +15,7 @@ export class Project extends BaseEntity {
   @Column()
   shortDescription: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   liveUrl: string | null;
 
   @Column()
