@@ -11,6 +11,10 @@ export class ChatUnavailableException extends BaseException {
   constructor(
     message = 'The assistant is temporarily unavailable. Please try again shortly.',
   ) {
-    super(message, ErrorCode.SERVICE_UNAVAILABLE, HttpStatus.SERVICE_UNAVAILABLE);
+    super(
+      message,
+      ErrorCode.SERVICE_UNAVAILABLE,
+      HttpStatus.SERVICE_UNAVAILABLE,
+    );
   }
 }

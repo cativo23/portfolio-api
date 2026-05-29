@@ -76,7 +76,9 @@ describe('SystemPromptService', () => {
     it('includes key identity facts about Carlos', () => {
       const prompt = service.build();
       expect(prompt).toContain('Carlos Cativo');
-      expect(prompt).toContain('Senior Tech Lead — Payments, Healthcare & Backend');
+      expect(prompt).toContain(
+        'Senior Tech Lead — Payments, Healthcare & Backend',
+      );
       expect(prompt).toContain('Blue Medical');
       expect(prompt).toContain('sofIA');
       expect(prompt).toContain('NestJS');

@@ -12,7 +12,9 @@ async function errorsFor(obj: Record<string, unknown>) {
 
 describe('AskChatDto', () => {
   it('accepts a valid question', async () => {
-    expect(await errorsFor({ question: 'What is your tech stack?' })).toHaveLength(0);
+    expect(
+      await errorsFor({ question: 'What is your tech stack?' }),
+    ).toHaveLength(0);
   });
 
   it('rejects a question shorter than 3 chars', async () => {
@@ -20,7 +22,9 @@ describe('AskChatDto', () => {
   });
 
   it('rejects a question longer than 500 chars', async () => {
-    expect((await errorsFor({ question: 'x'.repeat(501) })).length).toBeGreaterThan(0);
+    expect(
+      (await errorsFor({ question: 'x'.repeat(501) })).length,
+    ).toBeGreaterThan(0);
   });
 
   it('rejects a missing question', async () => {

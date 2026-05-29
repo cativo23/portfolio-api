@@ -5,7 +5,10 @@ import { ConfigService } from '@nestjs/config';
 import { createHash } from 'node:crypto';
 import type { ChatConfig } from '@config/chat.config';
 import { SystemPromptService } from './system-prompt.service';
-import { CHAT_PROVIDER, ChatProvider } from './providers/chat-provider.interface';
+import {
+  CHAT_PROVIDER,
+  ChatProvider,
+} from './providers/chat-provider.interface';
 import { ChatProviderError } from './providers/chat-provider.error';
 import { ChatUnavailableException } from './chat-unavailable.exception';
 

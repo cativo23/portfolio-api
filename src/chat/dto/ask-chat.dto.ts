@@ -18,7 +18,9 @@ const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
 };
 
 function sanitize(value: unknown): unknown {
-  return typeof value === 'string' ? sanitizeHtml(value, SANITIZE_OPTIONS) : value;
+  return typeof value === 'string'
+    ? sanitizeHtml(value, SANITIZE_OPTIONS)
+    : value;
 }
 
 export class AskChatDto {
@@ -28,7 +30,8 @@ export class AskChatDto {
   @MinLength(3)
   @MaxLength(500)
   @ApiProperty({
-    description: 'A question about Carlos (his experience, skills, projects, contact)',
+    description:
+      'A question about Carlos (his experience, skills, projects, contact)',
     example: 'What is your main tech stack?',
     minLength: 3,
     maxLength: 500,
