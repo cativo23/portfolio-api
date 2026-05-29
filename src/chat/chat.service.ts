@@ -38,7 +38,7 @@ export class ChatService {
     const cacheKey = this.cacheKey(question);
 
     const cachedAnswer = await this.cacheManager.get<string>(cacheKey);
-    if (cachedAnswer) {
+    if (cachedAnswer != null) {
       this.logger.log(`Chat cache hit (${cacheKey})`);
       return { answer: cachedAnswer, cached: true };
     }
