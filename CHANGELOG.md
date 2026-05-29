@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.8.0] - 2026-05-29
+
+### Added
+
+- **AI chat assistant** (`POST /api/v1/chat`): a public, rate-limited endpoint that answers visitor questions about Carlos, grounded on a canonical profile and served by Groq (`llama-3.1-8b-instant`) behind a swappable `ChatProvider`. A Redis answer-cache keyed by the normalized question protects the free-tier quota; a sandwiched system prompt with few-shot guardrails resists prompt injection; provider failures surface as HTTP 503 (`SERVICE_UNAVAILABLE`). Requires the `GROQ_API_KEY` env var (#124)
+
+### Changed
+
+- **Deploy**: the production deploy workflow now injects `GROQ_API_KEY` into the server environment so the chat module boots in production (#125)
+
+---
+
 ## [2.7.1] - 2026-05-24
 
 ### Fixed

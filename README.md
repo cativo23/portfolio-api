@@ -11,10 +11,10 @@
 </div>
 
 <!-- istanbul-badges-readme-start -->
-[![Lines](https://img.shields.io/badge/lines-96.58%25-brightgreen.svg?style=flat)](https://github.com/cativo23/portfolio-api)
-[![Statements](https://img.shields.io/badge/statements-96.34%25-brightgreen.svg?style=flat)](https://github.com/cativo23/portfolio-api)
-[![Branches](https://img.shields.io/badge/branches-92.3%25-brightgreen.svg?style=flat)](https://github.com/cativo23/portfolio-api)
-[![Functions](https://img.shields.io/badge/functions-92.66%25-brightgreen.svg?style=flat)](https://github.com/cativo23/portfolio-api)
+[![Lines](https://img.shields.io/badge/lines-96.75%25-brightgreen.svg?style=flat)](https://github.com/cativo23/portfolio-api)
+[![Statements](https://img.shields.io/badge/statements-96.54%25-brightgreen.svg?style=flat)](https://github.com/cativo23/portfolio-api)
+[![Branches](https://img.shields.io/badge/branches-91.45%25-brightgreen.svg?style=flat)](https://github.com/cativo23/portfolio-api)
+[![Functions](https://img.shields.io/badge/functions-93.14%25-brightgreen.svg?style=flat)](https://github.com/cativo23/portfolio-api)
 <!-- istanbul-badges-readme-end -->
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Node Version](https://img.shields.io/badge/node-%3E%3D23.0.0-brightgreen.svg)](https://nodejs.org/)
@@ -124,7 +124,7 @@ The following environment variables are required for the application to run:
 - `CORS_ORIGINS` - (Optional) Comma-separated list of allowed CORS origins. Defaults to `http://localhost:3000,http://localhost:5173,http://localhost:5174` in development
 - `PORT` - (Optional) Server port. Defaults to 3000
 - `NODE_ENV` - (Optional) Environment (development/production). In development, CORS is more permissive
-- `THROTTLE_TTL` - (Optional) Rate limit time window in milliseconds. Defaults to `60000` (1 minute)
+- `THROTTLE_TTL` - (Optional) Rate limit time window in **seconds** (NestJS throttler v6+ uses seconds). Defaults to `60` (1 minute)
 - `THROTTLE_LIMIT` - (Optional) Default rate limit (requests per window). Defaults to `100`
 - `THROTTLE_PUBLIC_LIMIT` - (Optional) Rate limit for public endpoints. Defaults to `10`
 - `THROTTLE_STRICT_LIMIT` - (Optional) Rate limit for auth endpoints (login/register). Defaults to `5`

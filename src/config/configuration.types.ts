@@ -41,3 +41,10 @@ export interface JwtConfig {
   /** Segundos hasta expiración del access token */
   expiresInSeconds: number;
 }
+
+export interface ThrottlerConfig {
+  /** Window duration in seconds (NestJS throttler v6+ uses seconds, not milliseconds) */
+  ttl: number;
+  /** Max requests per window for authenticated endpoints */
+  limit: number;
+}

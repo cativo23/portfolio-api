@@ -10,6 +10,8 @@ export class ProjectsCacheInterceptor extends CacheInterceptor {
       return undefined;
     }
 
-    return `projects:${request.url}`;
+    const userId: string = request.user?.id ?? 'anonymous';
+
+    return `projects:${request.method}:${request.url}:${userId}`;
   }
 }

@@ -144,6 +144,7 @@ describe('validateConfiguration', () => {
       process.env.DB_NAME = 'testdb';
       process.env.REDIS_HOST = 'localhost';
       process.env.API_KEY_SECRET = 'secret';
+      process.env.GROQ_API_KEY = 'secret';
 
       const config = {};
       const result = validateConfiguration(config);
@@ -157,6 +158,7 @@ describe('validateConfiguration', () => {
         database: { host: 'localhost', username: 'user', database: 'testdb' },
         redis: { host: 'localhost' },
         apiKey: { secret: 'secret' },
+        chat: { groqApiKey: 'secret' },
       };
 
       const result = validateConfiguration(config);
@@ -240,6 +242,20 @@ describe('validateConfiguration', () => {
       );
     });
 
+    it('should throw for missing GROQ_API_KEY', () => {
+      process.env.JWT_SECRET = 'secret';
+      process.env.DB_HOST = 'localhost';
+      process.env.DB_USERNAME = 'user';
+      process.env.DB_NAME = 'testdb';
+      process.env.REDIS_HOST = 'localhost';
+      process.env.API_KEY_SECRET = 'secret';
+      process.env.GROQ_API_KEY = '';
+
+      expect(() => validateConfiguration({})).toThrow(
+        'GROQ_API_KEY is required',
+      );
+    });
+
     it('should throw with multiple missing configs', () => {
       process.env.JWT_SECRET = '';
       process.env.DB_HOST = '';
@@ -257,6 +273,7 @@ describe('validateConfiguration', () => {
         database: { host: 'localhost', username: 'user', database: 'testdb' },
         redis: { host: 'localhost' },
         apiKey: { secret: 'secret' },
+        chat: { groqApiKey: 'secret' },
       };
 
       const result = validateConfiguration(config);
@@ -301,6 +318,7 @@ describe('validateConfiguration', () => {
       process.env.DB_NAME = '"testdb"';
       process.env.REDIS_HOST = '"localhost"';
       process.env.API_KEY_SECRET = '"secret"';
+      process.env.GROQ_API_KEY = '"secret"';
 
       const config = {};
       const result = validateConfiguration(config);

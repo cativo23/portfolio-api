@@ -79,7 +79,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ vars.DEPLOY_PORT }}
-          envs: DOCKER_USERNAME,DB_USERNAME,DB_PASSWORD,DB_NAME,MYSQL_ROOT_PASSWORD,JWT_SECRET,JWT_EXPIRES_IN,CORS_ORIGINS,API_KEY_SECRET,REDIS_PASSWORD,REDIS_TTL,THROTTLE_TTL,THROTTLE_LIMIT,THROTTLE_PUBLIC_LIMIT,THROTTLE_STRICT_LIMIT
+          envs: DOCKER_USERNAME,DB_USERNAME,DB_PASSWORD,DB_NAME,MYSQL_ROOT_PASSWORD,JWT_SECRET,JWT_EXPIRES_IN,CORS_ORIGINS,API_KEY_SECRET,REDIS_PASSWORD,REDIS_TTL,THROTTLE_TTL,THROTTLE_LIMIT,THROTTLE_PUBLIC_LIMIT,THROTTLE_STRICT_LIMIT,GROQ_API_KEY
           script: |
             # Docker and database credentials
             export DOCKER_USERNAME="${{ secrets.DOCKER_USERNAME }}"
@@ -91,6 +91,7 @@ jobs:
             export JWT_EXPIRES_IN="${{ secrets.JWT_EXPIRES_IN }}"
             export CORS_ORIGINS="${{ secrets.CORS_ORIGINS }}"
             export API_KEY_SECRET="${{ secrets.API_KEY_SECRET }}"
+            export GROQ_API_KEY="${{ secrets.GROQ_API_KEY }}"
             export REDIS_PASSWORD="${{ secrets.REDIS_PASSWORD }}"
             # Internal Docker network hosts (not secrets)
             export DB_HOST="mysql"
@@ -115,6 +116,7 @@ jobs:
             echo "JWT_EXPIRES_IN=${JWT_EXPIRES_IN}" >> .env
             echo "CORS_ORIGINS=${CORS_ORIGINS}" >> .env
             echo "API_KEY_SECRET=${API_KEY_SECRET}" >> .env
+            echo "GROQ_API_KEY=${GROQ_API_KEY}" >> .env
             echo "REDIS_HOST=redis" >> .env
             echo "REDIS_PORT=6379" >> .env
             echo "REDIS_PASSWORD=${REDIS_PASSWORD}" >> .env

@@ -28,6 +28,7 @@ export function validateConfiguration(
   const jwt = config.jwt as { secret?: string } | undefined;
   const redis = config.redis as { host?: string } | undefined;
   const apiKey = config.apiKey as { secret?: string } | undefined;
+  const chat = config.chat as { groqApiKey?: string } | undefined;
 
   // Build validation rules using config namespaces or process.env as fallback
   const rules: ValidationRule[] = [
@@ -62,6 +63,12 @@ export function validateConfiguration(
         apiKey?.secret?.length || trimEnvQuotes(process.env.API_KEY_SECRET)
       ),
       message: 'API_KEY_SECRET is required',
+    },
+    {
+      condition: !(
+        chat?.groqApiKey?.length || trimEnvQuotes(process.env.GROQ_API_KEY)
+      ),
+      message: 'GROQ_API_KEY is required',
     },
   ];
 
