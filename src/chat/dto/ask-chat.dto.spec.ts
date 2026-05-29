@@ -17,8 +17,8 @@ describe('AskChatDto', () => {
     ).toHaveLength(0);
   });
 
-  it('rejects a question shorter than 3 chars', async () => {
-    expect((await errorsFor({ question: 'a' })).length).toBeGreaterThan(0);
+  it('accepts a short question (e.g. a greeting)', async () => {
+    expect(await errorsFor({ question: 'hi' })).toHaveLength(0);
   });
 
   it('rejects a question longer than 500 chars', async () => {

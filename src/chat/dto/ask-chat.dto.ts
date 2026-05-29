@@ -4,7 +4,6 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  MinLength,
   MaxLength,
   IsEmpty,
 } from 'class-validator';
@@ -27,13 +26,12 @@ export class AskChatDto {
   @Transform(({ value }) => sanitize(value))
   @IsNotEmpty()
   @IsString()
-  @MinLength(3)
   @MaxLength(500)
   @ApiProperty({
     description:
       'A question about Carlos (his experience, skills, projects, contact)',
     example: 'What is your main tech stack?',
-    minLength: 3,
+    minLength: 1,
     maxLength: 500,
   })
   question: string;
