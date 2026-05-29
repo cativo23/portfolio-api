@@ -1,0 +1,241 @@
+/**
+ * Canonical grounding profile for the AI chatbot. This is the single source of
+ * truth for what the bot knows about Carlos. It is a superset reconciled from
+ * the portfolio's official CV surfaces (about page narrative + printable CV).
+ *
+ * This is intentionally separate from the public `ProfileResponseDto` returned
+ * by `GET /profile` — that DTO drives a legacy API shape, while this object is
+ * the richer, prose-oriented knowledge the chatbot grounds on. Edit this file
+ * to change what the bot can say.
+ */
+
+export interface GroundingExperience {
+  role: string;
+  company: string;
+  period: string;
+  location: string;
+  description: string;
+  highlights?: string[];
+  stack: string[];
+}
+
+export interface GroundingProject {
+  name: string;
+  status: string;
+  description: string;
+  stack: string;
+}
+
+export interface GroundingPackage {
+  name: string;
+  downloads: string;
+  description: string;
+}
+
+export interface GroundingSkillCategory {
+  name: string;
+  items: string[];
+}
+
+export interface GroundingProfile {
+  name: string;
+  title: string;
+  location: string;
+  yearsOfExperience: number;
+  summary: string[];
+  highlightedMetrics: string[];
+  experience: GroundingExperience[];
+  projects: GroundingProject[];
+  openSource: GroundingPackage[];
+  skills: GroundingSkillCategory[];
+  education: string;
+  outsideCode: string[];
+  openTo: string;
+  contact: {
+    emails: string[];
+    github: string;
+    linkedin: string;
+    website: string;
+  };
+}
+
+export const CARLOS_GROUNDING: GroundingProfile = {
+  name: 'Carlos Cativo',
+  title: 'Senior Tech Lead — Payments, Healthcare & Backend',
+  location: 'El Salvador (UTC-6) · works in EN/ES',
+  yearsOfExperience: 9,
+  summary: [
+    "9 years writing backends in El Salvador. Most of that has been microservices and full-stack tech leadership at Blue Medical Guatemala — leading BlueMeds end-to-end (Laravel API + Angular/Ionic admin), then breaking out Payment Service and Invoice Service as standalone Laravel microservices that real clinics bill against every day. The fintech and tax stack in the region is hard in a specific way: no nice SDKs, sparse docs, heterogeneous protocols across processors. Carlos has implemented multi-gateway payment integration by hand — ISO 8583, SOAP/XML, REST — behind a Strategy Pattern so the next processor is a config swap, not a rewrite. Same approach on Invoice Service for Guatemala's FEL e-invoicing through an authorized provider.",
+    "Over the last ~6 months Carlos has been extending into AI work on top of the backend foundation. He is the primary author of sofIA, a multi-agent voice system at Blue Medical for healthcare scheduling on ElevenLabs ConvAI, currently in production. Most of the engineering work is on the parts AI demos skip: state-machine workflow design, validation layers around tool calls, retry and recovery logic, and the operations dashboard the team uses to see what the agent actually did. The pattern he cares about isn't \"call an LLM\" — it's the deterministic safeguards around the LLM that keep it from blowing up in production.",
+    "He also runs his own production infrastructure at cativo.dev — 16 containers across 6 stacks (apps, blog, mail, monitoring, proxy, databases) — because running it yourself is the only way to actually understand what you ship into prod.",
+  ],
+  highlightedMetrics: [
+    'Currently leads a team of 5 engineers at Blue Medical Guatemala.',
+    'Scaled a payment platform from ~$30K to ~$450K USD/month while shipping 3 services from scratch.',
+  ],
+  experience: [
+    {
+      role: 'Tech Lead / Full-Stack Engineer',
+      company: 'Blue Medical Guatemala',
+      period: 'Apr 2022 → Present (3+ yrs)',
+      location: 'Guatemala (Remote)',
+      description:
+        'Lead developer across payment, e-invoicing, subscription, and AI voice platforms — owns design, delivery, and on-call from greenfield to production. Leads a team of 5 engineers.',
+      highlights: [
+        'sofIA — Multi-agent voice system for healthcare scheduling, in production. Primary author of a state-machine workflow on ElevenLabs ConvAI + n8n with deterministic validation, retry, and recovery layers around tool calls. Built the management platform: FastAPI API + Nuxt dashboard + Typer CLI.',
+        'Payment Service — Built from scratch in Laravel. Multi-gateway abstraction (Strategy Pattern) over heterogeneous protocols (ISO 8583, SOAP/XML, REST). VGS card vault for PCI-friendly tokenization (raw PAN never touches the service DB), network tokenization, per-commerce / per-card-token routing, Horizon queues per gateway, Livewire ops dashboard. Led an OWASP-grade security audit and ongoing hardening.',
+        "Invoice Service — Built from scratch in Laravel. Guatemala's FEL e-invoicing through an authorized provider, Strategy Pattern for provider swaps, SAP integration, async pipeline via Redis/Horizon, QR code generation, multi-establishment support, Livewire analytics dashboard.",
+        'BlueMeds — Medication subscription platform: lifecycle, delivery scheduling, insurance authorization, referral codes, Meilisearch catalog search, and 10+ third-party integrations across ERP, CRM, messaging, AI calling, and healthcare middleware.',
+        'BlueMeds Admin Panel — Angular/Ionic admin for the pharmaceutical platform with i18n EN/ES, Capacitor mobile build, Tailwind.',
+      ],
+      stack: [
+        'Laravel',
+        'PHP',
+        'NestJS',
+        'FastAPI',
+        'Python',
+        'Livewire',
+        'Nuxt',
+        'Angular/Ionic',
+        'PostgreSQL',
+        'MySQL',
+        'Redis/Horizon',
+        'Meilisearch',
+        'AWS',
+        'Docker',
+        'Bitbucket Pipelines',
+        'Sentry',
+        'ElevenLabs ConvAI',
+      ],
+    },
+    {
+      role: 'Backend Developer',
+      company: 'OrangeSoftCo (Publimovil Regional)',
+      period: 'Sep 2020 – Apr 2022 (1.5 yrs)',
+      location: 'San Marcos, El Salvador',
+      description:
+        'Re-architected the Y.O.D.A. monolith into microservices with Redis Streams for inter-service communication, improving end-to-end performance ~30%. Tightened GitLab CI/CD and Docker/K8s deploys on DigitalOcean, cutting build time ~20%.',
+      stack: [
+        'Laravel',
+        'FastAPI',
+        'Python',
+        'MySQL',
+        'Redis Streams',
+        'Docker',
+        'Kubernetes',
+        'GitLab CI/CD',
+        'DigitalOcean',
+      ],
+    },
+    {
+      role: 'Senior Developer',
+      company: 'Mussol (TripXpertz)',
+      period: 'Apr 2017 – Sep 2020 (3.5 yrs)',
+      location: 'El Salvador',
+      description:
+        'Built an internal dashboard administering 100+ travel websites; set up AWS-based CI/CD that improved deploy time and reliability. Also shipped C#/Unity mobile games.',
+      stack: ['Laravel', 'MySQL', 'AWS', 'C# / Unity'],
+    },
+  ],
+  projects: [
+    {
+      name: 'VittBot',
+      status: 'personal · in development',
+      description:
+        'Multi-agent BTC/USDT trading bot on Binance: an indicator pipeline feeds three Claude agents (Analyst, Trader, Validator) backed by a deterministic risk manager with 10 hard-coded rules that is never delegated to AI.',
+      stack: 'NestJS, TypeScript, Anthropic SDK, CCXT, Prisma + PostgreSQL',
+    },
+    {
+      name: 'nova-id',
+      status: 'personal · in development',
+      description:
+        'Zero Trust IAM stack using the Ory suite (Kratos, Hydra, Keto, Oathkeeper) with a NestJS admin API and Vue console.',
+      stack: 'Ory Stack, NestJS, Vue, Docker',
+    },
+    {
+      name: 'Clarify',
+      status: 'personal · in development',
+      description:
+        'AI legal-contract auditor (v1.0.0-alpha). PDF analysis, pay-per-analysis credits via Stripe webhooks, async processing on BullMQ.',
+      stack: 'Nuxt, Supabase (Postgres + RLS), OpenAI, Stripe, BullMQ + Redis',
+    },
+    {
+      name: 'cativo.dev infrastructure',
+      status: 'self-hosted',
+      description:
+        'Self-hosted production stack: 16 containers across 6 stacks (apps, blog, mail, monitoring, proxy, databases) on his own infrastructure.',
+      stack: 'Docker Compose, Linux, UFW, TLS, DNS',
+    },
+  ],
+  openSource: [
+    {
+      name: 'lumira',
+      downloads: '~3.4K downloads/mo',
+      description:
+        'Real-time statusline HUD for Claude Code and Qwen Code. Session analytics, latency overhead widget, quota projection. Zero deps. TypeScript, npm.',
+    },
+    {
+      name: 'nightwire',
+      downloads: '~475 downloads/mo',
+      description:
+        'Dark cyberpunk UI design system. Semantic color roles, neon palette, CLI installer. CSS, npm.',
+    },
+  ],
+  skills: [
+    { name: 'Languages', items: ['TypeScript', 'JavaScript', 'PHP', 'Python', 'Bash', 'SQL'] },
+    { name: 'Backend', items: ['NestJS', 'Laravel 10/11', 'FastAPI'] },
+    { name: 'Frontend', items: ['Nuxt/Vue', 'Angular', 'Ionic', 'Tailwind'] },
+    {
+      name: 'Data',
+      items: ['PostgreSQL (Prisma, SQLAlchemy, Eloquent)', 'MySQL', 'Redis', 'Meilisearch', 'Supabase'],
+    },
+    {
+      name: 'AI / Integrations',
+      items: [
+        'Anthropic Claude API',
+        'OpenAI',
+        'ElevenLabs ConvAI',
+        'multi-agent design',
+        'n8n',
+        'Stripe',
+        'Odoo',
+        'SAP',
+        'WhatsApp/Botmaker',
+        'Bland AI',
+      ],
+    },
+    {
+      name: 'Payments / Tax',
+      items: [
+        'Multi-gateway integration over heterogeneous protocols (ISO 8583, SOAP/XML, REST)',
+        'VGS card vault',
+        'network tokenization',
+        'FEL e-invoicing (Guatemala)',
+        'SAP',
+      ],
+    },
+    {
+      name: 'Infra / DevOps',
+      items: ['Docker', 'Traefik', 'Nginx', 'AWS (S3/ECR/EC2)', 'Cloudflare', 'GitHub Actions', 'Bitbucket Pipelines', 'Prometheus', 'Sentry'],
+    },
+    { name: 'Testing', items: ['Pest/PHPUnit', 'Vitest', 'Jest', 'BATS', 'TDD'] },
+  ],
+  education:
+    'B.Sc. Computer Systems Engineering, Universidad de El Salvador (2023). Specialization in Cloud Infrastructure.',
+  outsideCode: [
+    'Three rescued dogs — Nova, Vitto, and Kovu. They name the projects.',
+    'Civic Type R FK8 (Rallye Red).',
+    'Mechanical keyboards & IEMs (Truthear ZERO:RED in rotation).',
+    'Linux ricing — Hyprland on Arch with a Tokyo Night Waybar.',
+    'Cyberpunk & sci-fi — Akira, Evangelion, Ghost in the Shell.',
+    'Self-hosting tinkering on cativo.dev.',
+  ],
+  openTo:
+    'Open to Senior Backend, Tech Lead, and Engineering Manager roles — remote-first or with relocation sponsorship.',
+  contact: {
+    emails: ['cativo@cativo.dev', 'cativo23.kt@gmail.com'],
+    github: 'https://github.com/cativo23',
+    linkedin: 'https://www.linkedin.com/in/carlos-cativo',
+    website: 'https://cativo.dev',
+  },
+};

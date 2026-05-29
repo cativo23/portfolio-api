@@ -9,6 +9,7 @@ import {
 import { validateConfiguration } from '@config/validate-configuration';
 import apiKeyConfig from '@config/api-key.config';
 import mailConfig from '@config/mail.config';
+import chatConfig from '@config/chat.config';
 
 export const appConfiguration = registerAs('app', loadAppConfig);
 export const databaseConfiguration = registerAs('database', loadDatabaseConfig);
@@ -34,6 +35,7 @@ export const jwtConfiguration = registerAs('jwt', loadJwtConfig);
         jwtConfiguration,
         apiKeyConfig,
         mailConfig,
+        chatConfig,
       ],
       validate: validateConfiguration,
     }),

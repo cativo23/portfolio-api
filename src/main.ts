@@ -148,6 +148,7 @@ Paginated endpoints include \`meta.pagination\` with:
     .addTag('Contacts', 'Contact form endpoints')
     .addTag('Auth', 'Authentication endpoints')
     .addTag('api-keys', 'API key management endpoints')
+    .addTag('Chat', 'AI assistant endpoints')
     .build();
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);
