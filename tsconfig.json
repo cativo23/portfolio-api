@@ -30,6 +30,7 @@
       "@config/*": ["src/config/*"],
       "@database/*": ["src/database/*"],
       "@health/*": ["src/health/*"],
+      "@chat/*": ["src/chat/*"],
       "@src/*": ["src/*"]
     },
     "resolveJsonModule": true

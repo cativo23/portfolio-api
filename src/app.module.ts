@@ -13,6 +13,7 @@ import { ApiKeyModule } from '@core/api-key.module';
 import { ContactsModule } from '@contacts/contacts.module';
 import { ProfileModule } from '@profile/profile.module';
 import { EmailModule } from '@email/email.module';
+import { ChatModule } from '@chat/chat.module';
 import { RequestContextModule } from '@core/context/request-context.module';
 import { RequestIdMiddleware } from '@core/middleware/request-id.middleware';
 import { ResponseTransformInterceptor } from '@core/interceptors/response-transform.interceptor';
@@ -34,6 +35,7 @@ import { AppThrottlerModule } from '@core/throttler/throttler.module';
     ContactsModule,
     ProfileModule,
     EmailModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [

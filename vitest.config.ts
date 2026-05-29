@@ -14,6 +14,7 @@ export default defineConfig({
       '@config': path.resolve(__dirname, 'src/config'),
       '@database': path.resolve(__dirname, 'src/database'),
       '@health': path.resolve(__dirname, 'src/health'),
+      '@chat': path.resolve(__dirname, 'src/chat'),
       '@src': path.resolve(__dirname, 'src'),
     },
   },
