@@ -12,5 +12,6 @@ export default new DataSource({
   entities: [__dirname + '/../**/*.entity.js'],
   migrations: [__dirname + '/../database/migrations/*.js'],
   migrationsRun: false,
-  logging: true,
+  // Never log every query (with bound params) in prod — keep it to errors/warns.
+  logging: ['error', 'warn'],
 } as DataSourceOptions);

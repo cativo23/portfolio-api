@@ -107,56 +107,17 @@ export class TypeOrmLoggerService implements TypeOrmLogger {
   }
 
   /**
-   * Build SQL string with parameters for logging
+   * Build the SQL string for logging.
+   *
+   * Security: bound parameter values are NEVER interpolated into the logged
+   * string — they can contain plaintext passwords or PII that would then leak
+   * into container logs / the logging stack. The parameterized query (with its
+   * placeholders) is logged as-is, with only a redacted parameter count.
    */
   private buildSqlString(query: string, parameters?: any[]): string {
     if (!parameters || !parameters.length) {
       return query;
     }
-
-    // Simple parameter replacement for logging
-    let sql = query;
-    try {
-      if (parameters && parameters.length) {
-        // Replace ? with parameter values
-        if (sql.includes('?')) {
-          parameters.forEach((param) => {
-            sql = sql.replace('?', this.stringifyParameter(param));
-          });
-        }
-        // For named parameters
-        else {
-          Object.keys(parameters[0]).forEach((key) => {
-            sql = sql.replace(
-              new RegExp(`:${key}\\b`, 'g'),
-              this.stringifyParameter(parameters[0][key]),
-            );
-          });
-        }
-      }
-    } catch {
-      // If parameter replacement fails, return original query with parameters
-      return `${query} -- Parameters: ${JSON.stringify(parameters)}`;
-    }
-
-    return sql;
-  }
-
-  /**
-   * Convert parameter to string for logging
-   */
-  private stringifyParameter(param: any): string {
-    if (param === null || param === undefined) {
-      return 'NULL';
-    } else if (typeof param === 'string') {
-      return `'${param.replace(/'/g, "''")}'`;
-    } else if (param instanceof Date) {
-      return `'${param.toISOString()}'`;
-    } else if (Array.isArray(param)) {
-      return `[${param.map((p) => this.stringifyParameter(p)).join(', ')}]`;
-    } else if (typeof param === 'object') {
-      return JSON.stringify(param);
-    }
-    return String(param);
+    return `${query} -- [${parameters.length} parameter(s) redacted]`;
   }
 }
