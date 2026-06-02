@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { createHash } from 'node:crypto';
 import type { ChatConfig } from '@config/chat.config';
 import { SystemPromptService } from './system-prompt.service';
-import { OutputGuardService } from './output-guard.service';
+import { OutputSanitizerService } from './output-sanitizer.service';
 import {
   CHAT_PROVIDER,
   ChatProvider,
@@ -29,7 +29,7 @@ export class ChatService {
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     @Inject(CHAT_PROVIDER) private readonly provider: ChatProvider,
     private readonly systemPromptService: SystemPromptService,
-    private readonly outputGuard: OutputGuardService,
+    private readonly outputSanitizer: OutputSanitizerService,
     configService: ConfigService,
   ) {
     const config = configService.getOrThrow<ChatConfig>('chat');
@@ -42,7 +42,12 @@ export class ChatService {
     const cachedAnswer = await this.cacheManager.get<string>(cacheKey);
     if (cachedAnswer != null) {
       this.logger.log(`Chat cache hit (${cacheKey})`);
-      return { answer: cachedAnswer, cached: true };
+      // Re-sanitize on read too: an answer cached before this guard shipped
+      // (e.g. a leak captured during the pentest) must not be served verbatim.
+      return {
+        answer: this.outputSanitizer.sanitize(cachedAnswer),
+        cached: true,
+      };
     }
 
     const answer = await this.generate(question);
@@ -61,7 +66,7 @@ export class ChatService {
       ]);
       // Last line of defense: strip any system-prompt/profile leak before the
       // answer is returned or cached, regardless of how the model behaved.
-      return this.outputGuard.sanitize(result.content);
+      return this.outputSanitizer.sanitize(result.content);
     } catch (error) {
       if (error instanceof ChatProviderError) {
         this.logger.error('Chat provider unavailable');
