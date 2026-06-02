@@ -1,4 +1,5 @@
 import { vi } from 'vitest';
+import * as bcrypt from 'bcrypt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
 import { Repository } from 'typeorm';
@@ -39,30 +40,33 @@ describe('UsersService', () => {
   });
 
   describe('create', () => {
-    it('should create and return the new user', async () => {
+    it('should hash the password before persisting (never store plaintext)', async () => {
       const dto: CreateUserDto = {
         email: 'user@email.com',
         password: 'password123',
         username: 'testuser',
       };
 
-      const expectedUser: User = {
-        id: 1,
-        ...dto,
-      } as User;
-
-      vi.spyOn(repository, 'create').mockReturnValue(expectedUser);
-      vi.spyOn(repository, 'save').mockResolvedValue(expectedUser);
+      let captured: Partial<User> | undefined;
+      vi.spyOn(repository, 'create').mockImplementation((u) => {
+        captured = u as User;
+        return u as User;
+      });
+      vi.spyOn(repository, 'save').mockImplementation((u) =>
+        Promise.resolve(u as User),
+      );
 
       const result = await service.create(dto);
 
-      expect(result).toEqual(expectedUser);
-      expect(repository.create).toHaveBeenCalledWith({
-        email: dto.email,
-        password: dto.password,
-        username: dto.username,
-      });
-      expect(repository.save).toHaveBeenCalledWith(expectedUser);
+      expect(captured?.email).toBe(dto.email);
+      expect(captured?.username).toBe(dto.username);
+      // Password must be hashed, not the raw value
+      expect(captured?.password).toBeDefined();
+      expect(captured?.password).not.toBe('password123');
+      expect(await bcrypt.compare('password123', captured!.password!)).toBe(
+        true,
+      );
+      expect(result).toBeDefined();
     });
   });
 
@@ -170,7 +174,7 @@ describe('UsersService', () => {
       vi.spyOn(repository, 'save').mockResolvedValue({
         ...existingUser,
         ...updateDto,
-      });
+      } as User);
 
       const result = await service.update(1, updateDto);
 
