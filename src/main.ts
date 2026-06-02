@@ -151,17 +151,23 @@ Paginated endpoints include \`meta.pagination\` with:
     .addTag('Chat', 'AI assistant endpoints')
     .build();
 
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, documentFactory, {
-    swaggerOptions: {
-      persistAuthorization: true, // Keep auth token in Swagger UI
-      displayRequestDuration: true, // Show request duration
-      filter: true, // Enable filter/search
-      showExtensions: true,
-      showCommonExtensions: true,
-    },
-    customSiteTitle: 'Portfolio API Documentation',
-  });
+  // Never expose the API map (/docs, /docs-json) in production — it inventories
+  // every admin/users/api-keys/auth route for an attacker. Keep it in dev/staging.
+  if (appConfig.nodeEnv !== 'production') {
+    const documentFactory = () => SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('docs', app, documentFactory, {
+      swaggerOptions: {
+        persistAuthorization: true, // Keep auth token in Swagger UI
+        displayRequestDuration: true, // Show request duration
+        filter: true, // Enable filter/search
+        showExtensions: true,
+        showCommonExtensions: true,
+      },
+      customSiteTitle: 'Portfolio API Documentation',
+    });
+  } else {
+    Logger.log('Swagger docs disabled in production', 'Bootstrap');
+  }
 
   const port = appConfig.port;
   Logger.log(`Starting server on port ${port}`, 'Bootstrap');
