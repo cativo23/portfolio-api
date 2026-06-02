@@ -20,8 +20,9 @@ const throttlerConfig = loadThrottlerConfig();
  * Rate limiting configuration (global default):
  * - Default: 100 requests per 60 seconds (for authenticated endpoints)
  *
- * NOTE: NestJS throttler v6+ uses seconds for ttl, not milliseconds.
- * THROTTLE_TTL env var must be set in seconds (default: 60).
+ * NOTE: NestJS throttler v5+ uses MILLISECONDS for ttl. THROTTLE_TTL is
+ * authored in seconds (default: 60) and converted to ms by loadThrottlerConfig
+ * via the throttler's seconds() helper.
  *
  * For specific limits, use @Throttle decorator on controllers:
  * - Public endpoints: @Throttle({ default: { limit: publicLimit, ttl: 60 } })

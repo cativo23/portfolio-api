@@ -6,7 +6,7 @@ import {
   ApiTags,
   ApiTooManyRequestsResponse,
 } from '@nestjs/swagger';
-import { Throttle } from '@nestjs/throttler';
+import { Throttle, seconds } from '@nestjs/throttler';
 import { Public } from '@auth/decorators/public.decorator';
 import { ChatService } from './chat.service';
 import { AskChatDto, ChatResponseDto } from './dto';
@@ -28,7 +28,7 @@ export class ChatController {
   @Post()
   @Public()
   @HttpCode(HttpStatus.OK)
-  @Throttle({ default: { limit: CHAT_STRICT_LIMIT, ttl: 60 } })
+  @Throttle({ default: { limit: CHAT_STRICT_LIMIT, ttl: seconds(60) } })
   @ApiOperation({
     summary: 'Ask the portfolio assistant a question about Carlos',
   })
