@@ -43,7 +43,7 @@ export interface JwtConfig {
 }
 
 export interface ThrottlerConfig {
-  /** Window duration in seconds (NestJS throttler v6+ uses seconds, not milliseconds) */
+  /** Window duration in MILLISECONDS — the unit @nestjs/throttler v5+ expects. loadThrottlerConfig converts THROTTLE_TTL (seconds) via the seconds() helper. */
   ttl: number;
   /** Max requests per window for authenticated endpoints */
   limit: number;

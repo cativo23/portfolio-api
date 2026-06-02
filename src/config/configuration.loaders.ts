@@ -1,4 +1,5 @@
 import { LogLevel } from 'typeorm';
+import { seconds } from '@nestjs/throttler';
 import { parseEnvBoolean, parseEnvInt, trimEnvQuotes } from '@config/env.utils';
 import type {
   AppConfig,
@@ -88,7 +89,10 @@ export function loadJwtConfig(): JwtConfig {
 
 export function loadThrottlerConfig(): ThrottlerConfig {
   return {
-    ttl: parseEnvInt(process.env.THROTTLE_TTL, 60), // seconds (NestJS throttler v6+ uses seconds)
+    // @nestjs/throttler v5+ expects ttl in MILLISECONDS. THROTTLE_TTL is
+    // authored in seconds for readability, so convert it with seconds().
+    // (Passing raw seconds made the window 60ms — throttling never fired.)
+    ttl: seconds(parseEnvInt(process.env.THROTTLE_TTL, 60)),
     limit: parseEnvInt(process.env.THROTTLE_LIMIT, 100),
   };
 }
