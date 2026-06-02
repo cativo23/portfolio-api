@@ -16,6 +16,9 @@ async function bootstrap() {
   // resolves the real client IP from X-Forwarded-For. The throttler tracks
   // per-IP — without this every request would carry the proxy's IP and the
   // whole site would share one rate-limit bucket.
+  // NOTE: `1` trusts exactly one hop. For the per-IP throttle to be
+  // tamper-proof, Traefik must overwrite (not append to) X-Forwarded-For so a
+  // client can't spoof it to rotate IPs and evade the limit.
   app.set('trust proxy', 1);
 
   // Mount CLS middleware first - before any other middleware that depends on it

@@ -24,9 +24,10 @@ const throttlerConfig = loadThrottlerConfig();
  * authored in seconds (default: 60) and converted to ms by loadThrottlerConfig
  * via the throttler's seconds() helper.
  *
- * For specific limits, use @Throttle decorator on controllers:
- * - Public endpoints: @Throttle({ default: { limit: publicLimit, ttl: 60 } })
- * - Auth endpoints:   @Throttle({ default: { limit: strictLimit, ttl: 60 } })
+ * For specific limits, use @Throttle decorator on controllers (ttl in ms — use
+ * the seconds() helper for readability):
+ * - Public endpoints: @Throttle({ default: { limit: publicLimit, ttl: seconds(60) } })
+ * - Auth endpoints:   @Throttle({ default: { limit: strictLimit, ttl: seconds(60) } })
  */
 @Global()
 @Module({
@@ -34,7 +35,7 @@ const throttlerConfig = loadThrottlerConfig();
     ThrottlerModule.forRoot({
       throttlers: [
         {
-          ttl: throttlerConfig.ttl, // seconds
+          ttl: throttlerConfig.ttl, // milliseconds (loadThrottlerConfig already converted)
           limit: throttlerConfig.limit,
         },
       ],
