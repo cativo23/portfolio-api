@@ -13,7 +13,7 @@ describe('AuthController', () => {
   let controller: AuthController;
   let authService: AuthService;
 
-  const mockUser: User = {
+  const mockUser = {
     id: 1,
     username: 'john_doe',
     email: 'john@example.com',
@@ -22,7 +22,7 @@ describe('AuthController', () => {
     createdAt: new Date(),
     updatedAt: new Date(),
     deletedAt: null,
-  };
+  } as User;
 
   const mockAuthService = {
     login: vi.fn(),
@@ -130,12 +130,12 @@ describe('AuthController', () => {
   describe('profile', () => {
     it('should return user from decorator', () => {
       const mockRequest = { user: mockUser };
-      const mockUserDecorator: User = {
+      const mockUserDecorator = {
         ...mockUser,
         id: 2,
         username: 'decorator',
         email: 'decorator@example.com',
-      };
+      } as User;
 
       const result = controller.profile(mockRequest as any, mockUserDecorator);
 

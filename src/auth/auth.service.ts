@@ -31,12 +31,13 @@ export class AuthService {
     if (existingUser) {
       throw new ConflictException('Email already exists');
     }
-    const hashedPassword = await bcrypt.hash(payload.password, 10);
 
+    // Hashing is owned by UsersService.create() so every insert path hashes
+    // exactly once — forward the raw password here to avoid double-hashing.
     return await this.usersService.create({
       username: payload.username,
       email: payload.email,
-      password: hashedPassword,
+      password: payload.password,
     });
   }
 

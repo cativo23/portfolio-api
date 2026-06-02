@@ -64,10 +64,13 @@ describe('AuthService', () => {
       const result = await service.register(payload);
 
       expect(usersService.findOneByEmail).toHaveBeenCalledWith(payload.email);
+      // register no longer pre-hashes — hashing is owned by UsersService.create,
+      // so it must forward the raw password (avoids double-hashing).
       expect(usersService.create).toHaveBeenCalledWith(
         expect.objectContaining({
           email: payload.email,
           username: payload.username,
+          password: payload.password,
         }),
       );
       expect(result).toMatchObject({
