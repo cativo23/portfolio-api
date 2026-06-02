@@ -38,13 +38,17 @@ describe('TypeOrmLoggerService', () => {
       const logSpy = vi
         .spyOn(Logger.prototype, 'log')
         .mockImplementation(vi.fn());
-      const service = new TypeOrmLoggerService(createMockConfigService(['query']));
+      const service = new TypeOrmLoggerService(
+        createMockConfigService(['query']),
+      );
 
       service.logQuery('INSERT INTO `user`(`password`) VALUES (?)', [
         'SuperSecret123!',
       ]);
 
-      expect(logSpy.mock.calls.flat().join(' ')).not.toContain('SuperSecret123!');
+      expect(logSpy.mock.calls.flat().join(' ')).not.toContain(
+        'SuperSecret123!',
+      );
       logSpy.mockRestore();
     });
   });
@@ -125,7 +129,9 @@ describe('TypeOrmLoggerService', () => {
       const warnSpy = vi
         .spyOn(Logger.prototype, 'warn')
         .mockImplementation(vi.fn());
-      const service = new TypeOrmLoggerService(createMockConfigService(['warn']));
+      const service = new TypeOrmLoggerService(
+        createMockConfigService(['warn']),
+      );
 
       service.logQuerySlow(5000, 'SELECT * FROM `user` WHERE email = ?', [
         'victim@example.com',
