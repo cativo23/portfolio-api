@@ -14,8 +14,8 @@ import { AskChatDto, ChatResponseDto } from './dto';
 // Strict per-IP limit for this public, quota-bearing endpoint. Read at module
 // load because @Throttle is evaluated statically. Guard against a non-numeric
 // or non-positive env value (NaN would make the throttle behavior undefined).
-const PARSED_STRICT_LIMIT = Number(process.env.CHAT_STRICT_LIMIT);
-const CHAT_STRICT_LIMIT =
+const PARSED_STRICT_LIMIT = Number(process.env.THROTTLE_STRICT_LIMIT);
+const STRICT_LIMIT =
   Number.isFinite(PARSED_STRICT_LIMIT) && PARSED_STRICT_LIMIT > 0
     ? PARSED_STRICT_LIMIT
     : 5;
@@ -28,7 +28,7 @@ export class ChatController {
   @Post()
   @Public()
   @HttpCode(HttpStatus.OK)
-  @Throttle({ default: { limit: CHAT_STRICT_LIMIT, ttl: seconds(60) } })
+  @Throttle({ default: { limit: STRICT_LIMIT, ttl: seconds(60) } })
   @ApiOperation({
     summary: 'Ask the portfolio assistant a question about Carlos',
   })
