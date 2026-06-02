@@ -4,6 +4,7 @@ import { ProfileModule } from '@profile/profile.module';
 import { ChatController } from './chat.controller';
 import { ChatService } from './chat.service';
 import { SystemPromptService } from './system-prompt.service';
+import { OutputGuardService } from './output-guard.service';
 import { GroqChatProvider } from './providers/groq.provider';
 import { CHAT_PROVIDER } from './providers/chat-provider.interface';
 
@@ -18,6 +19,7 @@ import { CHAT_PROVIDER } from './providers/chat-provider.interface';
   providers: [
     ChatService,
     SystemPromptService,
+    OutputGuardService,
     { provide: CHAT_PROVIDER, useClass: GroqChatProvider },
   ],
 })

@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { createHash } from 'node:crypto';
 import type { ChatConfig } from '@config/chat.config';
 import { SystemPromptService } from './system-prompt.service';
+import { OutputGuardService } from './output-guard.service';
 import {
   CHAT_PROVIDER,
   ChatProvider,
@@ -28,6 +29,7 @@ export class ChatService {
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     @Inject(CHAT_PROVIDER) private readonly provider: ChatProvider,
     private readonly systemPromptService: SystemPromptService,
+    private readonly outputGuard: OutputGuardService,
     configService: ConfigService,
   ) {
     const config = configService.getOrThrow<ChatConfig>('chat');
@@ -57,7 +59,9 @@ export class ChatService {
         { role: 'system', content: this.systemPromptService.build() },
         { role: 'user', content: question },
       ]);
-      return result.content;
+      // Last line of defense: strip any system-prompt/profile leak before the
+      // answer is returned or cached, regardless of how the model behaved.
+      return this.outputGuard.sanitize(result.content);
     } catch (error) {
       if (error instanceof ChatProviderError) {
         this.logger.error('Chat provider unavailable');
