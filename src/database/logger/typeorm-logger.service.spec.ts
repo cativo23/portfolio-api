@@ -33,6 +33,20 @@ describe('TypeOrmLoggerService', () => {
         service.logQuery('SELECT * FROM users WHERE id = ?', [1]),
       ).not.toThrow();
     });
+
+    it('never writes parameter values to the log', () => {
+      const logSpy = vi
+        .spyOn(Logger.prototype, 'log')
+        .mockImplementation(vi.fn());
+      const service = new TypeOrmLoggerService(createMockConfigService(['query']));
+
+      service.logQuery('INSERT INTO `user`(`password`) VALUES (?)', [
+        'SuperSecret123!',
+      ]);
+
+      expect(logSpy.mock.calls.flat().join(' ')).not.toContain('SuperSecret123!');
+      logSpy.mockRestore();
+    });
   });
 
   describe('logQueryError', () => {
@@ -105,6 +119,22 @@ describe('TypeOrmLoggerService', () => {
       expect(() =>
         service.logQuerySlow(5000, 'SELECT * FROM users'),
       ).not.toThrow();
+    });
+
+    it('never writes parameter values to the log', () => {
+      const warnSpy = vi
+        .spyOn(Logger.prototype, 'warn')
+        .mockImplementation(vi.fn());
+      const service = new TypeOrmLoggerService(createMockConfigService(['warn']));
+
+      service.logQuerySlow(5000, 'SELECT * FROM `user` WHERE email = ?', [
+        'victim@example.com',
+      ]);
+
+      expect(warnSpy.mock.calls.flat().join(' ')).not.toContain(
+        'victim@example.com',
+      );
+      warnSpy.mockRestore();
     });
   });
 
