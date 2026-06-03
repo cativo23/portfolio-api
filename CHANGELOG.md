@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.9.0] - 2026-06-03
+
+### Security
+
+- **Passwords are now hashed on user creation** — `UsersService.create()` was persisting the plaintext password (unlike `update()`/`register()`, which hashed). Hashing now happens in `create()` as the single source of truth, via bcrypt.
+- **Bound query parameters are no longer logged** — the TypeORM logger redacted the SQL text but still interpolated bound parameter values into the logged string, leaking plaintext credentials/PII into container logs on failed queries. Parameters are now replaced with a redaction placeholder at every log level.
+- **Swagger UI is disabled in production** — API docs are no longer served publicly on prod (`NODE_ENV === 'production'`).
+- **Detailed health endpoints require an API key** — `/health/detailed` (and legacy `/health/check`) no longer disclose infra/version metrics to anonymous callers; k8s liveness/readiness probes stay public.
+- **Rate limiting now actually fires** — the throttler `ttl` was passed as seconds, but `@nestjs/throttler` v6 expects milliseconds, so every window expired almost instantly and no limit was ever enforced (login/register brute-force protection, the public `/chat` endpoint, the contact form, and the global default were all silently dead). The TTL is now built with the `seconds()` helper. Added `trust proxy` so per-IP limits key off the real client IP behind the Traefik reverse proxy. The chat strict-limit env var is read from `THROTTLE_STRICT_LIMIT` (the code previously read an unset var, so the configured value was ignored).
+- **Chatbot prompt/profile-leak guard** — a new deterministic `OutputSanitizerService` scans every chat answer for structural leak markers (a `<profile>` tag or known system-prompt phrases, after stripping zero-width characters) and returns a fixed refusal on a hit, independent of the model. It runs before the answer is cached and also on cache hits, so previously-cached leaks are not served.
+
+---
+
 ## [2.8.0] - 2026-05-29
 
 ### Added
