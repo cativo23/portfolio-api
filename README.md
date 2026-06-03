@@ -11,10 +11,10 @@
 </div>
 
 <!-- istanbul-badges-readme-start -->
-[![Lines](https://img.shields.io/badge/lines-96.69%25-brightgreen.svg?style=flat)](https://github.com/cativo23/portfolio-api)
-[![Statements](https://img.shields.io/badge/statements-96.47%25-brightgreen.svg?style=flat)](https://github.com/cativo23/portfolio-api)
-[![Branches](https://img.shields.io/badge/branches-91.41%25-brightgreen.svg?style=flat)](https://github.com/cativo23/portfolio-api)
-[![Functions](https://img.shields.io/badge/functions-93.06%25-brightgreen.svg?style=flat)](https://github.com/cativo23/portfolio-api)
+[![Lines](https://img.shields.io/badge/lines-96.74%25-brightgreen.svg?style=flat)](https://github.com/cativo23/portfolio-api)
+[![Statements](https://img.shields.io/badge/statements-96.52%25-brightgreen.svg?style=flat)](https://github.com/cativo23/portfolio-api)
+[![Branches](https://img.shields.io/badge/branches-91.48%25-brightgreen.svg?style=flat)](https://github.com/cativo23/portfolio-api)
+[![Functions](https://img.shields.io/badge/functions-93.11%25-brightgreen.svg?style=flat)](https://github.com/cativo23/portfolio-api)
 <!-- istanbul-badges-readme-end -->
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Node Version](https://img.shields.io/badge/node-%3E%3D23.0.0-brightgreen.svg)](https://nodejs.org/)
