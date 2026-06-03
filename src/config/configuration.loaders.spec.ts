@@ -4,6 +4,7 @@ import {
   loadDatabaseConfig,
   loadRedisConfig,
   loadJwtConfig,
+  loadThrottlerConfig,
 } from './configuration.loaders';
 
 describe('configuration.loaders', () => {
@@ -302,6 +303,32 @@ describe('configuration.loaders', () => {
       const config = loadJwtConfig();
 
       expect(config.secret).toBe('my-quoted-secret');
+    });
+  });
+
+  describe('loadThrottlerConfig', () => {
+    // @nestjs/throttler v5+ expects ttl in MILLISECONDS. THROTTLE_TTL is
+    // authored in seconds for readability, so the loader must convert it.
+    // Before this fix the loader returned raw seconds (60), which the library
+    // read as 60ms — a window so short the limit could never be reached and
+    // throttling never fired.
+    it('should default ttl to 60 seconds expressed in milliseconds', () => {
+      delete process.env.THROTTLE_TTL;
+      delete process.env.THROTTLE_LIMIT;
+
+      const config = loadThrottlerConfig();
+
+      expect(config).toEqual({ ttl: 60000, limit: 100 });
+    });
+
+    it('should convert a custom THROTTLE_TTL (seconds) to milliseconds', () => {
+      process.env.THROTTLE_TTL = '30';
+      process.env.THROTTLE_LIMIT = '25';
+
+      const config = loadThrottlerConfig();
+
+      expect(config.ttl).toBe(30000);
+      expect(config.limit).toBe(25);
     });
   });
 });

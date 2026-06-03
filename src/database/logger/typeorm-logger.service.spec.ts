@@ -1,4 +1,5 @@
 import { vi } from 'vitest';
+import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmLoggerService } from './typeorm-logger.service';
 
@@ -31,6 +32,24 @@ describe('TypeOrmLoggerService', () => {
       expect(() =>
         service.logQuery('SELECT * FROM users WHERE id = ?', [1]),
       ).not.toThrow();
+    });
+
+    it('never writes parameter values to the log', () => {
+      const logSpy = vi
+        .spyOn(Logger.prototype, 'log')
+        .mockImplementation(vi.fn());
+      const service = new TypeOrmLoggerService(
+        createMockConfigService(['query']),
+      );
+
+      service.logQuery('INSERT INTO `user`(`password`) VALUES (?)', [
+        'SuperSecret123!',
+      ]);
+
+      expect(logSpy.mock.calls.flat().join(' ')).not.toContain(
+        'SuperSecret123!',
+      );
+      logSpy.mockRestore();
     });
   });
 
@@ -66,6 +85,25 @@ describe('TypeOrmLoggerService', () => {
         ),
       ).not.toThrow();
     });
+
+    it('never writes parameter values to the log (no plaintext creds/PII)', () => {
+      const errorSpy = vi
+        .spyOn(Logger.prototype, 'error')
+        .mockImplementation(vi.fn());
+      const configService = createMockConfigService(['error']);
+      const service = new TypeOrmLoggerService(configService);
+
+      service.logQueryError(
+        new Error('Failed'),
+        'INSERT INTO `user`(`email`, `password`) VALUES (?, ?)',
+        ['victim@example.com', 'SuperSecret123!'],
+      );
+
+      const logged = errorSpy.mock.calls.flat().join(' ');
+      expect(logged).not.toContain('SuperSecret123!');
+      expect(logged).not.toContain('victim@example.com');
+      errorSpy.mockRestore();
+    });
   });
 
   describe('logQuerySlow', () => {
@@ -85,6 +123,24 @@ describe('TypeOrmLoggerService', () => {
       expect(() =>
         service.logQuerySlow(5000, 'SELECT * FROM users'),
       ).not.toThrow();
+    });
+
+    it('never writes parameter values to the log', () => {
+      const warnSpy = vi
+        .spyOn(Logger.prototype, 'warn')
+        .mockImplementation(vi.fn());
+      const service = new TypeOrmLoggerService(
+        createMockConfigService(['warn']),
+      );
+
+      service.logQuerySlow(5000, 'SELECT * FROM `user` WHERE email = ?', [
+        'victim@example.com',
+      ]);
+
+      expect(warnSpy.mock.calls.flat().join(' ')).not.toContain(
+        'victim@example.com',
+      );
+      warnSpy.mockRestore();
     });
   });
 
@@ -154,75 +210,8 @@ describe('TypeOrmLoggerService', () => {
     });
   });
 
-  describe('stringifyParameter', () => {
-    it('should return NULL for null values', () => {
-      const configService = createMockConfigService(['query']);
-      const service = new TypeOrmLoggerService(configService);
-
-      const result = (service as any).stringifyParameter(null);
-      expect(result).toBe('NULL');
-    });
-
-    it('should return NULL for undefined values', () => {
-      const configService = createMockConfigService(['query']);
-      const service = new TypeOrmLoggerService(configService);
-
-      const result = (service as any).stringifyParameter(undefined);
-      expect(result).toBe('NULL');
-    });
-
-    it('should wrap string values in quotes', () => {
-      const configService = createMockConfigService(['query']);
-      const service = new TypeOrmLoggerService(configService);
-
-      const result = (service as any).stringifyParameter('test');
-      expect(result).toBe("'test'");
-    });
-
-    it('should escape single quotes in strings', () => {
-      const configService = createMockConfigService(['query']);
-      const service = new TypeOrmLoggerService(configService);
-
-      const result = (service as any).stringifyParameter("test'value");
-      expect(result).toBe("'test''value'");
-    });
-
-    it('should format Date values as ISO strings', () => {
-      const configService = createMockConfigService(['query']);
-      const service = new TypeOrmLoggerService(configService);
-
-      const date = new Date('2024-01-01T00:00:00Z');
-      const result = (service as any).stringifyParameter(date);
-      expect(result).toBe("'2024-01-01T00:00:00.000Z'");
-    });
-
-    it('should format arrays as bracketed lists', () => {
-      const configService = createMockConfigService(['query']);
-      const service = new TypeOrmLoggerService(configService);
-
-      const result = (service as any).stringifyParameter([1, 2, 3]);
-      expect(result).toBe('[1, 2, 3]');
-    });
-
-    it('should format objects as JSON', () => {
-      const configService = createMockConfigService(['query']);
-      const service = new TypeOrmLoggerService(configService);
-
-      const result = (service as any).stringifyParameter({ key: 'value' });
-      expect(result).toBe('{"key":"value"}');
-    });
-
-    it('should convert numbers to strings', () => {
-      const configService = createMockConfigService(['query']);
-      const service = new TypeOrmLoggerService(configService);
-
-      const result = (service as any).stringifyParameter(42);
-      expect(result).toBe('42');
-    });
-  });
-
-  describe('buildSqlString', () => {
-    it('should return query without parameters if none provided', () => {
+  describe('buildSqlString (parameter redaction)', () => {
+    it('returns the query unchanged when no parameters are provided', () => {
       const configService = createMockConfigService(['query']);
       const service = new TypeOrmLoggerService(configService);
 
@@ -230,44 +219,31 @@ describe('TypeOrmLoggerService', () => {
       expect(result).toBe('SELECT * FROM users');
     });
 
-    it('should replace ? placeholders with parameters', () => {
+    it('never interpolates positional (?) parameter values', () => {
       const configService = createMockConfigService(['query']);
       const service = new TypeOrmLoggerService(configService);
 
       const result = (service as any).buildSqlString(
-        'SELECT * FROM users WHERE id = ? AND name = ?',
-        [1, 'test'],
+        'INSERT INTO `user`(`email`, `password`) VALUES (?, ?)',
+        ['victim@example.com', 'SuperSecret123!'],
       );
-      expect(result).toContain('1');
-      expect(result).toContain("'test'");
+
+      expect(result).not.toContain('SuperSecret123!');
+      expect(result).not.toContain('victim@example.com');
+      // Placeholders are preserved so the statement shape stays debuggable
+      expect(result).toContain('?');
     });
 
-    it('should handle named parameters', () => {
+    it('never interpolates named parameter values', () => {
       const configService = createMockConfigService(['query']);
       const service = new TypeOrmLoggerService(configService);
 
       const result = (service as any).buildSqlString(
-        'SELECT * FROM users WHERE id = :id',
-        [{ id: 1 }],
+        'SELECT * FROM `user` WHERE email = :email',
+        [{ email: 'victim@example.com' }],
       );
-      expect(result).toContain('1');
-    });
 
-    it('should return query with original params if replacement fails', () => {
-      const configService = createMockConfigService(['query']);
-      const service = new TypeOrmLoggerService(configService);
-
-      // Spy on stringifyParameter to make it throw
-      vi.spyOn(service as any, 'stringifyParameter').mockImplementation(() => {
-        throw new Error('Cannot stringify');
-      });
-
-      const result = (service as any).buildSqlString('SELECT * FROM users', [
-        { complex: 'object' },
-      ]);
-
-      expect(result).toContain('SELECT * FROM users');
-      expect(result).toContain('Parameters:');
+      expect(result).not.toContain('victim@example.com');
     });
   });
 });

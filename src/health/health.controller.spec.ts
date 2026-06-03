@@ -7,6 +7,7 @@ import {
 } from '@nestjs/terminus';
 import { HealthController } from './health.controller';
 import { HealthService } from './health.service';
+import { ApiKeyGuard } from '@core/api-key.guard';
 
 describe('HealthController', () => {
   let controller: HealthController;
@@ -37,7 +38,12 @@ describe('HealthController', () => {
           },
         },
       ],
-    }).compile();
+    })
+      // ApiKeyGuard needs ApiKeyService (not wired in this unit module); stub it.
+      // Guard application is asserted separately via the route-protection metadata tests.
+      .overrideGuard(ApiKeyGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = module.get<HealthController>(HealthController);
     healthCheckService = module.get<HealthCheckService>(HealthCheckService);
@@ -49,6 +55,28 @@ describe('HealthController', () => {
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
+  });
+
+  describe('route protection', () => {
+    const guardsOf = (method: keyof HealthController): unknown[] =>
+      Reflect.getMetadata(
+        '__guards__',
+        (HealthController.prototype as Record<string, any>)[method as string],
+      ) || [];
+
+    it('protects /health/detailed with the ApiKeyGuard (no infra metrics for anon)', () => {
+      expect(guardsOf('detailed')).toContain(ApiKeyGuard);
+    });
+
+    it('protects the legacy /health/check (same payload as detailed)', () => {
+      expect(guardsOf('check')).toContain(ApiKeyGuard);
+    });
+
+    it('keeps the k8s probes public (no guard on /health, /live, /ready)', () => {
+      for (const m of ['health', 'liveness', 'readiness'] as const) {
+        expect(guardsOf(m)).not.toContain(ApiKeyGuard);
+      }
+    });
   });
 
   afterEach(() => {

@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from '@src/app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Logger } from '@nestjs/common';
@@ -9,7 +10,16 @@ import { ClsMiddleware } from 'nestjs-cls';
 import helmet from 'helmet';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  // Trust the single reverse proxy (Traefik) in front of the app so Express
+  // resolves the real client IP from X-Forwarded-For. The throttler tracks
+  // per-IP — without this every request would carry the proxy's IP and the
+  // whole site would share one rate-limit bucket.
+  // NOTE: `1` trusts exactly one hop. For the per-IP throttle to be
+  // tamper-proof, Traefik must overwrite (not append to) X-Forwarded-For so a
+  // client can't spoof it to rotate IPs and evade the limit.
+  app.set('trust proxy', 1);
 
   // Mount CLS middleware first - before any other middleware that depends on it
   // This ensures CLS context is available for RequestIdMiddleware and others
@@ -151,17 +161,23 @@ Paginated endpoints include \`meta.pagination\` with:
     .addTag('Chat', 'AI assistant endpoints')
     .build();
 
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, documentFactory, {
-    swaggerOptions: {
-      persistAuthorization: true, // Keep auth token in Swagger UI
-      displayRequestDuration: true, // Show request duration
-      filter: true, // Enable filter/search
-      showExtensions: true,
-      showCommonExtensions: true,
-    },
-    customSiteTitle: 'Portfolio API Documentation',
-  });
+  // Never expose the API map (/docs, /docs-json) in production — it inventories
+  // every admin/users/api-keys/auth route for an attacker. Keep it in dev/staging.
+  if (appConfig.nodeEnv !== 'production') {
+    const documentFactory = () => SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('docs', app, documentFactory, {
+      swaggerOptions: {
+        persistAuthorization: true, // Keep auth token in Swagger UI
+        displayRequestDuration: true, // Show request duration
+        filter: true, // Enable filter/search
+        showExtensions: true,
+        showCommonExtensions: true,
+      },
+      customSiteTitle: 'Portfolio API Documentation',
+    });
+  } else {
+    Logger.log('Swagger docs disabled in production', 'Bootstrap');
+  }
 
   const port = appConfig.port;
   Logger.log(`Starting server on port ${port}`, 'Bootstrap');

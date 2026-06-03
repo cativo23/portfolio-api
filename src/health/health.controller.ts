@@ -1,11 +1,13 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { SkipThrottle } from '@nestjs/throttler';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiExcludeEndpoint,
+  ApiSecurity,
 } from '@nestjs/swagger';
+import { ApiKeyGuard } from '@core/api-key.guard';
 import {
   HealthCheck,
   HealthCheckService,
@@ -82,6 +84,8 @@ export class HealthController {
    */
   @Get('detailed')
   @SkipThrottle()
+  @UseGuards(ApiKeyGuard)
+  @ApiSecurity('x-api-key')
   @ApiOperation({
     summary: 'Get detailed health status with metrics',
     description:
@@ -151,6 +155,7 @@ export class HealthController {
    */
   @Get('check')
   @SkipThrottle()
+  @UseGuards(ApiKeyGuard)
   @ApiExcludeEndpoint()
   async check() {
     return this.healthService.getFullHealth();
