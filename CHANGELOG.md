@@ -5,7 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.10.0] - 2026-06-04
+
+### Added
+- **Multi-turn conversation context for the chat assistant** — `/chat` now accepts an optional `history` array (prior user/assistant turns, capped at 6, validated and sanitized like the question). The model receives `[system, ...history, question]`, so it can resolve follow-ups like "what stack does it use?". First-turn questions stay cached; multi-turn requests are never cached.
+
+### Changed
+- **Hardened the off-profile guardrail** — the assistant no longer invents definitions for terms outside Carlos's profile. The system-prompt RULES were restructured into an explicit "scope check first" refusal procedure with a loophole-closing clause (defining a profile term is still off-scope) and contrastive few-shot examples (definition requests are refused; "does Carlos use X" is answered).
+- **Switched the default chat model to `openai/gpt-oss-20b`** (from `llama-3.1-8b-instant`) — a stronger instruction-follower that reliably obeys the conditional refusal, removing the root cause of the hallucinated definitions.
+- **Versioned the chat answer cache key (`chat:v2`)** so answers produced by the old prompt/model are orphaned and expire.
+
+---
 
 ## [2.9.1] - 2026-06-04
 
