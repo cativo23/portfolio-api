@@ -27,7 +27,7 @@ export default registerAs('chat', (): ChatConfig => {
     groqApiKey,
     groqBaseUrl:
       process.env.GROQ_BASE_URL?.trim() || 'https://api.groq.com/openai/v1',
-    model: process.env.GROQ_MODEL?.trim() || 'llama-3.1-8b-instant',
+    model: process.env.GROQ_MODEL?.trim() || 'openai/gpt-oss-20b',
     temperature: num(process.env.CHAT_TEMPERATURE, 0.3),
     maxCompletionTokens: num(process.env.CHAT_MAX_COMPLETION_TOKENS, 512),
     cacheTtlSeconds: num(process.env.CHAT_CACHE_TTL, 86400),
