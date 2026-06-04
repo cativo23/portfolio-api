@@ -87,9 +87,37 @@ describe('SystemPromptService', () => {
 
     it('includes anti-injection guardrails', () => {
       const prompt = service.build();
-      expect(prompt.toLowerCase()).toContain('only answer questions about');
+      expect(prompt.toLowerCase()).toContain('scope check first');
       expect(prompt.toLowerCase()).toContain('ignore previous instructions');
       expect(prompt.toLowerCase()).toMatch(/decline|off-topic|unrelated/);
+    });
+
+    it('instructs the model to scope-check and refuse off-profile definition requests', () => {
+      const prompt = service.build().toLowerCase();
+      expect(prompt).toContain('scope check first');
+      expect(prompt).toMatch(/define|explain|what is/);
+      expect(prompt).toMatch(
+        /does not make a request to define that term in-scope/,
+      );
+    });
+
+    it('includes a definition-refusal few-shot (the observed failure mode)', () => {
+      expect(service.build().toLowerCase()).toContain(
+        'what is quantum computing',
+      );
+    });
+
+    it('includes a Spanish off-profile refusal example (bilingual contract)', () => {
+      expect(service.build()).toContain('¿Qué es Docker');
+    });
+
+    it('includes a contrastive in-scope example using a profile term', () => {
+      // "Does Carlos Cativo use Docker?" must be ANSWERED, not refused — guards over-refusal
+      expect(service.build()).toContain('Does Carlos Cativo use Docker?');
+    });
+
+    it('strengthens never-invent to forbid inference and generalization', () => {
+      expect(service.build().toLowerCase()).toMatch(/never invent or infer/);
     });
   });
 
