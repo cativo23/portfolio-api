@@ -79,7 +79,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ vars.DEPLOY_PORT }}
-          envs: DOCKER_USERNAME,DB_USERNAME,DB_PASSWORD,DB_NAME,MYSQL_ROOT_PASSWORD,JWT_SECRET,JWT_EXPIRES_IN,CORS_ORIGINS,API_KEY_SECRET,REDIS_PASSWORD,REDIS_TTL,THROTTLE_TTL,THROTTLE_LIMIT,THROTTLE_PUBLIC_LIMIT,THROTTLE_STRICT_LIMIT,GROQ_API_KEY
+          envs: DOCKER_USERNAME,DB_USERNAME,DB_PASSWORD,DB_NAME,MYSQL_ROOT_PASSWORD,JWT_SECRET,JWT_EXPIRES_IN,CORS_ORIGINS,API_KEY_SECRET,REDIS_PASSWORD,REDIS_TTL,THROTTLE_TTL,THROTTLE_LIMIT,THROTTLE_STRICT_LIMIT,GROQ_API_KEY
           script: |
             # Docker and database credentials
             export DOCKER_USERNAME="${{ secrets.DOCKER_USERNAME }}"
@@ -100,7 +100,6 @@ jobs:
             export REDIS_TTL="${{ vars.REDIS_TTL || 300 }}"
             export THROTTLE_TTL="${{ vars.THROTTLE_TTL || 60 }}"
             export THROTTLE_LIMIT="${{ vars.THROTTLE_LIMIT || 10 }}"
-            export THROTTLE_PUBLIC_LIMIT="${{ vars.THROTTLE_PUBLIC_LIMIT || 20 }}"
             export THROTTLE_STRICT_LIMIT="${{ vars.THROTTLE_STRICT_LIMIT || 5 }}"
 
             cd /home/cativo23/deploy/portfolio-api-deploy
@@ -123,7 +122,6 @@ jobs:
             echo "REDIS_TTL=${REDIS_TTL}" >> .env
             echo "THROTTLE_TTL=${THROTTLE_TTL}" >> .env
             echo "THROTTLE_LIMIT=${THROTTLE_LIMIT}" >> .env
-            echo "THROTTLE_PUBLIC_LIMIT=${THROTTLE_PUBLIC_LIMIT}" >> .env
             echo "THROTTLE_STRICT_LIMIT=${THROTTLE_STRICT_LIMIT}" >> .env
 
             # Login to Docker Hub on server
