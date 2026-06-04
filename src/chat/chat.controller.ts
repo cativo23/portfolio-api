@@ -36,7 +36,10 @@ export class ChatController {
   @ApiOkResponse({ description: 'The assistant answer', type: ChatResponseDto })
   @ApiTooManyRequestsResponse({ description: 'Rate limit exceeded' })
   async ask(@Body() dto: AskChatDto): Promise<ChatResponseDto> {
-    const { answer, cached } = await this.chatService.ask(dto.question);
+    const { answer, cached } = await this.chatService.ask(
+      dto.question,
+      dto.history ?? [],
+    );
     return new ChatResponseDto(answer, cached);
   }
 }

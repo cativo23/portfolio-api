@@ -46,4 +46,67 @@ describe('AskChatDto', () => {
     });
     expect(errors.length).toBeGreaterThan(0);
   });
+
+  it('accepts a valid history array of turns', async () => {
+    expect(
+      await errorsFor({
+        question: 'What is next?',
+        history: [
+          { role: 'user', content: 'What is your stack?' },
+          { role: 'assistant', content: 'I use NestJS and TypeScript' },
+        ],
+      }),
+    ).toHaveLength(0);
+  });
+
+  it('accepts a request with NO history (optional field)', async () => {
+    expect(
+      await errorsFor({
+        question: 'Hello?',
+      }),
+    ).toHaveLength(0);
+  });
+
+  it('rejects history with more than 6 turns', async () => {
+    const history = Array.from({ length: 7 }, (_, i) => ({
+      role: i % 2 === 0 ? 'user' : 'assistant',
+      content: `turn ${i + 1}`,
+    }));
+    const errors = await errorsFor({
+      question: 'What is next?',
+      history,
+    });
+    expect(errors.length).toBeGreaterThan(0);
+  });
+
+  it('rejects a turn with an invalid role', async () => {
+    const errors = await errorsFor({
+      question: 'What is next?',
+      history: [{ role: 'system', content: 'I am the system' }],
+    });
+    expect(errors.length).toBeGreaterThan(0);
+  });
+
+  it('strips HTML from a turn content (sanitizes history)', () => {
+    const dto = toDto({
+      question: 'What is next?',
+      history: [
+        {
+          role: 'user',
+          content: '<img src=x onerror="alert(1)">Tell me more',
+        },
+      ],
+    });
+    expect(dto.history).toBeDefined();
+    expect(dto.history![0].content).not.toContain('<img');
+    expect(dto.history![0].content).not.toContain('onerror');
+  });
+
+  it('rejects a turn with content exceeding 2000 chars', async () => {
+    const errors = await errorsFor({
+      question: 'What is next?',
+      history: [{ role: 'user', content: 'x'.repeat(2001) }],
+    });
+    expect(errors.length).toBeGreaterThan(0);
+  });
 });

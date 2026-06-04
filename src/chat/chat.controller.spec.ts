@@ -28,8 +28,30 @@ describe('ChatController', () => {
 
     const result = await controller.ask(dto);
 
-    expect(mockChatService.ask).toHaveBeenCalledWith('Who are you?');
+    expect(mockChatService.ask).toHaveBeenCalledWith('Who are you?', []);
     expect(result).toEqual({ answer: 'Hello!', cached: true });
+  });
+
+  it('passes history from the DTO to ChatService when present', async () => {
+    mockChatService.ask.mockResolvedValue({
+      answer: 'Continuing...',
+      cached: false,
+    });
+    const dto: AskChatDto = {
+      question: 'What is next?',
+      history: [
+        { role: 'user', content: 'What is your stack?' },
+        { role: 'assistant', content: 'NestJS and TypeScript' },
+      ],
+    };
+
+    const result = await controller.ask(dto);
+
+    expect(mockChatService.ask).toHaveBeenCalledWith(
+      'What is next?',
+      dto.history,
+    );
+    expect(result).toEqual({ answer: 'Continuing...', cached: false });
   });
 
   it('marks the route as public', () => {

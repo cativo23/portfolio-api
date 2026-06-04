@@ -105,7 +105,7 @@ describe('ChatService', () => {
     const firstKey = mockCache.get.mock.calls[0][0];
     const secondKey = mockCache.get.mock.calls[1][0];
     expect(firstKey).toBe(secondKey);
-    expect(firstKey).toMatch(/^chat:[a-f0-9]{64}$/);
+    expect(firstKey).toMatch(/^chat:v2:[a-f0-9]{64}$/);
   });
 
   it('strips a system-prompt leak from the answer and caches the refusal, not the leak', async () => {
@@ -144,5 +144,55 @@ describe('ChatService', () => {
     for (const call of logSpy.mock.calls) {
       expect(String(call[0])).not.toContain(secret);
     }
+  });
+
+  it('passes prior history between system and the new question to the provider', async () => {
+    mockProvider.complete.mockResolvedValue({ content: 'answer to q3' });
+
+    await service.ask('q3', [
+      { role: 'user', content: 'q1' },
+      { role: 'assistant', content: 'a1' },
+    ]);
+
+    expect(mockProvider.complete).toHaveBeenCalledWith([
+      { role: 'system', content: 'SYSTEM PROMPT' },
+      { role: 'user', content: 'q1' },
+      { role: 'assistant', content: 'a1' },
+      { role: 'user', content: 'q3' },
+    ]);
+  });
+
+  it('does not cache multi-turn answers', async () => {
+    mockProvider.complete.mockResolvedValue({ content: 'answer to q3' });
+
+    const result = await service.ask('q3', [
+      { role: 'user', content: 'q1' },
+      { role: 'assistant', content: 'a1' },
+    ]);
+
+    expect(result.cached).toBe(false);
+    expect(mockCache.set).not.toHaveBeenCalled();
+  });
+
+  it('skips the cache lookup for multi-turn requests', async () => {
+    mockProvider.complete.mockResolvedValue({ content: 'answer to q3' });
+
+    await service.ask('q3', [
+      { role: 'user', content: 'q1' },
+      { role: 'assistant', content: 'a1' },
+    ]);
+
+    expect(mockCache.get).not.toHaveBeenCalled();
+  });
+
+  it('confirms first-turn (no history) still caches correctly', async () => {
+    mockCache.get.mockResolvedValue(undefined);
+    mockProvider.complete.mockResolvedValue({ content: 'fresh answer' });
+
+    await service.ask('What is your stack?');
+
+    const cacheKey = mockCache.set.mock.calls[0][0];
+    expect(cacheKey).toMatch(/^chat:v2:[a-f0-9]{64}$/);
+    expect(mockCache.set).toHaveBeenCalledTimes(1);
   });
 });
