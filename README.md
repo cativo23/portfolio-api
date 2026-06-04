@@ -126,7 +126,6 @@ The following environment variables are required for the application to run:
 - `NODE_ENV` - (Optional) Environment (development/production). In development, CORS is more permissive
 - `THROTTLE_TTL` - (Optional) Rate limit time window in **seconds** (NestJS throttler v6+ uses seconds). Defaults to `60` (1 minute)
 - `THROTTLE_LIMIT` - (Optional) Default rate limit (requests per window). Defaults to `100`
-- `THROTTLE_PUBLIC_LIMIT` - (Optional) Rate limit for public endpoints. Defaults to `10`
 - `THROTTLE_STRICT_LIMIT` - (Optional) Rate limit for auth endpoints (login/register). Defaults to `5`
 
 ## Project Setup
