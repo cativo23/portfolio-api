@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.9.1] - 2026-06-04
+
+### Changed
+
+- **Removed dead `THROTTLE_PUBLIC_LIMIT` config** — the deploy pipeline wrote `THROTTLE_PUBLIC_LIMIT` to the server `.env`, but no code ever read it. There is no "public" route tier: public endpoints either carry an explicit `@Throttle` (`/chat` reads `THROTTLE_STRICT_LIMIT`; `/contacts`, `/auth/login`, `/auth/register` hardcode their limits) or fall back to the global `THROTTLE_LIMIT`. Dropped from `deploy.yml`, `.env.example`, and the README. No runtime change. (#132)
+
+---
+
 ## [2.9.0] - 2026-06-03
 
 ### Security
