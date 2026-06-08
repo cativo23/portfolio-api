@@ -37,6 +37,13 @@ const FIXTURE: GroundingProfile = {
   education: 'Tutored privately in mathematics.',
   outsideCode: ['Horse racing math.'],
   openTo: 'Open to engine collaborations.',
+  fit: {
+    positioning: 'Deepest on mechanical computation; a pioneer, not a clerk.',
+    boundaries: [
+      'Not a fit for hand-tabulation roles — her depth is algorithms.',
+    ],
+    routeToDirect: 'For terms, write to her directly.',
+  },
   contact: {
     emails: ['ada@example.com'],
     github: 'https://github.com/ada',
@@ -118,6 +125,33 @@ describe('SystemPromptService', () => {
 
     it('strengthens never-invent to forbid inference and generalization', () => {
       expect(service.build().toLowerCase()).toMatch(/never invent or infer/);
+    });
+
+    it('renders the curated fit/boundary section from the profile', () => {
+      const prompt = service.build();
+      // positioning framing + the only-these-boundaries fence
+      expect(prompt).toContain('## Fit');
+      expect(prompt.toLowerCase()).toContain('backend center of gravity');
+      expect(prompt.toLowerCase()).toContain('only limitations you may state');
+      // a real curated boundary (applied-AI, not ML research)
+      expect(prompt.toLowerCase()).toMatch(
+        /does not train or fine-tune models/,
+      );
+    });
+
+    it('instructs fit/weakness questions to reframe as mutual fit, not flaws', () => {
+      const prompt = service.build().toLowerCase();
+      expect(prompt).toContain('fit & weakness questions');
+      expect(prompt).toMatch(/mutual fit/);
+      expect(prompt).toContain('biggest weakness'); // few-shot present
+    });
+
+    it('forbids the bot from discussing compensation', () => {
+      const prompt = service.build().toLowerCase();
+      expect(prompt).toMatch(
+        /never discuss, estimate, or negotiate compensation/,
+      );
+      expect(prompt).toContain('how much does carlos cativo charge'); // comp few-shot
     });
   });
 
