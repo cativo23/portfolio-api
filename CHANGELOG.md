@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.0] - 2026-06-08
+
+### Changed
+- **`THROTTLE_LIMIT` default raised to 100** across code, README, `.env.example`, and the deploy pipeline. It read 100 in code/README but 10 in `.env.example`/`deploy.yml`, so production silently ran the global limit at 10. Paired with the frontend now forwarding the real client IP (so per-IP throttling is genuinely per-visitor), 10/min was too low for normal browsing. (#135)
+- **Documented the trust-proxy invariant in `main.ts`** — the Nuxt BFF reaches this API over the internal docker network (bypassing Traefik) and forwards a single clean `X-Forwarded-For` = the real client IP; both the public (via Traefik) and BFF paths are exactly one proxy hop, so `trust proxy 1` stays correct. Records the load-bearing dependency on Traefik stripping client-supplied XFF at the edge. No behavior change. (#135)
+
+---
+
 ## [2.10.0] - 2026-06-04
 
 ### Added
