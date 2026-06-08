@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.13.0] - 2026-06-08
+
+### Added
+- **Honest fit boundaries for the chat assistant** — the bot can now answer "what's his weakness?", "why wouldn't I hire him?", and "is he a fit for [role]?" as mutual-fit qualification instead of only selling. A curated `fit` block in the grounding (positioning + approved boundary lines + a route-to-direct) gives the bot grounded, focus-not-flaw answers; boundaries are data the bot may state, never a license to invent negatives, so there's no new hallucination or prompt-injection surface. A new prompt rule governs framing (lead with depth, keep backend the headline), and compensation is double-gated so the bot never discusses or anchors on money. (#139)
+
+---
+
 ## [2.12.0] - 2026-06-08
 
 ### Removed
