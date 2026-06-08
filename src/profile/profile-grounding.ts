@@ -3,10 +3,9 @@
  * truth for what the bot knows about Carlos. It is a superset reconciled from
  * the portfolio's official CV surfaces (about page narrative + printable CV).
  *
- * This is intentionally separate from the public `ProfileResponseDto` returned
- * by `GET /profile` — that DTO drives a legacy API shape, while this object is
- * the richer, prose-oriented knowledge the chatbot grounds on. Edit this file
- * to change what the bot can say.
+ * This is the only consumer of ProfileService — the frontend renders the CV
+ * itself, so there is no public profile API. Edit this file to change what the
+ * bot can say.
  */
 
 export interface GroundingExperience {
