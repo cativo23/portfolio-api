@@ -36,6 +36,20 @@ export interface GroundingSkillCategory {
   items: string[];
 }
 
+/**
+ * Curated fit / lead-qualification data. This is the ONLY source of "boundary"
+ * statements the bot may make — it never reasons about weaknesses on its own
+ * (that would be fabrication and a prompt-injection lever). `positioning` is the
+ * always-first framing; `boundaries` are honest fit limits phrased as focus, not
+ * flaws, each with the adjacent strength baked in; `routeToDirect` is where the
+ * bot sends anything it must not negotiate (e.g. compensation).
+ */
+export interface GroundingFit {
+  positioning: string;
+  boundaries: string[];
+  routeToDirect: string;
+}
+
 export interface GroundingProfile {
   name: string;
   title: string;
@@ -50,6 +64,7 @@ export interface GroundingProfile {
   education: string;
   outsideCode: string[];
   openTo: string;
+  fit: GroundingFit;
   contact: {
     emails: string[];
     github: string;
@@ -253,6 +268,22 @@ export const CARLOS_GROUNDING: GroundingProfile = {
   ],
   openTo:
     'Open to Senior Backend, Tech Lead, and Engineering Manager roles — remote-first or with relocation sponsorship.',
+  fit: {
+    positioning:
+      'Senior tech lead and engineer with a backend center of gravity — payments, healthcare platforms, and production AI systems. Full-stack who ships solid frontend (Vue/Nuxt, Angular, even a design system), but goes deepest on backend architecture. Comfortable running real production infrastructure himself (self-hosts 16 containers — Docker, Traefik, AWS — and lives in the terminal). Depth in one area is the senior signal, not a gap.',
+    boundaries: [
+      "Seniority: he's a fit for senior IC, tech lead, and engineering-manager roles. Junior or mid-level positions would underuse him — he's past that level. A strong senior individual-contributor role with no direct reports is absolutely a fit.",
+      'AI: he is an applied engineer — he builds LLM and multi-agent systems in production with deterministic safeguards (sofIA, VittBot, Clarify). He does not train or fine-tune models, do ML research, data science, or MLOps. The research/training end is not his lane; taking models and shipping them reliably is.',
+      'Frontend: he is full-stack with a backend center of gravity. He ships solid frontend to deliver a product end to end, but does not position as a dedicated frontend or UI/UX specialist — his senior depth is backend.',
+      'Mobile: he ships hybrid mobile with Ionic/Capacitor (and has older C#/Unity history). Native iOS/Android in Swift or Kotlin is not his specialty — hybrid plus a strong backend is the fit; deep native mobile is not.',
+      'Location: he is in El Salvador (UTC-6), remote-first, open to relocation with sponsorship. On-site in a far-off timezone with no remote or relocation is not workable; remote or relocation-sponsored is.',
+      'Infrastructure: he runs real production infrastructure himself and is comfortable deep in the terminal and on servers (Docker, Traefik, k8s exposure, AWS) — infra in service of shipping product, with strong ops instincts. He is not a dedicated SRE or platform specialist operating at large scale (SLOs, fleet-wide observability, big on-call rotations). Backend with a DevOps streak is the fit; a pure platform-engineering seat at scale is not his target.',
+      'Management: he is open to engineering-manager roles, but he is hands-on. A fully non-coding, pure people-management role is not the fit; an EM or lead role that stays close to the code is.',
+      'Scale: his depth is end-to-end product ownership at a startup / scale-up — he has led from greenfield to production and owns systems fully, with real autonomy. The fit is someone who thrives owning the whole stack end to end.',
+    ],
+    routeToDirect:
+      'For compensation, rates, or anything that needs negotiating, that is a direct conversation — reach Carlos at cativo@cativo.dev.',
+  },
   contact: {
     emails: ['cativo@cativo.dev', 'cativo23.kt@gmail.com'],
     github: 'https://github.com/cativo23',
