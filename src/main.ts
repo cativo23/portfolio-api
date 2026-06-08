@@ -19,6 +19,19 @@ async function bootstrap() {
   // NOTE: `1` trusts exactly one hop. For the per-IP throttle to be
   // tamper-proof, Traefik must overwrite (not append to) X-Forwarded-For so a
   // client can't spoof it to rotate IPs and evade the limit.
+  //
+  // There are TWO request paths to this API and BOTH are exactly one proxy hop,
+  // so `1` is correct for each:
+  //   1. Public:  browser -> Traefik -> api          (Traefik sets XFF)
+  //   2. BFF:     browser -> Traefik -> Nuxt -> api   (the Nuxt BFF reaches us
+  //      directly over the internal docker network, bypassing Traefik, and
+  //      forwards a single clean X-Forwarded-For = the real client IP via its
+  //      apiFetch helper). Without that forwarding, all frontend traffic would
+  //      bucket under the Nuxt container's IP.
+  // LOAD-BEARING: path 2 is only safe because Traefik strips client-supplied XFF
+  // at the edge, so the BFF reads the true client IP. Do NOT add a second proxy
+  // hop on either path, and do NOT enable forwardedHeaders/insecure on the
+  // Traefik edge, without re-verifying this value and the BFF assumption.
   app.set('trust proxy', 1);
 
   // Mount CLS middleware first - before any other middleware that depends on it
