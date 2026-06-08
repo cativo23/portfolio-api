@@ -99,7 +99,7 @@ jobs:
             # Configuration variables (use GitHub vars or defaults)
             export REDIS_TTL="${{ vars.REDIS_TTL || 300 }}"
             export THROTTLE_TTL="${{ vars.THROTTLE_TTL || 60 }}"
-            export THROTTLE_LIMIT="${{ vars.THROTTLE_LIMIT || 10 }}"
+            export THROTTLE_LIMIT="${{ vars.THROTTLE_LIMIT || 100 }}"
             export THROTTLE_STRICT_LIMIT="${{ vars.THROTTLE_STRICT_LIMIT || 5 }}"
 
             cd /home/cativo23/deploy/portfolio-api-deploy
