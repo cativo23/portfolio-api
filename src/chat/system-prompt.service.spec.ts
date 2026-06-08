@@ -39,7 +39,9 @@ const FIXTURE: GroundingProfile = {
   openTo: 'Open to engine collaborations.',
   fit: {
     positioning: 'Deepest on mechanical computation; a pioneer, not a clerk.',
-    boundaries: ['Not a fit for hand-tabulation roles — her depth is algorithms.'],
+    boundaries: [
+      'Not a fit for hand-tabulation roles — her depth is algorithms.',
+    ],
     routeToDirect: 'For terms, write to her directly.',
   },
   contact: {
@@ -130,9 +132,7 @@ describe('SystemPromptService', () => {
       // positioning framing + the only-these-boundaries fence
       expect(prompt).toContain('## Fit');
       expect(prompt.toLowerCase()).toContain('backend center of gravity');
-      expect(prompt.toLowerCase()).toContain(
-        'only limitations you may state',
-      );
+      expect(prompt.toLowerCase()).toContain('only limitations you may state');
       // a real curated boundary (applied-AI, not ML research)
       expect(prompt.toLowerCase()).toMatch(
         /does not train or fine-tune models/,
@@ -143,12 +143,14 @@ describe('SystemPromptService', () => {
       const prompt = service.build().toLowerCase();
       expect(prompt).toContain('fit & weakness questions');
       expect(prompt).toMatch(/mutual fit/);
-      expect(prompt).toContain("biggest weakness"); // few-shot present
+      expect(prompt).toContain('biggest weakness'); // few-shot present
     });
 
     it('forbids the bot from discussing compensation', () => {
       const prompt = service.build().toLowerCase();
-      expect(prompt).toMatch(/never discuss, estimate, or negotiate compensation/);
+      expect(prompt).toMatch(
+        /never discuss, estimate, or negotiate compensation/,
+      );
       expect(prompt).toContain('how much does carlos cativo charge'); // comp few-shot
     });
   });
