@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.14.0] - 2026-07-16
+
+### Added
+- **`GET /infra/stats` endpoint** — live running-container and docker-compose-stack counts for the portfolio's public SIGNAL panel, derived from the existing read-only docker-socket-proxy (`/containers/json` list only — never inspect, so no container env is read). Public, throttle-exempt, Redis-cached 5 min, and degrades to null counts on any proxy failure. Configurable via `DOCKER_PROXY_URL` (defaults to the co-networked `dockerproxy:2375`, so no infra change). See space-server ADR-0004. (#141)
+
+---
+
 ## [2.13.0] - 2026-06-08
 
 ### Added
