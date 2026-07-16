@@ -31,6 +31,7 @@
       "@database/*": ["src/database/*"],
       "@health/*": ["src/health/*"],
       "@chat/*": ["src/chat/*"],
+      "@infra/*": ["src/infra/*"],
       "@src/*": ["src/*"]
     },
     "resolveJsonModule": true

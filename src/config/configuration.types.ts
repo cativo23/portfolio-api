@@ -42,6 +42,15 @@ export interface JwtConfig {
   expiresInSeconds: number;
 }
 
+export interface InfraConfig {
+  /**
+   * Base URL of the read-only docker-socket-proxy (tecnativa/docker-socket-proxy).
+   * Used to derive live running-container and compose-stack counts for the
+   * public "SIGNAL" panel. Only the `/containers/json` list endpoint is called.
+   */
+  dockerProxyUrl: string;
+}
+
 export interface ThrottlerConfig {
   /** Window duration in MILLISECONDS — the unit @nestjs/throttler v5+ expects. loadThrottlerConfig converts THROTTLE_TTL (seconds) via the seconds() helper. */
   ttl: number;

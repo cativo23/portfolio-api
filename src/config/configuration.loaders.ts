@@ -4,6 +4,7 @@ import { parseEnvBoolean, parseEnvInt, trimEnvQuotes } from '@config/env.utils';
 import type {
   AppConfig,
   DatabaseConfig,
+  InfraConfig,
   JwtConfig,
   RedisConfig,
   ThrottlerConfig,
@@ -84,6 +85,13 @@ export function loadJwtConfig(): JwtConfig {
   return {
     secret,
     expiresInSeconds: parseEnvInt(process.env.JWT_EXPIRES_IN, 3600),
+  };
+}
+
+export function loadInfraConfig(): InfraConfig {
+  return {
+    dockerProxyUrl:
+      trimEnvQuotes(process.env.DOCKER_PROXY_URL) || 'http://dockerproxy:2375',
   };
 }
 

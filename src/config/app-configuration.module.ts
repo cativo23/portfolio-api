@@ -3,6 +3,7 @@ import { ConfigModule, registerAs } from '@nestjs/config';
 import {
   loadAppConfig,
   loadDatabaseConfig,
+  loadInfraConfig,
   loadJwtConfig,
   loadRedisConfig,
 } from '@config/configuration.loaders';
@@ -15,6 +16,7 @@ export const appConfiguration = registerAs('app', loadAppConfig);
 export const databaseConfiguration = registerAs('database', loadDatabaseConfig);
 export const redisConfiguration = registerAs('redis', loadRedisConfig);
 export const jwtConfiguration = registerAs('jwt', loadJwtConfig);
+export const infraConfiguration = registerAs('infra', loadInfraConfig);
 
 /**
  * Configuración tipada vía namespaces: `app`, `database`, `redis`, `jwt`.
@@ -33,6 +35,7 @@ export const jwtConfiguration = registerAs('jwt', loadJwtConfig);
         databaseConfiguration,
         redisConfiguration,
         jwtConfiguration,
+        infraConfiguration,
         apiKeyConfig,
         mailConfig,
         chatConfig,
