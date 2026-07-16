@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.15.0] - 2026-07-16
+
+### Changed
+- **`GET /infra/stats` counts Traefik-exposed services, not raw containers** — the endpoint now counts only containers labelled `traefik.enable=true` (the services actually fronted by the reverse proxy) instead of every running container, and the response field is renamed `containers` → `services`. The SIGNAL panel now reflects publicly-fronted services (blog, webmail, dashboards, apps) rather than internal plumbing (exporters, cadvisor, db, redis, the docker proxy itself). Still uses only the `/containers/json` list endpoint — never inspect — per ADR-0004; `stacks` is unchanged. (#143)
+
+---
+
 ## [2.14.0] - 2026-07-16
 
 ### Added
