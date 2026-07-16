@@ -14,7 +14,7 @@ import { ContactsModule } from '@contacts/contacts.module';
 import { ProfileModule } from '@profile/profile.module';
 import { EmailModule } from '@email/email.module';
 import { ChatModule } from '@chat/chat.module';
-import { InfraModule } from '@src/infra/infra.module';
+import { InfraModule } from '@infra/infra.module';
 import { RequestContextModule } from '@core/context/request-context.module';
 import { RequestIdMiddleware } from '@core/middleware/request-id.middleware';
 import { ResponseTransformInterceptor } from '@core/interceptors/response-transform.interceptor';

@@ -58,9 +58,8 @@ export class InfraService {
       return { containers, stacks };
     } catch (error) {
       // Decorative data: never let a proxy outage break the caller — degrade to nulls.
-      this.logger.warn(
-        `Failed to fetch docker stats: ${(error as Error).message}`,
-      );
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.warn(`Failed to fetch docker stats: ${message}`);
       return { containers: null, stacks: null };
     }
   }

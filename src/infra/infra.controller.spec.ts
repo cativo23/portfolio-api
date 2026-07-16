@@ -8,6 +8,9 @@ const mockInfraService = {
   getStats: vi.fn(),
 };
 
+// Required for DI: the controller is decorated with @UseInterceptors(CacheInterceptor),
+// so Nest instantiates CacheInterceptor (which injects CACHE_MANAGER) when compiling the
+// test module — even though the interceptor never runs during direct method calls.
 const mockCacheManager = {
   get: vi.fn(),
   set: vi.fn(),
@@ -40,5 +43,17 @@ describe('InfraController', () => {
       stacks: 12,
     });
     expect(mockInfraService.getStats).toHaveBeenCalledTimes(1);
+  });
+
+  it('passes null counts through unchanged when the source is unreachable', async () => {
+    mockInfraService.getStats.mockResolvedValue({
+      containers: null,
+      stacks: null,
+    });
+
+    await expect(controller.stats()).resolves.toEqual({
+      containers: null,
+      stacks: null,
+    });
   });
 });

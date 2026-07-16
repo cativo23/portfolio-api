@@ -47,14 +47,15 @@ describe('InfraService', () => {
           container('portfolio'),
           container('space-server'),
           container('ghost'),
-          container(), // standalone container, no compose project
+          container(), // standalone container, empty Labels
+          {}, // container summary with no Labels key at all
         ],
       }),
     );
 
     const stats = await service.getStats();
 
-    expect(stats).toEqual({ containers: 5, stacks: 3 });
+    expect(stats).toEqual({ containers: 6, stacks: 3 });
     expect(mockHttpService.get).toHaveBeenCalledWith(
       'http://dockerproxy:2375/containers/json',
       expect.objectContaining({ timeout: expect.any(Number) }),
