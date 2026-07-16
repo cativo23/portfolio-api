@@ -6,8 +6,8 @@ import type { InfraConfig } from '@config/configuration.types';
 
 /** Live infrastructure counts surfaced on the public SIGNAL panel. */
 export interface InfraStats {
-  /** Running containers, or null when the docker proxy is unreachable. */
-  containers: number | null;
+  /** Traefik-exposed services, or null when the docker proxy is unreachable. */
+  services: number | null;
   /** Distinct docker-compose projects (stacks), or null on failure. */
   stacks: number | null;
 }
@@ -18,6 +18,13 @@ interface DockerContainerSummary {
 }
 
 const COMPOSE_PROJECT_LABEL = 'com.docker.compose.project';
+/**
+ * Traefik's opt-in label. Counting only containers that carry it yields
+ * "services I run" (blog, webmail, dashboards, apps…) rather than the raw
+ * running-container total, which is dominated by internal plumbing —
+ * exporters, cadvisor, db, redis, the docker proxy itself.
+ */
+const TRAEFIK_ENABLE_LABEL = 'traefik.enable';
 const REQUEST_TIMEOUT_MS = 5000;
 
 /**
@@ -48,19 +55,21 @@ export class InfraService {
         ),
       );
 
-      const containers = data.length;
+      const services = data.filter(
+        (c) => c.Labels?.[TRAEFIK_ENABLE_LABEL] === 'true',
+      ).length;
       const stacks = new Set(
         data
           .map((c) => c.Labels?.[COMPOSE_PROJECT_LABEL])
           .filter((project): project is string => Boolean(project)),
       ).size;
 
-      return { containers, stacks };
+      return { services, stacks };
     } catch (error) {
       // Decorative data: never let a proxy outage break the caller — degrade to nulls.
       const message = error instanceof Error ? error.message : String(error);
       this.logger.warn(`Failed to fetch docker stats: ${message}`);
-      return { containers: null, stacks: null };
+      return { services: null, stacks: null };
     }
   }
 }
