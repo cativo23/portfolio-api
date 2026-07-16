@@ -36,10 +36,10 @@ describe('InfraController', () => {
   });
 
   it('returns the stats from the service', async () => {
-    mockInfraService.getStats.mockResolvedValue({ containers: 20, stacks: 12 });
+    mockInfraService.getStats.mockResolvedValue({ services: 17, stacks: 12 });
 
     await expect(controller.stats()).resolves.toEqual({
-      containers: 20,
+      services: 17,
       stacks: 12,
     });
     expect(mockInfraService.getStats).toHaveBeenCalledTimes(1);
@@ -47,12 +47,12 @@ describe('InfraController', () => {
 
   it('passes null counts through unchanged when the source is unreachable', async () => {
     mockInfraService.getStats.mockResolvedValue({
-      containers: null,
+      services: null,
       stacks: null,
     });
 
     await expect(controller.stats()).resolves.toEqual({
-      containers: null,
+      services: null,
       stacks: null,
     });
   });

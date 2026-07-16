@@ -15,8 +15,11 @@ const mockConfigService = {
   }),
 };
 
-function container(project?: string) {
-  return { Labels: project ? { 'com.docker.compose.project': project } : {} };
+function container(project?: string, exposed = true) {
+  const labels: Record<string, string> = {};
+  if (project) labels['com.docker.compose.project'] = project;
+  if (exposed) labels['traefik.enable'] = 'true';
+  return { Labels: labels };
 }
 
 describe('InfraService', () => {
@@ -39,15 +42,16 @@ describe('InfraService', () => {
     service = module.get<InfraService>(InfraService);
   });
 
-  it('counts running containers and distinct compose stacks', async () => {
+  it('counts only Traefik-exposed services but all distinct compose stacks', async () => {
     mockHttpService.get.mockReturnValue(
       of({
         data: [
-          container('portfolio'),
-          container('portfolio'),
-          container('space-server'),
-          container('ghost'),
-          container(), // standalone container, empty Labels
+          container('portfolio'), // exposed
+          container('portfolio'), // exposed
+          container('space-server'), // exposed
+          container('ghost'), // exposed
+          container('monitoring', false), // internal-only stack, no traefik label
+          container(undefined, false), // standalone internal container
           {}, // container summary with no Labels key at all
         ],
       }),
@@ -55,7 +59,9 @@ describe('InfraService', () => {
 
     const stats = await service.getStats();
 
-    expect(stats).toEqual({ containers: 6, stacks: 3 });
+    // 4 containers carry traefik.enable=true → 4 services; stacks span all
+    // compose projects (portfolio, space-server, ghost, monitoring) → 4.
+    expect(stats).toEqual({ services: 4, stacks: 4 });
     expect(mockHttpService.get).toHaveBeenCalledWith(
       'http://dockerproxy:2375/containers/json',
       expect.objectContaining({ timeout: expect.any(Number) }),
@@ -69,7 +75,7 @@ describe('InfraService', () => {
 
     const stats = await service.getStats();
 
-    expect(stats).toEqual({ containers: null, stacks: null });
+    expect(stats).toEqual({ services: null, stacks: null });
   });
 
   it('returns zeroes when no containers are running', async () => {
@@ -77,6 +83,6 @@ describe('InfraService', () => {
 
     const stats = await service.getStats();
 
-    expect(stats).toEqual({ containers: 0, stacks: 0 });
+    expect(stats).toEqual({ services: 0, stacks: 0 });
   });
 });
