@@ -6,11 +6,11 @@ import { ApiProperty } from '@nestjs/swagger';
  */
 export class InfraStatsResponseDto {
   @ApiProperty({
-    description: 'Number of running containers',
+    description: 'Number of Traefik-exposed services',
     nullable: true,
-    example: 20,
+    example: 17,
   })
-  containers: number | null;
+  services: number | null;
 
   @ApiProperty({
     description: 'Number of distinct docker-compose projects (stacks)',

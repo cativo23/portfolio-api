@@ -11,8 +11,8 @@ const INFRA_CACHE_TTL_MS = 5 * 60 * 1000;
 /**
  * Public infrastructure signal for the portfolio's SIGNAL panel.
  *
- * Exposes only aggregate counts (running containers, compose stacks) — the same
- * numbers rendered publicly on the site — so there is no new information exposure.
+ * Exposes only aggregate counts (Traefik-exposed services, compose stacks) — the
+ * same numbers rendered publicly on the site — so there is no new information exposure.
  */
 @ApiTags('Infra')
 @Controller('infra')
@@ -25,9 +25,9 @@ export class InfraController {
   @CacheKey('infra:stats')
   @CacheTTL(INFRA_CACHE_TTL_MS)
   @ApiOperation({
-    summary: 'Live container and stack counts',
+    summary: 'Live service and stack counts',
     description:
-      'Running-container and docker-compose-stack counts derived from the ' +
+      'Traefik-exposed-service and docker-compose-stack counts derived from the ' +
       'read-only docker-socket-proxy. Fields are null if the source is unreachable.',
   })
   @ApiResponse({
