@@ -369,5 +369,68 @@ describe('CreateProjectDto', () => {
       expect(errors.length).toBeGreaterThan(0);
       expect(errors.some((e) => e.property === 'features')).toBe(true);
     });
+
+    it('should accept optional problem/role/outcome as strings', async () => {
+      const dto = plainToClass(CreateProjectDto, {
+        title: 'My Project',
+        description: 'A great project description',
+        shortDescription: 'Short desc',
+        repoUrl: 'https://github.com/user/repo',
+        problem: 'The problem being solved',
+        role: "Carlos's role on this project",
+        outcome: 'The concrete result',
+      });
+
+      const errors = await validate(dto);
+      expect(errors).toHaveLength(0);
+    });
+
+    it('should accept minimal input without problem/role/outcome (all optional)', async () => {
+      const dto = plainToClass(CreateProjectDto, {
+        title: 'My Project',
+        description: 'A great project description',
+        shortDescription: 'Short desc',
+        repoUrl: 'https://github.com/user/repo',
+      });
+
+      const errors = await validate(dto);
+      expect(errors).toHaveLength(0);
+      expect(dto.problem).toBeUndefined();
+      expect(dto.role).toBeUndefined();
+      expect(dto.outcome).toBeUndefined();
+    });
+
+    it.each(['problem', 'role', 'outcome'])(
+      'should enforce maxLength on %s (500)',
+      async (field) => {
+        const dto = plainToClass(CreateProjectDto, {
+          title: 'My Project',
+          description: 'A great project description',
+          shortDescription: 'Short desc',
+          repoUrl: 'https://github.com/user/repo',
+          [field]: 'a'.repeat(501),
+        });
+
+        const errors = await validate(dto);
+        expect(errors.length).toBeGreaterThan(0);
+        expect(errors.some((e) => e.property === field)).toBe(true);
+      },
+    );
+
+    it.each(['problem', 'role', 'outcome'])(
+      'should accept %s at maxLength boundary (500)',
+      async (field) => {
+        const dto = plainToClass(CreateProjectDto, {
+          title: 'My Project',
+          description: 'A great project description',
+          shortDescription: 'Short desc',
+          repoUrl: 'https://github.com/user/repo',
+          [field]: 'a'.repeat(500),
+        });
+
+        const errors = await validate(dto);
+        expect(errors).toHaveLength(0);
+      },
+    );
   });
 });

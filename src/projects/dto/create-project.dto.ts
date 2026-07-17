@@ -94,4 +94,31 @@ export class CreateProjectDto {
     default: ProjectStatus.COMPLETED,
   })
   status?: ProjectStatus;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  @ApiPropertyOptional({
+    description: 'The problem this project solves (curated detail-page spine)',
+    maxLength: 500,
+  })
+  problem?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  @ApiPropertyOptional({
+    description: "Carlos's role on this project (curated detail-page spine)",
+    maxLength: 500,
+  })
+  role?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  @ApiPropertyOptional({
+    description: 'The concrete outcome/result (curated detail-page spine)',
+    maxLength: 500,
+  })
+  outcome?: string;
 }
