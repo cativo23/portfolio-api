@@ -31,7 +31,9 @@
     "seed:test:prod": "node dist/src/database/seeder.prod.js",
     "seed:update-projects": "npx ts-node -r tsconfig-paths/register src/database/seeds/update-projects-seed.ts",
     "seed:update-projects:prod": "node dist/src/database/seeds/update-projects-seed.prod.js",
-    "seed:normalize-hero-urls": "npx ts-node -r tsconfig-paths/register src/database/seeds/normalize-hero-urls.ts"
+    "seed:normalize-hero-urls": "npx ts-node -r tsconfig-paths/register src/database/seeds/normalize-hero-urls.ts",
+    "seed:update-project-spine": "npx ts-node -r tsconfig-paths/register src/database/seeds/update-project-spine.ts",
+    "seed:update-project-spine:prod": "node dist/src/database/seeds/update-project-spine.prod.js"
   },
   "dependencies": {
     "@nestjs/axios": "^4",

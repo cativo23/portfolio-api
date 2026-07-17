@@ -37,6 +37,15 @@ export class Project extends BaseEntity {
   @Column({ type: 'json', nullable: true })
   features: string[];
 
+  @Column({ type: 'text', nullable: true })
+  problem: string | null;
+
+  @Column({ type: 'text', nullable: true })
+  role: string | null;
+
+  @Column({ type: 'text', nullable: true })
+  outcome: string | null;
+
   @Index()
   @Column({
     type: 'enum',

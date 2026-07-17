@@ -43,6 +43,24 @@ export class ProjectResponseDto {
   features: string[];
 
   @ApiProperty({
+    description: 'The problem this project solves',
+    required: false,
+  })
+  problem?: string;
+
+  @ApiProperty({
+    description: "Carlos's role on this project",
+    required: false,
+  })
+  role?: string;
+
+  @ApiProperty({
+    description: 'The concrete outcome/result',
+    required: false,
+  })
+  outcome?: string;
+
+  @ApiProperty({
     description: 'Project status',
     enum: ProjectStatus,
     default: ProjectStatus.COMPLETED,
@@ -73,6 +91,9 @@ export class ProjectResponseDto {
     dto.content = project.content;
     dto.heroImage = project.heroImage;
     dto.features = project.features ?? [];
+    dto.problem = project.problem ?? undefined;
+    dto.role = project.role ?? undefined;
+    dto.outcome = project.outcome ?? undefined;
     dto.status = project.status ?? ProjectStatus.COMPLETED;
     dto.createdAt = project.createdAt;
     dto.updatedAt = project.updatedAt;
