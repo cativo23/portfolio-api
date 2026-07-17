@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.17.0] - 2026-07-17
+
+### Added
+- **Project detail-page "spine" fields** — three new nullable `problem`/`role`/`outcome` columns on `Project` (500-char cap each), used to replace the raw README dump on project detail pages with a curated, recruiter-skimmable summary. A new re-runnable `seed:update-project-spine` script (+ `:prod` variant) fills in curated content for the 8 featured projects, without ever overwriting a value already set another way. (#148)
+
+---
+
 ## [2.16.0] - 2026-07-17
 
 ### Fixed
