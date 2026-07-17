@@ -47,8 +47,7 @@ export class AuthService {
    * @param email - User's email address
    * @param password - User's password
    * @returns Promise resolving to an object containing the access token, expiration time, and user information
-   * @throws NotFoundException if the user is not found
-   * @throws AuthenticationException if the password is incorrect
+   * @throws AuthenticationException if the user is not found or the password is incorrect
    */
   async login(
     email: string,
@@ -92,13 +91,15 @@ export class AuthService {
    * @param email - User's email address
    * @param password - User's password
    * @returns Promise resolving to the user entity if validation is successful
-   * @throws NotFoundException if the user is not found
-   * @throws AuthenticationException if the password is incorrect
+   * @throws AuthenticationException if the user is not found or the password is incorrect
    */
   async validateUser(email: string, password: string): Promise<User> {
     const user = await this.usersService.findOneByEmail(email);
-    if (!user) {
-      // Same error message as invalid password to prevent user enumeration
+    if (!user || !user.password) {
+      // Also covers users inserted directly into the DB without a hashed
+      // password: bcrypt.compare throws on a null/undefined hash, which would
+      // otherwise surface as a 500 instead of a clean 401. Same message as an
+      // incorrect password to prevent user enumeration.
       throw new AuthenticationException('Invalid email or password');
     }
     const isMatch: boolean = await bcrypt.compare(password, user.password);

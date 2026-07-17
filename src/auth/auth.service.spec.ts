@@ -133,6 +133,23 @@ describe('AuthService', () => {
         service.validateUser(user.email, 'wrongpass'),
       ).rejects.toThrow(AuthenticationException);
     });
+
+    it('should throw AuthenticationException (not 500) if the stored password is missing', async () => {
+      // A user inserted directly into the DB without going through
+      // UsersService.create() can have a null/undefined password. bcrypt.compare
+      // throws "data and hash arguments required" on such a hash, which would
+      // otherwise surface as a 500 instead of a clean 401.
+      const user = {
+        id: 1,
+        email: 'test@mail.com',
+        password: undefined,
+      } as unknown as User;
+      usersService.findOneByEmail.mockResolvedValue(user);
+
+      await expect(service.validateUser(user.email, password)).rejects.toThrow(
+        AuthenticationException,
+      );
+    });
   });
 
   describe('login', () => {
