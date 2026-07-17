@@ -37,7 +37,13 @@ export function normalizeHeroImageUrl(
 /**
  * Rewrites any project whose hero URL points at a non-canonical origin
  * (e.g. a stale `localhost:3001` dev URL) to the canonical prod host.
+ *
+ * Requires a live DB connection (same as the sibling `database/seeder*`
+ * scripts, which the coverage config already excludes), so it's covered by
+ * running it against a real dev DB rather than a unit spec; the pure
+ * `normalizeHeroImageUrl` transform above carries the real test coverage.
  */
+/* v8 ignore start */
 async function normalizeHeroUrls(): Promise<void> {
   const logger = new Logger('NormalizeHeroUrls');
   const dataSource = await AppDataSource.initialize();
@@ -70,3 +76,4 @@ if (require.main === module) {
     .then(() => process.exit(0))
     .catch(() => process.exit(1));
 }
+/* v8 ignore stop */
