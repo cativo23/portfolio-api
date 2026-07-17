@@ -48,8 +48,8 @@ async function normalizeHeroUrls(): Promise<void> {
 
     for (const project of projects) {
       const next = normalizeHeroImageUrl(project.heroImage);
-      if (next !== project.heroImage) {
-        await repository.update(project.id, { heroImage: next as string });
+      if (typeof next === 'string' && next !== project.heroImage) {
+        await repository.update(project.id, { heroImage: next });
         logger.log(
           `Project #${project.id}: heroImage ${project.heroImage} → ${next}`,
         );
