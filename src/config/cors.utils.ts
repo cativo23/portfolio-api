@@ -3,6 +3,7 @@ import type { AppConfig } from '@config/configuration.types';
 const DEV_LOCALHOST_ORIGINS = [
   'http://localhost:3000',
   'http://localhost:3001',
+  'http://localhost:3002',
   'http://localhost:4173',
   'http://localhost:4200',
   'http://localhost:5173',
