@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.16.0] - 2026-07-17
+
+### Fixed
+- **`/auth/login` returned 500 instead of 401 for an existing user with a null password hash** — `bcrypt.compare` throws on a null/undefined hash (reachable only via a direct DB insert that bypasses `UsersService.create()`'s hashing); `validateUser` now guards for a missing hash and fails as a clean, enumeration-safe 401 like any other bad credential. (#145)
+
+### Added
+- **`seed:normalize-hero-urls` script** — a re-runnable, idempotent dev-only seed that rewrites any project's `heroImage` origin to the canonical production host (`cativo.dev`), fixing local hero images that 404 after a hand-edited dev DB pointed at a stale `localhost:3001` origin. No effect on production data. (#146)
+
+### Changed
+- **`localhost:3002` added to the dev-only CORS allowlist** — the frontend dev server's port. (#146)
+
+---
+
 ## [2.15.0] - 2026-07-16
 
 ### Changed
