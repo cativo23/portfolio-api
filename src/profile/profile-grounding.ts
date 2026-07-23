@@ -184,13 +184,13 @@ export const CARLOS_GROUNDING: GroundingProfile = {
   openSource: [
     {
       name: 'lumira',
-      downloads: '~3.4K downloads/mo',
+      downloads: '~1.8K downloads/mo',
       description:
         'Real-time statusline HUD for Claude Code and Qwen Code. Session analytics, latency overhead widget, quota projection. Zero deps. TypeScript, npm.',
     },
     {
       name: 'nightwire',
-      downloads: '~475 downloads/mo',
+      downloads: '~84 downloads/mo',
       description:
         'Dark cyberpunk UI design system. Semantic color roles, neon palette, CLI installer. CSS, npm.',
     },
