@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.17.1] - 2026-07-23
+
+### Fixed
+- **Stale lumira/nightwire download counts in chat grounding data** — the chatbot's profile grounding still said lumira ~3.4K/mo and nightwire ~475/mo. Corrected to the verified live npm registry numbers (~1.8K/mo and ~84/mo respectively). (#150)
+
+---
+
 ## [2.17.0] - 2026-07-17
 
 ### Added
