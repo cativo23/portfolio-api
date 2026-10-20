@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.17.2] - 2026-10-19
+
+### Fixed
+- **The chat no longer quotes stale download and container counts.** The profile grounding said lumira gets ~1.8K downloads a month, nightwire ~84, and that the server runs "16 containers across 6 stacks"; npm now reports ~580 / ~38 and prod runs 24 services across 21 stacks. The packages are now described as "published on npm" and the infra without counting it, matching the site, so there is nothing left to drift. The system prompt already forbids inventing facts, so a visitor asking for a figure gets "I don't have that". (#152)
+- **Blue Medical tenure in the grounding updated to 4+ years** (was 3+). (#152)
+
+---
+
 ## [2.17.1] - 2026-07-23
 
 ### Fixed
