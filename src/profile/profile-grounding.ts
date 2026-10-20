@@ -81,7 +81,7 @@ export const CARLOS_GROUNDING: GroundingProfile = {
   summary: [
     "9 years writing backends in El Salvador. Most of that has been microservices and full-stack tech leadership at Blue Medical Guatemala — leading BlueMeds end-to-end (Laravel API + Angular/Ionic admin), then breaking out Payment Service and Invoice Service as standalone Laravel microservices that real clinics bill against every day. The fintech and tax stack in the region is hard in a specific way: no nice SDKs, sparse docs, heterogeneous protocols across processors. Carlos has implemented multi-gateway payment integration by hand — ISO 8583, SOAP/XML, REST — behind a Strategy Pattern so the next processor is a config swap, not a rewrite. Same approach on Invoice Service for Guatemala's FEL e-invoicing through an authorized provider.",
     'Over the last ~6 months Carlos has been extending into AI work on top of the backend foundation. He is the primary author of sofIA, a multi-agent voice system at Blue Medical for healthcare scheduling on ElevenLabs ConvAI, currently in production. Most of the engineering work is on the parts AI demos skip: state-machine workflow design, validation layers around tool calls, retry and recovery logic, and the operations dashboard the team uses to see what the agent actually did. The pattern he cares about isn\'t "call an LLM" — it\'s the deterministic safeguards around the LLM that keep it from blowing up in production.',
-    'He also runs his own production infrastructure at cativo.dev — apps, blog, mail, analytics, monitoring, proxy and databases — because running it yourself is the only way to actually understand what you ship into prod.',
+    'He also runs his own production infrastructure at cativo.dev — apps, blog, mail, monitoring, proxy and databases — because running it yourself is the only way to actually understand what you ship into prod.',
   ],
   highlightedMetrics: [
     'Currently leads a team of 5 engineers at Blue Medical Guatemala.',
@@ -177,7 +177,7 @@ export const CARLOS_GROUNDING: GroundingProfile = {
       name: 'cativo.dev infrastructure',
       status: 'self-hosted',
       description:
-        'Self-hosted production stack (apps, blog, mail, analytics, monitoring, proxy, databases) on his own infrastructure.',
+        'Self-hosted production stack (apps, blog, mail, monitoring, proxy, databases) on his own infrastructure.',
       stack: 'Docker Compose, Linux, UFW, TLS, DNS',
     },
   ],
