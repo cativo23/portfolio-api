@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.17.3] - 2026-10-19
+
+### Changed
+- **The chat no longer lists analytics in the self-hosted stack.** Umami was removed from the site and the server, so both infra descriptions in the grounding drop it. (#154)
+
+---
+
 ## [2.17.2] - 2026-10-19
 
 ### Fixed
