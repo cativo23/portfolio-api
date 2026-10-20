@@ -81,7 +81,7 @@ export const CARLOS_GROUNDING: GroundingProfile = {
   summary: [
     "9 years writing backends in El Salvador. Most of that has been microservices and full-stack tech leadership at Blue Medical Guatemala — leading BlueMeds end-to-end (Laravel API + Angular/Ionic admin), then breaking out Payment Service and Invoice Service as standalone Laravel microservices that real clinics bill against every day. The fintech and tax stack in the region is hard in a specific way: no nice SDKs, sparse docs, heterogeneous protocols across processors. Carlos has implemented multi-gateway payment integration by hand — ISO 8583, SOAP/XML, REST — behind a Strategy Pattern so the next processor is a config swap, not a rewrite. Same approach on Invoice Service for Guatemala's FEL e-invoicing through an authorized provider.",
     'Over the last ~6 months Carlos has been extending into AI work on top of the backend foundation. He is the primary author of sofIA, a multi-agent voice system at Blue Medical for healthcare scheduling on ElevenLabs ConvAI, currently in production. Most of the engineering work is on the parts AI demos skip: state-machine workflow design, validation layers around tool calls, retry and recovery logic, and the operations dashboard the team uses to see what the agent actually did. The pattern he cares about isn\'t "call an LLM" — it\'s the deterministic safeguards around the LLM that keep it from blowing up in production.',
-    'He also runs his own production infrastructure at cativo.dev — 16 containers across 6 stacks (apps, blog, mail, monitoring, proxy, databases) — because running it yourself is the only way to actually understand what you ship into prod.',
+    'He also runs his own production infrastructure at cativo.dev — apps, blog, mail, analytics, monitoring, proxy and databases — because running it yourself is the only way to actually understand what you ship into prod.',
   ],
   highlightedMetrics: [
     'Currently leads a team of 5 engineers at Blue Medical Guatemala.',
@@ -91,7 +91,7 @@ export const CARLOS_GROUNDING: GroundingProfile = {
     {
       role: 'Tech Lead / Full-Stack Engineer',
       company: 'Blue Medical Guatemala',
-      period: 'Apr 2022 → Present (3+ yrs)',
+      period: 'Apr 2022 → Present (4+ yrs)',
       location: 'Guatemala (Remote)',
       description:
         'Lead developer across payment, e-invoicing, subscription, and AI voice platforms — owns design, delivery, and on-call from greenfield to production. Leads a team of 5 engineers.',
@@ -177,20 +177,20 @@ export const CARLOS_GROUNDING: GroundingProfile = {
       name: 'cativo.dev infrastructure',
       status: 'self-hosted',
       description:
-        'Self-hosted production stack: 16 containers across 6 stacks (apps, blog, mail, monitoring, proxy, databases) on his own infrastructure.',
+        'Self-hosted production stack (apps, blog, mail, analytics, monitoring, proxy, databases) on his own infrastructure.',
       stack: 'Docker Compose, Linux, UFW, TLS, DNS',
     },
   ],
   openSource: [
     {
       name: 'lumira',
-      downloads: '~1.8K downloads/mo',
+      downloads: 'published on npm',
       description:
         'Real-time statusline HUD for Claude Code and Qwen Code. Session analytics, latency overhead widget, quota projection. Zero deps. TypeScript, npm.',
     },
     {
       name: 'nightwire',
-      downloads: '~84 downloads/mo',
+      downloads: 'published on npm',
       description:
         'Dark cyberpunk UI design system. Semantic color roles, neon palette, CLI installer. CSS, npm.',
     },
@@ -270,7 +270,7 @@ export const CARLOS_GROUNDING: GroundingProfile = {
     'Open to Senior Backend, Tech Lead, and Engineering Manager roles — remote-first or with relocation sponsorship.',
   fit: {
     positioning:
-      'Senior tech lead and engineer with a backend center of gravity — payments, healthcare platforms, and production AI systems. Full-stack who ships solid frontend (Vue/Nuxt, Angular, even a design system), but goes deepest on backend architecture. Comfortable running real production infrastructure himself (self-hosts 16 containers — Docker, Traefik, AWS — and lives in the terminal). Depth in one area is the senior signal, not a gap.',
+      'Senior tech lead and engineer with a backend center of gravity — payments, healthcare platforms, and production AI systems. Full-stack who ships solid frontend (Vue/Nuxt, Angular, even a design system), but goes deepest on backend architecture. Comfortable running real production infrastructure himself (self-hosts his own stack — Docker, Traefik, AWS — and lives in the terminal). Depth in one area is the senior signal, not a gap.',
     boundaries: [
       "Seniority: he's a fit for senior IC, tech lead, and engineering-manager roles. Junior or mid-level positions would underuse him — he's past that level. A strong senior individual-contributor role with no direct reports is absolutely a fit.",
       'AI: he is an applied engineer — he builds LLM and multi-agent systems in production with deterministic safeguards (sofIA, VittBot, Clarify). He does not train or fine-tune models, do ML research, data science, or MLOps. The research/training end is not his lane; taking models and shipping them reliably is.',
