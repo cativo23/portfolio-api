@@ -91,7 +91,7 @@ export const CARLOS_GROUNDING: GroundingProfile = {
     {
       role: 'Tech Lead / Full-Stack Engineer',
       company: 'Blue Medical Guatemala',
-      period: 'Apr 2022 → Present (3+ yrs)',
+      period: 'Apr 2022 → Present (4+ yrs)',
       location: 'Guatemala (Remote)',
       description:
         'Lead developer across payment, e-invoicing, subscription, and AI voice platforms — owns design, delivery, and on-call from greenfield to production. Leads a team of 5 engineers.',
