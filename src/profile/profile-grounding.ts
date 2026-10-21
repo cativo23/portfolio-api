@@ -75,32 +75,32 @@ export interface GroundingProfile {
 
 export const CARLOS_GROUNDING: GroundingProfile = {
   name: 'Carlos Cativo',
-  title: 'Senior Tech Lead — Payments, Healthcare & Backend',
+  title: 'Senior Backend Engineer & Tech Lead',
   location: 'El Salvador (UTC-6) · works in EN/ES',
   yearsOfExperience: 9,
   summary: [
-    "9 years writing backends in El Salvador. Most of that has been microservices and full-stack tech leadership at Blue Medical Guatemala — leading BlueMeds end-to-end (Laravel API + Angular/Ionic admin), then breaking out Payment Service and Invoice Service as standalone Laravel microservices that real clinics bill against every day. The fintech and tax stack in the region is hard in a specific way: no nice SDKs, sparse docs, heterogeneous protocols across processors. Carlos has implemented multi-gateway payment integration by hand — ISO 8583, SOAP/XML, REST — behind a Strategy Pattern so the next processor is a config swap, not a rewrite. Same approach on Invoice Service for Guatemala's FEL e-invoicing through an authorized provider.",
-    'Over the last ~6 months Carlos has been extending into AI work on top of the backend foundation. He is the primary author of sofIA, a multi-agent voice system at Blue Medical for healthcare scheduling on ElevenLabs ConvAI, currently in production. Most of the engineering work is on the parts AI demos skip: state-machine workflow design, validation layers around tool calls, retry and recovery logic, and the operations dashboard the team uses to see what the agent actually did. The pattern he cares about isn\'t "call an LLM" — it\'s the deterministic safeguards around the LLM that keep it from blowing up in production.',
+    "9 years writing backends in El Salvador. Most of that has been microservices and full-stack tech leadership at Blue Medical Guatemala — tech lead for BlueMeds (Laravel API + Angular/Ionic admin), then breaking out Payment Service and Invoice Service as standalone Laravel microservices used in production daily by real business users. The fintech and tax stack in the region is hard in a specific way: no nice SDKs, sparse docs, heterogeneous protocols across processors. Carlos has implemented multi-gateway payment integration by hand — ISO 8583, SOAP/XML, REST — behind a Strategy Pattern so the next processor is a config swap, not a rewrite. Same approach on Invoice Service for Guatemala's FEL e-invoicing through authorized providers.",
+    'Over the last ~6 months Carlos has been extending into AI work on top of the backend foundation. He is the primary author of sofIA, a multi-agent voice system at Blue Medical for appointment scheduling on ElevenLabs ConvAI, currently in production. Most of the engineering work is on the parts AI demos skip: state-machine workflow design, validation layers around tool calls, retry and recovery logic, and the operations dashboard the team uses to see what the agent actually did. The pattern he cares about isn\'t "call an LLM" — it\'s the deterministic safeguards around the LLM that keep it from blowing up in production.',
     'He also runs his own production infrastructure at cativo.dev — apps, blog, mail, monitoring, proxy and databases — because running it yourself is the only way to actually understand what you ship into prod.',
   ],
   highlightedMetrics: [
     'Currently leads a team of 5 engineers at Blue Medical Guatemala.',
-    'Scaled a payment platform from ~$30K to ~$450K USD/month while shipping 3 services from scratch.',
+    'Replaced a single-script subscription charger with a fault-tolerant, multi-gateway payment service — now ~$500K USD/mo.',
   ],
   experience: [
     {
-      role: 'Tech Lead / Full-Stack Engineer',
+      role: 'Tech Lead',
       company: 'Blue Medical Guatemala',
       period: 'Apr 2022 → Present (4+ yrs)',
       location: 'Guatemala (Remote)',
       description:
         'Lead developer across payment, e-invoicing, subscription, and AI voice platforms — owns design, delivery, and on-call from greenfield to production. Leads a team of 5 engineers.',
       highlights: [
-        'sofIA — Multi-agent voice system for healthcare scheduling, in production. Primary author of a state-machine workflow on ElevenLabs ConvAI + n8n with deterministic validation, retry, and recovery layers around tool calls. Built the management platform: FastAPI API + Nuxt dashboard + Typer CLI.',
+        'sofIA — Multi-agent voice system for appointment scheduling, in production. Primary author of a state-machine workflow on ElevenLabs ConvAI + n8n with deterministic validation, retry, and recovery layers around tool calls. Built the management platform: FastAPI API + Nuxt dashboard + Typer CLI.',
         'Payment Service — Built from scratch in Laravel. Multi-gateway abstraction (Strategy Pattern) over heterogeneous protocols (ISO 8583, SOAP/XML, REST). VGS card vault for PCI-friendly tokenization (raw PAN never touches the service DB), network tokenization, per-commerce / per-card-token routing, Horizon queues per gateway, Livewire ops dashboard. Led an OWASP-grade security audit and ongoing hardening.',
-        "Invoice Service — Built from scratch in Laravel. Guatemala's FEL e-invoicing through an authorized provider, Strategy Pattern for provider swaps, SAP integration, async pipeline via Redis/Horizon, QR code generation, multi-establishment support, Livewire analytics dashboard.",
-        'BlueMeds — Medication subscription platform: lifecycle, delivery scheduling, insurance authorization, referral codes, Meilisearch catalog search, and 10+ third-party integrations across ERP, CRM, messaging, AI calling, and healthcare middleware.',
-        'BlueMeds Admin Panel — Angular/Ionic admin for the pharmaceutical platform with i18n EN/ES, Capacitor mobile build, Tailwind.',
+        "Invoice Service — Built from scratch in Laravel. Guatemala's FEL e-invoicing through authorized providers, Strategy Pattern for provider swaps, SAP integration, async pipeline via Redis/Horizon, QR code generation, multi-establishment support, Livewire analytics dashboard.",
+        'BlueMeds — Tech lead for a subscription platform: lifecycle, delivery scheduling, referral codes, Meilisearch catalog search, and integrations across ERP, support, messaging and payment systems.',
+        'BlueMeds Admin Panel — Angular/Ionic admin for the platform with i18n EN/ES, Capacitor mobile build, Tailwind.',
       ],
       stack: [
         'Laravel',
@@ -224,7 +224,6 @@ export const CARLOS_GROUNDING: GroundingProfile = {
         'Odoo',
         'SAP',
         'WhatsApp/Botmaker',
-        'Bland AI',
       ],
     },
     {
@@ -267,18 +266,18 @@ export const CARLOS_GROUNDING: GroundingProfile = {
     'Self-hosting tinkering on cativo.dev.',
   ],
   openTo:
-    'Open to Senior Backend, Tech Lead, and Engineering Manager roles — remote-first or with relocation sponsorship.',
+    'Open to Senior Backend, Tech Lead, and Staff roles — remote-first or with relocation sponsorship.',
   fit: {
     positioning:
-      'Senior tech lead and engineer with a backend center of gravity — payments, healthcare platforms, and production AI systems. Full-stack who ships solid frontend (Vue/Nuxt, Angular, even a design system), but goes deepest on backend architecture. Comfortable running real production infrastructure himself (self-hosts his own stack — Docker, Traefik, AWS — and lives in the terminal). Depth in one area is the senior signal, not a gap.',
+      'Senior backend engineer and tech lead — deep experience in payments, healthcare platforms, integrations, and production AI systems, and open to any domain. Full-stack who ships solid frontend (Vue/Nuxt, Angular, even a design system), but goes deepest on backend architecture. Comfortable running real production infrastructure himself (self-hosts his own stack — Docker, Traefik, AWS — and lives in the terminal). Depth in one area is the senior signal, not a gap.',
     boundaries: [
-      "Seniority: he's a fit for senior IC, tech lead, and engineering-manager roles. Junior or mid-level positions would underuse him — he's past that level. A strong senior individual-contributor role with no direct reports is absolutely a fit.",
+      "Seniority: he's a fit for senior IC, tech lead, and staff roles. Junior or mid-level positions would underuse him — he's past that level. A strong senior individual-contributor role with no direct reports is absolutely a fit.",
       'AI: he is an applied engineer — he builds LLM and multi-agent systems in production with deterministic safeguards (sofIA, VittBot, Clarify). He does not train or fine-tune models, do ML research, data science, or MLOps. The research/training end is not his lane; taking models and shipping them reliably is.',
       'Frontend: he is full-stack with a backend center of gravity. He ships solid frontend to deliver a product end to end, but does not position as a dedicated frontend or UI/UX specialist — his senior depth is backend.',
       'Mobile: he ships hybrid mobile with Ionic/Capacitor (and has older C#/Unity history). Native iOS/Android in Swift or Kotlin is not his specialty — hybrid plus a strong backend is the fit; deep native mobile is not.',
       'Location: he is in El Salvador (UTC-6), remote-first, open to relocation with sponsorship. On-site in a far-off timezone with no remote or relocation is not workable; remote or relocation-sponsored is.',
       'Infrastructure: he runs real production infrastructure himself and is comfortable deep in the terminal and on servers (Docker, Traefik, k8s exposure, AWS) — infra in service of shipping product, with strong ops instincts. He is not a dedicated SRE or platform specialist operating at large scale (SLOs, fleet-wide observability, big on-call rotations). Backend with a DevOps streak is the fit; a pure platform-engineering seat at scale is not his target.',
-      'Management: he is open to engineering-manager roles, but he is hands-on. A fully non-coding, pure people-management role is not the fit; an EM or lead role that stays close to the code is.',
+      'Management: he prefers to keep coding. He is not targeting engineering-manager or pure people-management roles; a senior IC, tech lead, or staff role where he leads technically while staying hands-on in the code is the fit.',
       'Scale: his depth is end-to-end product ownership at a startup / scale-up — he has led from greenfield to production and owns systems fully, with real autonomy. The fit is someone who thrives owning the whole stack end to end.',
     ],
     routeToDirect:
