@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.17.4] - 2026-10-20
+
+### Changed
+- **The chat says the same thing as the audited CV.** The grounding now describes the payment service by what was built (~$500K USD/mo) instead of a growth curve, invoicing "through authorized providers", BlueMeds by role (tech lead) and integration areas, sofIA as "appointment scheduling", and drops medication/pharmaceutical wording and an AI-calling vendor. (#156)
+- **One title, Staff instead of Engineering Manager.** Title is "Senior Backend Engineer & Tech Lead" and the Blue Medical role "Tech Lead"; the `fit` block and `openTo` target Senior Backend / Tech Lead / Staff and say plainly he wants to keep coding rather than move into people management. Healthcare stays as one domain among several, and the hiring few-shot no longer frames it as his only lane. (#156)
+
+---
+
 ## [2.17.3] - 2026-10-19
 
 ### Changed
