@@ -99,8 +99,8 @@ export const CARLOS_GROUNDING: GroundingProfile = {
         'sofIA — Multi-agent voice system for appointment scheduling, in production. Primary author of a state-machine workflow on ElevenLabs ConvAI + n8n with deterministic validation, retry, and recovery layers around tool calls. Built the management platform: FastAPI API + Nuxt dashboard + Typer CLI.',
         'Payment Service — Built from scratch in Laravel. Multi-gateway abstraction (Strategy Pattern) over heterogeneous protocols (ISO 8583, SOAP/XML, REST). VGS card vault for PCI-friendly tokenization (raw PAN never touches the service DB), network tokenization, per-commerce / per-card-token routing, Horizon queues per gateway, Livewire ops dashboard. Led an OWASP-grade security audit and ongoing hardening.',
         "Invoice Service — Built from scratch in Laravel. Guatemala's FEL e-invoicing through authorized providers, Strategy Pattern for provider swaps, SAP integration, async pipeline via Redis/Horizon, QR code generation, multi-establishment support, Livewire analytics dashboard.",
-        'BlueMeds — Tech lead for a medication subscription platform: lifecycle, delivery scheduling, referral codes, Meilisearch catalog search, and integrations across ERP, support, messaging and payment systems.',
-        'BlueMeds Admin Panel — Angular/Ionic admin for the pharmaceutical platform with i18n EN/ES, Capacitor mobile build, Tailwind.',
+        'BlueMeds — Tech lead for a subscription platform: lifecycle, delivery scheduling, referral codes, Meilisearch catalog search, and integrations across ERP, support, messaging and payment systems.',
+        'BlueMeds Admin Panel — Angular/Ionic admin for the platform with i18n EN/ES, Capacitor mobile build, Tailwind.',
       ],
       stack: [
         'Laravel',
@@ -224,7 +224,6 @@ export const CARLOS_GROUNDING: GroundingProfile = {
         'Odoo',
         'SAP',
         'WhatsApp/Botmaker',
-        'Bland AI',
       ],
     },
     {
@@ -270,7 +269,7 @@ export const CARLOS_GROUNDING: GroundingProfile = {
     'Open to Senior Backend, Tech Lead, and Staff roles — remote-first or with relocation sponsorship.',
   fit: {
     positioning:
-      'Senior backend engineer and tech lead — deep experience in payments, integrations, and production AI systems, and open to any domain. Full-stack who ships solid frontend (Vue/Nuxt, Angular, even a design system), but goes deepest on backend architecture. Comfortable running real production infrastructure himself (self-hosts his own stack — Docker, Traefik, AWS — and lives in the terminal). Depth in one area is the senior signal, not a gap.',
+      'Senior backend engineer and tech lead — deep experience in payments, healthcare platforms, integrations, and production AI systems, and open to any domain. Full-stack who ships solid frontend (Vue/Nuxt, Angular, even a design system), but goes deepest on backend architecture. Comfortable running real production infrastructure himself (self-hosts his own stack — Docker, Traefik, AWS — and lives in the terminal). Depth in one area is the senior signal, not a gap.',
     boundaries: [
       "Seniority: he's a fit for senior IC, tech lead, and staff roles. Junior or mid-level positions would underuse him — he's past that level. A strong senior individual-contributor role with no direct reports is absolutely a fit.",
       'AI: he is an applied engineer — he builds LLM and multi-agent systems in production with deterministic safeguards (sofIA, VittBot, Clarify). He does not train or fine-tune models, do ML research, data science, or MLOps. The research/training end is not his lane; taking models and shipping them reliably is.',
